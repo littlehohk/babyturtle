@@ -118,6 +118,30 @@ The layout scales to fit an iPhone in portrait or landscape. In landscape orient
 
 支援 iPhone 直向及橫向顯示。橫向時會隱藏次要文字，確保整個水族箱及底部控制區完整顯示。
 
+## Animation and feeding update / 動畫及餵食改良
+
+The current browser version adds five visual and interaction refinements based on the BREST reference images:
+
+1. **Mouth-first feeding:** eating occurs only when the modelled **tip of the mouth** reaches within 0.28 cm of the bloodworm in 3D. Touching the shell, legs, or another body part does not count. The neck/mouth shows a brief feeding motion near the worm.
+2. **Top-view face:** the turtle now has two large eyes and two red cheek/ear patches near its chin, which remain visible as it changes heading.
+3. **Swimming and walking paddles:** four articulated limbs have opposing, phase-offset strokes with extended front flippers and smaller rear kicks, guided by the source swimming and walking pose references.
+4. **Directional side view:** the turtle turns toward the left, right, near camera or far wall using interpolated foreshortening and swimming pitch; these intermediate poses are procedurally inferred where no exact reference frame exists.
+5. **Depth cues:** the turtle appears smaller when diving toward the bottom in top view, and when swimming away toward the far glass in side view. Its physical position and game rules do not change when switching view.
+
+These effects remain **procedural approximations** of the original BREST art rather than exact reproductions of every ESP32 sprite.
+
+## 動畫及餵食更新
+
+現行網頁版根據 BREST 儲存庫內的烏龜參考圖片，作出五項修改：
+
+1. **只有嘴尖接觸紅蟲才可進食：** 必須在立體空間中讓嘴尖距離紅蟲不超過 0.28 厘米，龜殼或四肢碰到紅蟲不會當作已吃下。
+2. **俯視造型：** 頭部有兩隻大眼睛，面頰／下巴附近各有一處紅色斑紋；轉向時仍可看見。
+3. **四肢游泳動畫：** 前肢交替伸展及划水，後肢配合較小幅度的踢水，陸上走動與水中游泳採用不同節奏。
+4. **側視轉向：** 向左、右、靠近或遠離觀看者，以及上浮或下潛時，會調節姿勢與透視比例。沒有原作參考畫面的中間角度，以程序動畫推算。
+5. **深度效果：** 俯視模式中，潛向水底時烏龜會變小；側視模式中，游向遠處玻璃時亦會縮小，令畫面更有立體感。
+
+這些圖像是根據原作風格製作的**程序化近似動畫**，並非逐格直接複製 ESP32 圖像。
+
 ## Deploy with GitHub Pages / GitHub Pages 發佈
 
 1. Open repository **Settings → Pages**.
