@@ -48,20 +48,228 @@ function catchUp(){const now=Date.now();if(now>s.time){advance((now-s.time)/1000
 function reduce(field){s[field]=clamp(s[field]-.1,0,5);save()}
 function restart(){const temp=s.outside;s=fresh();s.outside=temp;s.water=targetWater(temp);worms=[];wander=0;save()}
 function feed(px,py){if(s.dead||s.t.side||px>=18/28*320||py<WT||py>=CT||worms.length>=16)return;const x=clamp(px/320*28,1,17.6),y=clamp((CT-py)/(CT-WT)*17,.5,16.5),angle=s.t.heading;worms.push({x,y,z:10,target:Math.random()<.5?5:0,life:0,notice:(x-s.t.x)*Math.cos(angle)+(y-s.t.y)*Math.sin(angle)<0?3:0})}
-function swim(dt,now){if(s.dead)return;const t=s.t,day=daylight(now),night=!day&&!s.light;for(const w of worms){w.life+=dt;w.z=Math.max(w.target,w.z-.08*dt);w.notice=Math.max(0,w.notice-dt)}worms=worms.filter(w=>w.life<180);if(t.surface||t.sleep||t.recovery>0)return;
-const wantsLand=night&&t.darkSince&&now-t.darkSince>=300000;
-if(wantsLand&&!t.land){target={x:23,y:8.5,z:10}}else if(play>0){play=Math.max(0,play-dt)}else{const candidate=worms.filter(w=>w.notice<=0).sort((a,b)=>Math.hypot(a.x-t.x,a.y-t.y,a.z-t.z)-Math.hypot(b.x-t.x,b.y-t.y,b.z-t.z))[0];if(candidate){target={x:clamp(candidate.x-1.6,1.5,26.5),y:clamp(candidate.y,1.5,15.5),z:clamp(candidate.z-.8,0,9.2)}}else if((wander-=dt)<=0){wander=rand(5,12);rest=Math.random()<.25?rand(2,8):0;const moveLand=t.land?Math.random()<.3:Math.random()<.14;target=moveLand?{x:t.land?rand(2,15):rand(20,26),y:rand(2,15),z:t.land?8.9:10}:{x:t.land?rand(20,26):rand(2,16.5),y:rand(2,15),z:t.land?10:rand(2,9.2)}}}
-if(rest>0){rest-=dt;return}let dx=target.x-t.x,dy=target.y-t.y,dz=target.z-t.z;const heading=Math.atan2(dy,dx),diff=Math.atan2(Math.sin(heading-t.heading),Math.cos(heading-t.heading));t.heading+=clamp(diff,-2.7*dt,2.7*dt);
-const crossing=target.x>=18!==t.land;if(crossing){if(t.land&&t.x<19)t.land=false;if(!t.land&&t.x>19.5){t.land=true;t.z=10}if(t.x>16.5&&t.x<19.5)t.z=9.2+.8*clamp((t.x-16.5)/3,0,1)}
-const dist=Math.hypot(dx,dy,dz);if(dist>.05){const speed=play>0?4.2:t.land?.9:worms.length?2.6:1.6,m=Math.min(1,speed*dt/dist);t.x=clamp(t.x+dx*m,1,26.5);t.y=clamp(t.y+dy*m,1,16);t.z=clamp(t.z+dz*m,0,10)}if(!crossing){t.land=t.x>=19.5&&target.x>=18;if(t.land)t.z=10}
-for(let i=worms.length-1;i>=0;i--){const w=worms[i],reach=Math.hypot(w.x-t.x,w.y-t.y,w.z-t.z);if(w.notice<=0&&!t.land&&reach<2.3){worms.splice(i,1);reduce('h')}}}
+// The rendered nose is 2.2 cm in front of the turtle's model origin.
+const MOUTH_REACH=2.2;
+function mouthPoint(t){
+  return {x:t.x+Math.cos(t.heading)*MOUTH_REACH,
+          y:t.y+Math.sin(t.heading)*MOUTH_REACH,
+          z:t.z+.18};
+}
+function mouthGap(t,w){
+  const m=mouthPoint(t);
+  return Math.hypot(m.x-w.x,m.y-w.y,m.z-w.z);
+}
+function swim(dt,now){
+  if(s.dead||dt<=0)return;
+  const t=s.t,day=daylight(now),night=!day&&!s.light;
+  for(const w of worms){
+    w.life+=dt;
+    w.z=Math.max(w.target,w.z-.08*dt);
+    w.notice=Math.max(0,w.notice-dt);
+  }
+  worms=worms.filter(w=>w.life<180);
+  if(t.surface||t.sleep||t.recovery>0){
+    t.moving=false;t.vz=0;return;
+  }
+  const wantsLand=night&&t.darkSince&&now-t.darkSince>=300000;
+  const candidate=(!wantsLand&&play<=0)?
+    worms.filter(w=>w.notice<=0).sort((a,b)=>
+      Math.hypot(a.x-t.x,a.y-t.y,a.z-t.z)-
+      Math.hypot(b.x-t.x,b.y-t.y,b.z-t.z))[0]:null;
+  let moveGoal=target;
+  if(wantsLand&&!t.land)moveGoal={x:23,y:8.5,z:10};
+  else if(play>0)play=Math.max(0,play-dt);
+  else if(candidate&&!t.land){
+    // Approach the worm from the correct direction: shell overlap is NOT eating.
+    const dx=candidate.x-t.x,dy=candidate.y-t.y,dr=Math.hypot(dx,dy);
+    const ux=dr>.05?dx/dr:Math.cos(t.heading);
+    const uy=dr>.05?dy/dr:Math.sin(t.heading);
+    moveGoal={x:clamp(candidate.x-MOUTH_REACH*ux,1,26.5),
+              y:clamp(candidate.y-MOUTH_REACH*uy,1,16),
+              z:clamp(candidate.z-.18,0,9.2)};
+  }else if(candidate&&t.land){
+    moveGoal={x:16,y:t.y,z:9.2};
+  }else if((wander-=dt)<=0){
+    wander=rand(5,12);rest=Math.random()<.25?rand(2,8):0;
+    const moveLand=t.land?Math.random()<.3:Math.random()<.14;
+    moveGoal=moveLand?
+      {x:t.land?rand(2,15):rand(20,26),y:rand(2,15),z:t.land?8.9:10}:
+      {x:t.land?rand(20,26):rand(2,16.5),y:rand(2,15),z:t.land?10:rand(2,9.2)};
+  }
+  target=moveGoal;
+  if(rest>0&&!candidate&&!wantsLand){rest-=dt;t.moving=false;return;}
+  const dx=moveGoal.x-t.x,dy=moveGoal.y-t.y,dz=moveGoal.z-t.z;
+  const approach= candidate ? Math.atan2(candidate.y-t.y,candidate.x-t.x):Math.atan2(dy,dx);
+  const delta=Math.atan2(Math.sin(approach-t.heading),Math.cos(approach-t.heading));
+  t.heading+=clamp(delta,-2.7*dt,2.7*dt);
+  const crossing=(moveGoal.x>=18)!==t.land;
+  if(crossing){
+    if(t.land&&t.x<19)t.land=false;
+    if(!t.land&&t.x>19.5){t.land=true;t.z=10}
+    if(t.x>16.5&&t.x<19.5)t.z=9.2+.8*clamp((t.x-16.5)/3,0,1);
+  }
+  const distance=Math.hypot(dx,dy,dz);
+  const ox=t.x,oy=t.y,oz=t.z;
+  if(distance>.025){
+    const speed=play>0?4.2:t.land?.9:candidate?2.6:1.6;
+    const factor=Math.min(1,speed*dt/distance);
+    t.x=clamp(t.x+dx*factor,1,26.5);
+    t.y=clamp(t.y+dy*factor,1,16);
+    t.z=clamp(t.z+dz*factor,0,10);
+  }
+  if(!crossing){
+    t.land=t.x>=19.5&&moveGoal.x>=18;
+    if(t.land)t.z=10;
+  }
+  const moved=Math.hypot(t.x-ox,t.y-oy,t.z-oz);
+  t.moving=moved>.004;
+  t.vx=t.moving?(t.x-ox)/dt:0;
+  t.vy=t.moving?(t.y-oy)/dt:0;
+  t.vz=t.moving?(t.z-oz)/dt:0;
+  t.stroke=(t.stroke||0)+(t.moving?dt*(t.land?5:7):dt*.7);
+  t.capture=0;
+  if(candidate&&!t.land){
+    const gap=mouthGap(t,candidate);
+    t.capture=clamp((1-gap)/.75,0,1);
+    // Mouth tip must actually touch the worm in all THREE world dimensions.
+    if(gap<=.28){
+      const index=worms.indexOf(candidate);
+      if(index>=0){worms.splice(index,1);reduce('h');t.capture=1}
+    }
+  }
+}
 function poly(points,color){g.beginPath();g.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)g.lineTo(points[i][0],points[i][1]);g.closePath();g.fillStyle=color;g.fill()}
 function ell(x,y,rx,ry,color,rot=0){g.beginPath();g.ellipse(x,y,Math.max(.1,rx),Math.max(.1,ry),rot,0,Math.PI*2);g.fillStyle=color;g.fill()}
 function txt(t,x,y,size=10,color='#fff',align='left'){g.font=size+'px -apple-system,Arial,sans-serif';g.fillStyle=color;g.textAlign=align;g.fillText(t,x,y);g.textAlign='left'}
 function shellPattern(){g.strokeStyle='#6f7132';g.lineWidth=.8;for(let a=0;a<6;a++){const th=a*Math.PI/3;g.beginPath();g.moveTo(0,0);g.lineTo(Math.cos(th)*9,Math.sin(th)*7);g.stroke()}ell(0,0,5,4,'#678245')}
-function drawTurtle(now){const t=s.t,x=t.x/28*320,y=t.side?CT-t.z/10*143-4:CT-t.y/17*(CT-WT);const moving=!t.sleep&&t.recovery<=0&&!s.dead;g.save();g.translate(x,y);if(t.side){g.scale(Math.cos(t.heading)>=0?1:-1,1);let cycle=moving?Math.sin(now/130):0;for(let n of [-1,1]){ell(-5+n*2,7+cycle*n*3,6,2.4,'#6f9e59',n*.25)}ell(-5,-1,17,9,'#667e3f');ell(-5,-5,15,9,'#557036');ell(-4,0,13,4,'#a6a161');for(let a=-10;a<=10;a+=6){g.strokeStyle='#334e24';g.beginPath();g.moveTo(a-5,-7);g.lineTo(a+2,-1);g.stroke()}poly([[-20,-1],[-28,2],[-21,5]],'#5f9460');ell(10,0,10,9,'#759c52');ell(13,2,7,6,'#829b55');ell(16,-3,3,3,'white');ell(17,-3,1.4,1.4,'#161e14');poly([[9,-3],[12,-4],[13,0],[9,0]],'#d94432');ell(7,-5,2,1.3,'#df3c2d');if(t.sleep){g.strokeStyle='#203624';g.beginPath();g.moveTo(14,-3);g.lineTo(18,-2);g.stroke()}}
-else{g.rotate(t.heading);const legwave=moving?Math.sin(now/125):0;for(let i of [-1,1])for(let j of [-1,1]){g.save();g.translate(i*5,j*10);g.rotate(j*legwave*.23);ell(-2,0,4,9,'#6b9955',j*.4);g.restore()}poly([[-12,0],[-23,-4],[-23,4]],'#639259');ell(1,0,14,11,'#324d20');ell(1,0,12,10,'#70844a');shellPattern();ell(15,0,9,8,'#7a9f58');ell(19,-3,2.4,2.3,'#fff');ell(20,-3,1.1,1.1,'#172019');ell(19,4,2.1,1.3,'#e34e36');ell(17,4,2,1,'#e34e36');if(t.sleep){g.strokeStyle='#243e25';g.beginPath();g.moveTo(17,-3);g.lineTo(21,-2);g.stroke()}}
-g.restore();if(t.sleep)txt('zZ',x+15,y-18,12,'#fff');if(t.recovery>0&&!t.sleep)txt('· ·',x+15,y-18,10,'#d4f8ff')}
+// Procedural anatomy based on BREST reference pose sheets:
+// front flippers alternate sweeping strokes; hind paddles follow with a lag.
+function flipper(x,y,front,side,phase,walking=false){
+  g.save();g.translate(x,y);
+  const swing=(walking?0.48:0.68)*Math.sin(phase+(side<0?0:Math.PI)+(front?0:Math.PI*.75));
+  g.rotate(side*(front?.24:-.30)+swing);
+  g.scale(1,side);
+  const len=front?17:12;
+  g.strokeStyle='#334927';g.lineWidth=1.1;
+  g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(front?7:-7,5,front?2:-6,len-3);
+  g.quadraticCurveTo(front?-3:-11,len+4,front?-8:-9,len-4);
+  g.quadraticCurveTo(-4,4,0,0);g.closePath();g.fillStyle='#79a759';g.fill();g.stroke();
+  g.strokeStyle='#c7d66b';g.lineWidth=1;
+  g.beginPath();g.moveTo(-1,3);g.quadraticCurveTo(front?0:-6,10,front?-2:-8,len-2);g.stroke();
+  for(let i=0;i<3;i++){g.strokeStyle='#34472a';g.lineWidth=.8;g.beginPath();g.moveTo((front?-7:-9)+i*2,len-5);g.lineTo((front?-7:-9)+i*2.5,len+1+(i%2));g.stroke()}
+  g.restore();
+}
+function topFace(sleeping){
+  // The two large eyes are visible at every heading in top projection.
+  ell(15.4,-5,4.2,4.6,'#fff');
+  ell(15.4,5,4.2,4.6,'#fff');
+  ell(16.6,-5,2.5,3.1,'#2d3827');
+  ell(16.6,5,2.5,3.1,'#2d3827');
+  ell(17.4,-6,1.0,1.2,'#fff');
+  ell(17.4,4,1.0,1.2,'#fff');
+  // Red eared-slider patches placed beside the lower head/cheeks.
+  ell(11.5,-7,2.3,2.9,'#ec6343',-.3);
+  ell(11.5,7,2.3,2.9,'#ec6343',.3);
+  if(sleeping){
+    g.strokeStyle='#2c4827';g.lineWidth=1.4;
+    for(const sy of [-5,5]){g.beginPath();g.moveTo(12,sy);g.quadraticCurveTo(15.5,sy-1,19,sy);g.stroke()}
+  }
+}
+function shellTop(){
+  ell(-1,0,14,11,'#293e20');
+  ell(-1,0,12.5,9.7,'#a3ba50');
+  ell(-1,0,11.3,8.7,'#769441');
+  g.save();g.translate(-1,0);
+  g.strokeStyle='#2a512d';g.lineWidth=1.1;
+  g.beginPath();g.ellipse(0,0,11,8.5,0,0,Math.PI*2);g.stroke();
+  for(let k=0;k<6;k++){
+    const a=k*Math.PI/3;g.beginPath();g.moveTo(Math.cos(a)*3,Math.sin(a)*2);
+    g.quadraticCurveTo(Math.cos(a)*8,Math.sin(a)*4,Math.cos(a)*11,Math.sin(a)*8.5);g.stroke();
+    g.strokeStyle='#afc953';g.beginPath();g.arc(Math.cos(a)*6,Math.sin(a)*4,1.8,a,a+2.5);g.stroke();
+  }
+  ell(0,0,5.1,4.1,'#afc959');g.restore();
+}
+function sideFace(sleeping,nearProfile){
+  // Profile eyes/ears when travelling along X, paired eyes when facing camera.
+  if(nearProfile){
+    for(const sy of [-1,1]){
+      ell(19,sy*3.3,3.25,3.7,'#fff');
+      ell(19.8,sy*3.3,2.1,2.4,'#263b2c');
+      ell(20.5,sy*3.3-1,.9,.95,'white');
+      ell(12.7,sy*5,2.1,2.5,'#e75e3f');
+    }
+  }else{
+    ell(18,-4.1,3.7,4.1,'#fff');
+    ell(19,-4.2,2.4,2.6,'#263727');
+    ell(19.7,-5.1,.95,1,'white');
+    ell(12.2,-3.1,2.2,2,'#e95536');
+  }
+  if(sleeping){g.strokeStyle='#294b2c';g.lineWidth=1.4;g.beginPath();g.moveTo(15,-4);g.quadraticCurveTo(19,-2.8,22,-4);g.stroke()}
+}
+function drawTurtle(now){
+  const t=s.t,side=t.side;
+  const x=t.x/28*320, y=side?CT-t.z/10*143-4:CT-t.y/17*(CT-WT);
+  const underwater=!t.land;
+  const depthScale=side?
+     .67+.33*(1-t.y/17): // Side view: far wall appears smaller.
+     (t.land?1:.56+.44*clamp(t.z/9.2,0,1)); // Top view: bottom is smaller.
+  const active=Boolean(t.moving)&&!t.sleep&&!s.dead&&t.recovery<=0;
+  const phase=t.stroke||0,stroke=active?phase:phase*.18;
+  g.save();g.translate(x,y);g.scale(depthScale,depthScale);
+  if(side){
+    const cosine=Math.cos(t.heading),frontness=Math.sin(t.heading);
+    const profile=Math.abs(cosine),faceViewer=frontness<-.18,away=frontness>.18;
+    const facing=cosine>=0?1:-1;
+    // Perspective yaw: interpolate profile -> three-quarter -> front/rear.
+    const foreshorten=.54+.46*profile;
+    g.scale(facing*foreshorten,1);
+    const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.1);
+    g.rotate(-pitch*.65*facing);
+    // Draw rear paddles first and front paddles after the shell.
+    flipper(-10,3,false,-1,stroke);
+    flipper(-11,5,false,1,stroke+.5);
+    if(away&&profile<.5){
+      ell(14,0,8,7,'#78a252');
+      sideFace(t.sleep,true);
+    }
+    ell(1,2,14,6,'#bbb864');
+    ell(0,-3,15,10,'#263d24');
+    ell(0,-4,13.5,9.5,'#8ca748');
+    ell(0,-6,12.5,7.6,'#a3c14d');
+    g.strokeStyle='#426d31';g.lineWidth=.95;
+    for(let u=-9;u<=9;u+=6){g.beginPath();g.moveTo(u,-11);g.quadraticCurveTo(u+4,-6,u+5,-1);g.stroke()}
+    // Swimmer's flippers alternate long, sweeping strokes.
+    flipper(4,3,true,-1,stroke,t.land);
+    flipper(5,5,true,1,stroke+.22,t.land);
+    if(!away||profile>.52){
+      ell(15,-.4,9.5,8,'#83ae60');
+      ell(18,1,7,5.7,'#8eb566');
+      sideFace(t.sleep,profile<.45&&faceViewer);
+      if(t.capture>.25){g.strokeStyle='#263d28';g.lineWidth=1.3;g.beginPath();g.moveTo(20,4);g.quadraticCurveTo(22,6+3*t.capture,24,3);g.stroke()}
+    }
+    poly([[-12,0],[-25,3],[-12,5]],'#78a35c');
+  }else{
+    // Rotate +X to the turtle's heading; face and both red cheek spots
+    // remain paired and symmetric at every angle.
+    g.rotate(t.heading);
+    flipper(-8,-8,false,-1,stroke+.7,t.land);
+    flipper(-8,8,false,1,stroke+.7,t.land);
+    flipper(5,-9,true,-1,stroke,t.land);
+    flipper(5,9,true,1,stroke,t.land);
+    poly([[-11,-2],[-23,0],[-11,3]],'#719c58');
+    ell(16,0,9,8.5,'#7eae58');
+    topFace(t.sleep);
+    shellTop();
+    // Top-view shell does not hide the face, eyes or chin patches.
+    ell(17,0,8.2,7.2,'#81aa5d');
+    topFace(t.sleep);
+    if(t.capture>.25){g.strokeStyle='#2b482a';g.lineWidth=1.1;g.beginPath();g.moveTo(22,-2);g.lineTo(24,0);g.lineTo(22,2);g.stroke()}
+  }
+  g.restore();
+  if(t.sleep)txt('zZ',x+12*depthScale,y-17*depthScale,12*depthScale,'#fff');
+  if(t.recovery>0&&!t.sleep)txt('· ·',x+12*depthScale,y-17*depthScale,10*depthScale,'#d4f8ff');
+}
+
 function drawWorm(w,now){const x=w.x/28*320,y=s.t.side?CT-w.z/10*143:CT-w.y/17*(CT-WT);g.beginPath();for(let i=0;i<15;i++){const u=i/14,xx=x+(u-.5)*11,yy=y+Math.sin(u*Math.PI*2)*Math.cos(now/210+w.x)*3.4;i?g.lineTo(xx,yy):g.moveTo(xx,yy)}g.strokeStyle='#c35e74';g.lineWidth=2.1;g.lineCap='round';g.stroke()}
 function brightness(now){if(s.light)return 1;const e=sunElevation(now);if(e<=-12)return .08;if(e<-.833)return .08+.32*((e+12)/11.167);return .4+.6*Math.sqrt(clamp((e+.833)/35,0,1))}
 function render(now){g.clearRect(0,0,320,240);g.fillStyle='#afe6e9';g.fillRect(0,WT,320,CT-WT);if(s.t.side){g.fillStyle='#9fd5de';g.fillRect(0,WT,320,143);g.fillStyle='#7cb1b9';g.fillRect(0,171,320,49);g.fillStyle='#394945';g.fillRect(0,214,320,6);g.fillStyle=s.thermal===2?'#a84437':'#65432e';g.fillRect(18/28*320,WT,320-18/28*320,9);g.fillStyle='#5b7f88';g.fillRect(18/28*320,WT+10,320-18/28*320,3)}
