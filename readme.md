@@ -118,6 +118,12 @@ The layout scales to fit an iPhone in portrait or landscape. In landscape orient
 
 支援 iPhone 直向及橫向顯示。橫向時會隱藏次要文字，確保整個水族箱及底部控制區完整顯示。
 
+### Revised four-limb attachment and stroke / 四肢連接及划水修訂
+
+All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape, with modest front/rear proportional differences. The roots are drawn beneath the shell, not as narrow joints. In top view, diagonal pairs alternate; the hind kicks lag slightly. In side view, far limbs render behind the body, while near limbs are clipped under the shell rim. Each stroke extends on the power phase and folds back during recovery. The artwork is a procedural interpretation of the supplied BREST swimming references.
+
+四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
+
 ## Animation and feeding update / 動畫及餵食改良
 
 The current browser version adds five visual and interaction refinements based on the BREST reference images:
