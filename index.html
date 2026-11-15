@@ -49,16 +49,64 @@ function reduce(field){s[field]=clamp(s[field]-.1,0,5);save()}
 function restart(){const temp=s.outside;s=fresh();s.outside=temp;s.water=targetWater(temp);worms=[];wander=0;save()}
 function feed(px,py){if(s.dead||s.t.side||px>=18/28*320||py<WT||py>=CT||worms.length>=16)return;const x=clamp(px/320*28,1,17.6),y=clamp((CT-py)/(CT-WT)*17,.5,16.5),angle=s.t.heading;worms.push({x,y,z:10,target:Math.random()<.5?5:0,life:0,notice:(x-s.t.x)*Math.cos(angle)+(y-s.t.y)*Math.sin(angle)<0?3:0})}
 // The rendered nose is 2.2 cm in front of the turtle's model origin.
+
 const MOUTH_REACH=2.2;
+function turtleDrawScale(t){
+  return t.side?(.67+.33*(1-t.y/17)):(t.land?1:.56+.44*clamp(t.z/9.2,0,1));
+}
+// Return the tip of the VISIBLE nose (not a shell-centre or overlap radius)
+// in logical 320x240 canvas pixels. Geometry follows the exact view transforms.
+function visibleMouth(t){
+  const sc=turtleDrawScale(t),cx=t.x/28*320;
+  if(!t.side){
+    const cy=CT-t.y/17*(CT-WT);
+    // The top-view canvas has downward-positive Y; world Y is upward-positive.
+    return {x:cx+25*sc*Math.cos(t.heading),
+            y:cy-25*sc*Math.sin(t.heading)};
+  }
+  const cy=CT-t.z/10*143-4,c=Math.cos(t.heading),facing=c>=0?1:-1;
+  const projectedWidth=.16+.84*Math.abs(c);
+  const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.1);
+  const angle=-pitch*.65*facing;
+  return {x:cx+sc*facing*projectedWidth*(25*Math.cos(angle)-3*Math.sin(angle)),
+          y:cy+sc*(25*Math.sin(angle)+3*Math.cos(angle))};
+}
 function mouthPoint(t){
-  return {x:t.x+Math.cos(t.heading)*MOUTH_REACH,
-          y:t.y+Math.sin(t.heading)*MOUTH_REACH,
-          z:t.z+.18};
+  const pixel=visibleMouth(t);
+  // Convert the rendered tip back into world coordinates; perspective size
+  // changes therefore cannot make the torso accidentally count as the mouth.
+  return t.side?
+    {x:pixel.x*28/320,
+     y:t.y+Math.sin(t.heading)*MOUTH_REACH*turtleDrawScale(t),
+     z:(CT-pixel.y)*10/143}:
+    {x:pixel.x*28/320,
+     y:(CT-pixel.y)*17/(CT-WT),
+     z:t.z+.18};
 }
-function mouthGap(t,w){
-  const m=mouthPoint(t);
-  return Math.hypot(m.x-w.x,m.y-w.y,m.z-w.z);
+function pointSegmentGap(px,py,ax,ay,bx,by){
+  const dx=bx-ax,dy=by-ay,l2=dx*dx+dy*dy;
+  const u=l2?clamp(((px-ax)*dx+(py-ay)*dy)/l2,0,1):0;
+  return Math.hypot(px-(ax+dx*u),py-(ay+dy*u));
 }
+// Contact must pass BOTH a real 3D tip-to-worm test and a 2D test
+// against the actual animated worm stroke visible to the player.
+function mouthContact(t,w,phase){
+  const m=mouthPoint(t),px=visibleMouth(t);
+  const halfLength=5.5*28/320;
+  const xOnWorm=w.x+clamp(m.x-w.x,-halfLength,halfLength);
+  const world=Math.hypot(m.x-xOnWorm,m.y-w.y,m.z-w.z);
+  const cx=w.x/28*320;
+  const cy=t.side?CT-w.z/10*143:CT-w.y/17*(CT-WT);
+  const bend=Math.cos(phase/210+w.x);
+  let screen=Infinity,prevX=0,prevY=0;
+  for(let i=0;i<=16;i++){
+    const u=i/16,x=cx+(u-.5)*11,y=cy+Math.sin(u*Math.PI*2)*bend*3.4;
+    if(i)screen=Math.min(screen,pointSegmentGap(px.x,px.y,prevX,prevY,x,y));
+    prevX=x;prevY=y;
+  }
+  return {world,screen};
+}
+
 function swim(dt,now){
   if(s.dead||dt<=0)return;
   const t=s.t,day=daylight(now),night=!day&&!s.light;
@@ -84,8 +132,9 @@ function swim(dt,now){
     const dx=candidate.x-t.x,dy=candidate.y-t.y,dr=Math.hypot(dx,dy);
     const ux=dr>.05?dx/dr:Math.cos(t.heading);
     const uy=dr>.05?dy/dr:Math.sin(t.heading);
-    moveGoal={x:clamp(candidate.x-MOUTH_REACH*ux,1,26.5),
-              y:clamp(candidate.y-MOUTH_REACH*uy,1,16),
+    const reach=MOUTH_REACH*turtleDrawScale(t);
+    moveGoal={x:clamp(candidate.x-reach*ux,1,26.5),
+              y:clamp(candidate.y-reach*uy,1,16),
               z:clamp(candidate.z-.18,0,9.2)};
   }else if(candidate&&t.land){
     moveGoal={x:16,y:t.y,z:9.2};
@@ -129,10 +178,11 @@ function swim(dt,now){
   t.stroke=(t.stroke||0)+(t.moving?dt*(t.land?5:7):dt*.7);
   t.capture=0;
   if(candidate&&!t.land){
-    const gap=mouthGap(t,candidate);
-    t.capture=clamp((1-gap)/.75,0,1);
-    // Mouth tip must actually touch the worm in all THREE world dimensions.
-    if(gap<=.28){
+    const gap=mouthContact(t,candidate,performance.now());
+    t.capture=gap.world<.75?clamp((5-gap.screen)/4,0,1):0;
+    // Only the VISIBLE mouth tip touching the worm can trigger eating.
+    // No torso, limb, or shell collision is used.
+    if(gap.world<=.23&&gap.screen<=2.4){
       const index=worms.indexOf(candidate);
       if(index>=0){worms.splice(index,1);reduce('h');t.capture=1}
     }
@@ -150,6 +200,9 @@ function shellPattern(){g.strokeStyle='#6f7132';g.lineWidth=.8;for(let a=0;a<6;a
 function flipper(x,y,front,side,phase,walking=false,projection='top'){
   g.save();
   g.translate(x,y);
+  // Half the previous linear dimensions: approximately one-quarter
+  // of the previous visible limb area. The origin stays under the shell.
+  g.scale(.5,.5);
   const swim=!walking,cycle=Math.sin(phase),lift=Math.cos(phase);
   const power=(cycle+1)*.5;
   const length=front?17.5:15.3;
@@ -242,9 +295,7 @@ function drawTurtle(now){
   const t=s.t,side=t.side;
   const x=t.x/28*320, y=side?CT-t.z/10*143-4:CT-t.y/17*(CT-WT);
   const underwater=!t.land;
-  const depthScale=side?
-     .67+.33*(1-t.y/17): // Side view: far wall appears smaller.
-     (t.land?1:.56+.44*clamp(t.z/9.2,0,1)); // Top view: bottom is smaller.
+  const depthScale=turtleDrawScale(t); // Same scale as the mouth contact geometry.
   const active=Boolean(t.moving)&&!t.sleep&&!s.dead&&t.recovery<=0;
   const phase=t.stroke||0,stroke=active?phase:phase*.18;
   g.save();g.translate(x,y);g.scale(depthScale,depthScale);
@@ -253,7 +304,7 @@ function drawTurtle(now){
     const profile=Math.abs(cosine),faceViewer=frontness<-.18,away=frontness>.18;
     const facing=cosine>=0?1:-1;
     // Perspective yaw: interpolate profile -> three-quarter -> front/rear.
-    const foreshorten=.54+.46*profile;
+    const foreshorten=.16+.84*profile;
     g.scale(facing*foreshorten,1);
     const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.1);
     g.rotate(-pitch*.65*facing);
@@ -291,7 +342,7 @@ function drawTurtle(now){
   }else{
     // Rotate +X to the turtle's heading; face and both red cheek spots
     // remain paired and symmetric at every angle.
-    g.rotate(t.heading);
+    g.rotate(-t.heading); // Correct world Y-up -> canvas Y-down projection.
     // Diagonal alternating paddling, as in the top-view reference.
     // FL and RR drive together; FR and RL drive half a cycle later.
     // Rear kick is slightly delayed and smaller than front sweep.
