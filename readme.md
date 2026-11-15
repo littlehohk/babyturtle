@@ -118,6 +118,16 @@ The layout scales to fit an iPhone in portrait or landscape. In landscape orient
 
 支援 iPhone 直向及橫向顯示。橫向時會隱藏次要文字，確保整個水族箱及底部控制區完整顯示。
 
+### Smaller limbs and strict visible-mouth feeding / 四肢縮小及嚴格嘴尖接觸判定
+
+The four limbs now render at **50% of their previous linear dimensions**, equivalent to **approximately 25% of their former visible area**. Their bases remain embedded beneath the shell, and the alternating front/rear swimming motion is retained.
+
+Feeding now requires the rendered mouth tip to meet the animated bloodworm itself: the browser checks both 3D mouth-to-worm proximity and pixel-level contact with the worm's curved body. A worm touching the turtle's shell, chest, or limbs does not count as eaten. The top-view heading was also corrected so the rendered mouth points in the same direction as the turtle's movement and collision calculations.
+
+四肢現縮至先前的**一半長度與寬度**，顯示面積約為原來的**四分之一**。四肢根部仍藏於龜殼之下，並保留前後肢交替划水的動作。
+
+餵食判定須同時符合立體空間中的嘴尖接近，以及畫面中**實際顯示的嘴尖碰到紅蟲身體**；龜殼、胸部或四肢碰到紅蟲不會算作進食。俯視模式的朝向亦已修正，使畫面中的嘴尖與烏龜的行進及碰撞方向一致。
+
 ### Revised four-limb attachment and stroke / 四肢連接及划水修訂
 
 All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape, with modest front/rear proportional differences. The roots are drawn beneath the shell, not as narrow joints. In top view, diagonal pairs alternate; the hind kicks lag slightly. In side view, far limbs render behind the body, while near limbs are clipped under the shell rim. Each stroke extends on the power phase and folds back during recovery. The artwork is a procedural interpretation of the supplied BREST swimming references.
