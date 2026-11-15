@@ -252,6 +252,48 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
   // Keep the compact limb dimensions established in the previous revision.
   g.scale(.5,.5);
   const cycle=Math.sin(phase),power=(cycle+1)*.5;
+  if(projection==='side'&&!walking){
+    // Side-view swimming: paddles sweep LEFT / RIGHT across the screen,
+    // never hang down like the Z-jointed legs used on land.
+    // Physical 1+3 / 2+4 timing arrives through the caller's gaitPhase().
+    const yaw=clamp(Math.abs(cameraFacing),0,1);
+    const viewSide=Math.sqrt(Math.max(0,1-yaw*yaw));
+    const forward=cameraFacing>=0?1:-1;
+    const limbAxis=(front?1:-1)*cameraFacing-
+      (side<0?-.28:.28)*viewSide;
+    const outward=limbAxis>=0?1:-1;
+    const reach=(front?14.5:12.8)*(.64+.36*yaw);
+    const dx=outward*Math.max(5.8,reach+outward*forward*cycle*4.0);
+    const height=(side<0?-1.6:1.6)+Math.cos(phase)*1.15;
+    // Mirror a common broad, flattened paddle towards the projected tip.
+    g.scale(Math.sign(dx)||1,1);
+    const length=Math.abs(dx);
+    const endY=height;
+    ell(0,0,4.8,3.6,'#587e3e');
+    g.beginPath();
+    g.moveTo(-3.2,-2.8);
+    g.bezierCurveTo(2,-3.4,length*.65,endY-3.3,length-2.1,endY-3.5);
+    g.quadraticCurveTo(length+2.3,endY-3.2,length+3.2,endY-.5);
+    g.lineTo(length+3.1,endY+1.4);
+    g.quadraticCurveTo(length+.8,endY+4.1,length-2.3,endY+3.0);
+    g.bezierCurveTo(length*.48,endY+3.1,1,3.8,-3.2,2.8);
+    g.closePath();
+    g.fillStyle='#7ba957';g.fill();
+    g.strokeStyle='#304b25';g.lineWidth=1.25;g.stroke();
+    g.beginPath();g.moveTo(-1.8,-.7);
+    g.bezierCurveTo(length*.28,-1.8,length*.66,endY-.8,length+1.5,endY-.7);
+    g.strokeStyle='#c6da76';g.lineWidth=1.4;g.stroke();
+    g.beginPath();g.moveTo(-2,1.4);
+    g.bezierCurveTo(length*.3,2,length*.6,endY+1.8,length+.7,endY+1.35);
+    g.strokeStyle='#426f38';g.lineWidth=.9;g.stroke();
+    for(let j=-1;j<=1;j++){
+      g.beginPath();g.moveTo(length+2,endY+j*1.6);
+      g.lineTo(length+4.7+(j===0?.9:0),endY+j*2);
+      g.strokeStyle='#344b2d';g.lineWidth=1.05;g.stroke();
+    }
+    g.restore();
+    return;
+  }
   const amp=walking?.24:(front?.67:.54);
   // Forward always means towards the head (+local X). In top view the
   // near/far sides are reflected, so their *rotation* must also reverse.
@@ -474,7 +516,10 @@ function drawSideTurtle3D(t,stroke){
     ell(-r*.49,4.5,2.0,1.1,'#719d4e');
     ell(r*.46,4.5,2.0,1.1,'#719d4e');
   }else{
-    g.save();g.beginPath();g.rect(-r-9,4.8,2*r+18,36);g.clip();
+    // Swimming paddles occupy a narrow horizontal band beside the shell.
+    // Show them, while still concealing their roots under the lower rim.
+    g.save();g.beginPath();
+    g.rect(-r-9,t.land?4.8:3.6,2*r+18,36);g.clip();
     flipper(legX(false,nearSide),4,false,nearSide,stroke+gaitPhase(false,nearSide),t.land,'side',p.c);
     flipper(legX(true,nearSide),3.9,true,nearSide,stroke+gaitPhase(true,nearSide),t.land,'side',p.c);
     g.restore();
