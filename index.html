@@ -20,7 +20,7 @@
 const $=id=>document.getElementById(id),cv=$('tank'),g=cv.getContext('2d'),W=320,H=240,WT=28,CT=220,LAND=22.4,FW=28,FD=17,FZ=9.2,SEC_DAY=86400;
 g.scale(3,3);
 const I={
-title:['Baby Red-eared Slider','紅耳龜寶寶'],subtitle:['BREST · virtual turtle aquarium','BREST · 虛擬烏龜水族箱'],settings:['Settings','設定'],settingsTitle:['Turtle settings','烏龜設定'],cityTab:['City & weather','城市及天氣'],cityIntro:["Changing your city preserves the turtle's age, health and care history.",'更改城市不會重設烏龜的年齡、健康及飼養記錄。'],findCity:['Find a city','搜尋城市'],search:['Search','搜尋'],temperatureFallback:['Manual outside temperature','手動設定戶外氣溫'],fallbackNote:['Use this if online weather is unavailable. Water temperature still changes naturally.','無法取得即時天氣時可手動設定戶外氣溫，水溫仍會正常變化。'],outside:['Outside temperature (°C)','戶外氣溫（°C）'],apply:['Apply temperature','套用氣溫'],ageTitle:['Turtle statistics','烏龜資料'],storageNote:['Progress is stored in this browser. Private browsing or clearing website data can erase it. English and Chinese share the same save.','進度儲存在此瀏覽器；私密瀏覽或清除網站資料可能令存檔消失。中英文使用同一存檔。'],careHeading:['How to care for your turtle','如何照顧烏龜'],ruleFeed:['Tap open water in Top view to place a bloodworm. Each worm eaten reduces Hunger by 0.1. Worms sink to mid-water or the bottom and disappear after three minutes.','在俯視模式輕觸水面投放紅蟲。每吃下一條，飢餓指數下降 0.1。紅蟲會沉至半水深或底部，三分鐘後消失。'],rulePlay:['Swipe to play or switch the Light. Each action reduces Boredom by 0.1.','滑動與烏龜玩耍，或開關燈光；每次令無聊指數下降 0.1。'],ruleView:['Top and Side show the same 3D tank. The brown platform occupies the right side, with water beneath it. The turtle can swim, dive and climb onto land.','俯視及側視顯示同一立體水族箱。右側棕色平台下仍有水；烏龜可以游泳、潛水及爬上陸地。'],ruleSleep:['Sleep happens automatically: three possible 15-minute daytime naps and night sleep after sunset and five minutes of darkness. Hold the tank for two seconds to request sleep/wake.','烏龜會自動睡覺：白天最多三次、每次十五分鐘的小睡；日落後持續關燈五分鐘，會準備夜眠。長按水族箱兩秒可要求睡覺或喚醒。'],ruleBreath:['Awake dives are limited to 20 minutes, sleeping dives to three hours. Surfacing and breathing recovery are automatic.','清醒潛水最多二十分鐘，睡眠潛水最多三小時，會自動上浮呼吸及恢復。'],ruleCare:['Health begins at 10. Hunger and Boredom outside 1–4 each cost 0.1 Health per hour; water outside 14–28°C costs 0.2 per hour. Good daytime care can restore 0.05 per hour (maximum 0.5 per day). At the end of a complete local day, sleeping longer than daylight adds 0.1 Health; otherwise deduct 0.3. Death occurs at Health 0 or Hunger 5 for more than one continuous hour.','健康初始為 10。飢餓及無聊指數低於 1 或高於 4，各每小時扣 0.1 健康；水溫低於 14°C 或高於 28°C，每小時扣 0.2。白天照顧良好每小時可回復 0.05（每日最多 0.5）。每個完整本地日結算時，睡眠比日照時間長則加 0.1，否則扣 0.3。健康降至零，或飢餓維持在 5 超過一小時，便會死亡。'],ruleThermal:['AirCon cools 1°C per 30 minutes, Heater warms 1.5°C per 30 minutes. With both off, water moves toward its natural target by 0.2°C every five minutes.','冷氣每三十分鐘降低 1°C，暖水器每三十分鐘提高 1.5°C。兩者關閉時，水溫每五分鐘以 0.2°C 的速度趨近自然目標。'],ruleNew:['After death, hold the bottom strip for two seconds to start a new turtle.','死亡後按住底部控制區兩秒即可養新龜。'],notAdvice:['These are fictional game rules, not actual turtle-care recommendations.','以上為虛構遊戲規則，並非真實烏龜飼養建議。'],done:['Done — back to aquarium','完成 — 返回水族箱'],how:['How to play','玩法說明'],weather:['Refresh weather','更新天氣'],fullscreen:['Full screen','全螢幕'],hint:['Tap the water in Top view to feed bloodworms · Swipe to play · Hold the tank for two seconds to sleep or wake · Top/Side and temperature controls are in the bottom strip.','俯視模式輕觸水面餵紅蟲 · 滑動玩耍 · 長按兩秒要求睡覺或喚醒 · 底部設有俯視、側視及溫度控制。'],top:['Top','俯視'],side:['Side','側視'],cool:['AirCon','冷氣'],heat:['Heater','暖水'],light:['Light','燈光'],on:['ON','開'],off:['OFF','關'],hunger:['Hunger','飢餓'],boredom:['Boredom','無聊'],health:['Health','健康'],water:['Water','水溫'],new:['HOLD 2s: NEW TURTLE','按住兩秒：養新龜'],deadHealth:['Health reached 0.0','健康降至 0.0'],deadHunger:['Died of Hunger','死於飢餓'],age:['Age','年齡'],sleep:['Sleeping','睡眠中'],breath:['Breathing','呼吸恢復中'],stale:['Offline weather — cached value','離線天氣 — 沿用上次數值'],saved:['Saved on this device','已儲存於此裝置'],cannotSave:['Saving is unavailable','無法儲存'],searching:['Searching…','搜尋中……'],noCity:['No matching cities','找不到相符城市'],cityError:['City search unavailable','無法搜尋城市'],weatherError:['Weather unavailable — keeping previous temperature','無法取得天氣 — 沿用現有氣溫'],weatherOK:['Weather updated','天氣已更新'],manualOK:['Manual temperature set','已設定氣溫'],invalid:['Enter a temperature between -90 and 60°C','請輸入 -90 至 60°C 的氣溫'],choose:['Choose a city','請選擇城市'],current:['Current city','目前城市'],newLife:['New turtle','新龜'],day:['Day','日']};
+title:['Baby Red-eared Slider','紅耳龜寶寶'],subtitle:['BREST · virtual turtle aquarium','BREST · 虛擬烏龜水族箱'],settings:['Settings','設定'],settingsTitle:['Turtle settings','烏龜設定'],cityTab:['City & weather','城市及天氣'],cityIntro:["Changing your city preserves the turtle's age, health and care history.",'更改城市不會重設烏龜的年齡、健康及飼養記錄。'],findCity:['Find a city','搜尋城市'],search:['Search','搜尋'],temperatureFallback:['Manual outside temperature','手動設定戶外氣溫'],fallbackNote:['Use this if online weather is unavailable. Water temperature still changes naturally.','無法取得即時天氣時可手動設定戶外氣溫，水溫仍會正常變化。'],outside:['Outside temperature (°C)','戶外氣溫（°C）'],apply:['Apply temperature','套用氣溫'],ageTitle:['Turtle statistics','烏龜資料'],storageNote:['Progress is stored in this browser. Private browsing or clearing website data can erase it. English and Chinese share the same save.','進度儲存在此瀏覽器；私密瀏覽或清除網站資料可能令存檔消失。中英文使用同一存檔。'],careHeading:['How to care for your turtle','如何照顧烏龜'],ruleFeed:['Tap open water in Top view to place a bloodworm. Each worm eaten reduces Hunger by 0.1. Worms sink to mid-water or the bottom and disappear after three minutes.','在俯視模式輕觸水面投放紅蟲。每吃下一條，飢餓指數下降 0.1。紅蟲會沉至半水深或底部，三分鐘後消失。'],rulePlay:['Swipe to play or switch the Light. Each action reduces Boredom by 0.1.','滑動與烏龜玩耍，或開關燈光；每次令無聊指數下降 0.1。'],ruleView:['Top and Side show the same 3D tank. The brown platform occupies the right side, with water beneath it. The turtle can swim, dive and climb onto land.','俯視及側視顯示同一立體水族箱。右側棕色平台下仍有水；烏龜可以游泳、潛水及爬上陸地。'],ruleSleep:['Sleep happens automatically: three possible 15-minute daytime naps and night sleep after sunset and five minutes of darkness. Hold the tank for two seconds to request sleep/wake.','烏龜會自動睡覺：白天最多三次、每次十五分鐘的小睡；日落後持續關燈五分鐘，會準備夜眠。長按水族箱兩秒可要求睡覺或喚醒。'],ruleBreath:['Awake dives are limited to 20 minutes, sleeping dives to three hours. Surfacing and breathing recovery are automatic.','清醒潛水最多二十分鐘，睡眠潛水最多三小時，會自動上浮呼吸及恢復。'],ruleCare:['Health begins at 10. Hunger and Boredom outside 1–4 each cost 0.1 Health per hour; water outside 14–28°C costs 0.2 per hour. Good daytime care can restore 0.05 per hour (maximum 0.5 per day). At the end of a complete local day, sleeping longer than daylight adds 0.1 Health; otherwise deduct 0.3. Death occurs at Health 0 or Hunger 5 for more than one continuous hour.','健康初始為 10。飢餓及無聊指數低於 1 或高於 4，各每小時扣 0.1 健康；水溫低於 14°C 或高於 28°C，每小時扣 0.2。白天照顧良好每小時可回復 0.05（每日最多 0.5）。每個完整本地日結算時，睡眠比日照時間長則加 0.1，否則扣 0.3。健康降至零，或飢餓維持在 5 超過一小時，便會死亡。'],ruleThermal:['AirCon cools 1°C per 30 minutes, Heater warms 1.5°C per 30 minutes. With both off, water moves toward its natural target by 0.2°C every five minutes.','冷氣每三十分鐘降低 1°C，暖水器每三十分鐘提高 1.5°C。兩者關閉時，水溫每五分鐘以 0.2°C 的速度趨近自然目標。'],ruleNew:['After death, hold the bottom strip for two seconds to start a new turtle.','死亡後按住底部控制區兩秒即可養新龜。'],notAdvice:['These are fictional game rules, not actual turtle-care recommendations.','以上為虛構遊戲規則，並非真實烏龜飼養建議。'],done:['Done — back to aquarium','完成 — 返回水族箱'],how:['How to play','玩法說明'],weather:['Refresh weather','更新天氣'],fullscreen:['Full screen','全螢幕'],hint:['Tap the water in Top view to feed bloodworms · Swipe to play · Hold the tank for two seconds to sleep or wake · Top/Side and temperature controls are in the bottom strip.','俯視模式輕觸水面餵紅蟲 · 滑動玩耍 · 長按兩秒要求睡覺或喚醒 · 底部設有俯視、側視及溫度控制。'],top:['Top','俯視'],side:['Side','側視'],cool:['AirCon','冷氣'],heat:['Heater','暖水'],light:['Light','燈光'],on:['ON','開'],off:['OFF','關'],hunger:['Hunger','飢餓'],boredom:['Boredom','無聊'],health:['Health','健康'],water:['Water','水溫'],new:['HOLD 2s: NEW TURTLE','按住兩秒：養新龜'],deadHealth:['Health reached 0.0','健康降至 0.0'],deadHunger:['Died of Hunger','死於飢餓'],age:['Age','年齡'],sleep:['Sleeping','睡眠中'],breath:['Breathing','呼吸恢復中'],surfacing:['Surfacing for air','正在上浮換氣'],resting:['Resting','正在休息'],stale:['Offline weather — cached value','離線天氣 — 沿用上次數值'],saved:['Saved on this device','已儲存於此裝置'],cannotSave:['Saving is unavailable','無法儲存'],searching:['Searching…','搜尋中……'],noCity:['No matching cities','找不到相符城市'],cityError:['City search unavailable','無法搜尋城市'],weatherError:['Weather unavailable — keeping previous temperature','無法取得天氣 — 沿用現有氣溫'],weatherOK:['Weather updated','天氣已更新'],manualOK:['Manual temperature set','已設定氣溫'],invalid:['Enter a temperature between -90 and 60°C','請輸入 -90 至 60°C 的氣溫'],choose:['Choose a city','請選擇城市'],current:['Current city','目前城市'],newLife:['New turtle','新龜'],day:['Day','日']};
 let lang='en';try{lang=localStorage.getItem('brest-web-lang')==='zh'?'zh':'en'}catch(e){}
 const tr=k=>(I[k]||[k,k])[lang==='zh'?1:0],clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
 let loc={name:'Sha Tin, Hong Kong',lat:22.38,lon:114.19,timezone:'Asia/Hong_Kong'};
@@ -132,11 +132,25 @@ function swim(dt,now){
     w.notice=Math.max(0,w.notice-dt);
   }
   worms=worms.filter(w=>w.life<180);
-  if(t.surface||t.sleep||t.recovery>0){
-    // An underwater sleeper settles completely onto the aquarium floor.
-    // On land, remain on the basking platform. No paddling while asleep.
-    if(t.sleep&&!t.land&&!t.surface)t.z=0;
+  if(t.sleep){
+    // Genuine sleep is stationary; keep the folded sleeping pose.
+    if(!t.land&&!t.surface)t.z=0;
     t.moving=false;t.vx=0;t.vy=0;t.vz=0;return;
+  }
+  if(t.surface){
+    // The original code suspended every swimming stroke while surfacing.
+    // A conscious turtle must keep paddling during its ascent.
+    t.moving=true;t.vx=0;t.vy=0;t.vz=2.3;
+    t.stroke=(t.stroke||0)+dt*4.0;
+    return;
+  }
+  if(t.recovery>0){
+    // Breathing recovery can last 5–15 real minutes after long dives.
+    // Remain at the surface, but keep slow visible limb/head motion.
+    t.moving=false;t.vx=0;t.vy=0;t.vz=0;
+    t.stroke=(t.stroke||0)+dt*.38;
+    if(play>0)play=Math.max(0,play-dt);
+    return;
   }
   const wantsLand=night&&t.darkSince&&now-t.darkSince>=300000;
   const candidate=(!wantsLand&&play<=0)?
@@ -165,7 +179,16 @@ function swim(dt,now){
       {x:t.land?rand(LAND+1.6,26.1):rand(2,LAND-2),y:rand(2,15),z:t.land?10:rand(2,9.2)};
   }
   target=moveGoal;
-  if(rest>0&&!candidate&&!wantsLand){rest-=dt;t.moving=false;return;}
+  if(rest>0&&!candidate&&!wantsLand){
+    rest=Math.max(0,rest-dt);
+    t.moving=false;t.vx=0;t.vy=0;t.vz=0;
+    return;
+  }
+  // Do not wait out an entire roaming timer after reaching a destination.
+  // This was causing several seconds of apparently frozen side-view motion.
+  if(!candidate&&!wantsLand&&play<=0&&
+     Math.hypot(moveGoal.x-t.x,moveGoal.y-t.y,moveGoal.z-t.z)<.16)
+    wander=0;
   const dx=moveGoal.x-t.x,dy=moveGoal.y-t.y,dz=moveGoal.z-t.z;
   const approach= candidate ? Math.atan2(candidate.y-t.y,candidate.x-t.x):Math.atan2(dy,dx);
   const delta=Math.atan2(Math.sin(approach-t.heading),Math.cos(approach-t.heading));
@@ -528,9 +551,20 @@ function drawTurtle(now){
   const underwater=!t.land;
   const depthScale=turtleDrawScale(t); // Same scale as the mouth contact geometry.
   const active=Boolean(t.moving)&&!t.sleep&&!s.dead&&t.recovery<=0;
-  const phase=t.stroke||0,stroke=active?phase:phase*.18;
+  const phase=t.stroke||0;
+  // Gently animate an awake turtle even while it is resting or breathing.
+  // Sleep remains fully motionless.
+  const idleBreath=!t.sleep&&!s.dead&&!active?Math.sin(now/720)*.18:0;
+  const stroke=active?phase:phase*.18+idleBreath;
   g.save();g.translate(x,y);g.scale(depthScale,depthScale);
   if(side){
+    // A small buoyant movement and slow breathing animation prevent
+    // recovered/idle turtles from looking like a frozen 2D image.
+    // No bobbing on land, and sleeping animals remain still.
+    if(!t.land&&!t.sleep&&!s.dead){
+      const buoyancy=t.recovery>0?.75:(active?.28:.42);
+      g.translate(0,Math.sin(now/(t.recovery>0?520:760))*buoyancy);
+    }
     drawSideTurtle3D(t,stroke);
   }else{
     // Rotate +X to the turtle's heading; face and both red cheek spots
@@ -568,6 +602,22 @@ function drawTurtle(now){
   g.restore();
   if(t.sleep)txt('zZ',x+12*depthScale,y-17*depthScale,12*depthScale,'#fff');
   if(t.recovery>0&&!t.sleep)txt('· ·',x+12*depthScale,y-17*depthScale,10*depthScale,'#d4f8ff');
+  if(side&&!s.dead){
+    // Explain intentional immobility, with a visible countdown during
+    // prolonged recovery; the labels are localized in both languages.
+    const status=t.sleep?tr('sleep'):
+      t.surface?tr('surfacing'):
+      t.recovery>0?tr('breath')+' '+Math.ceil(t.recovery/60)+'m':
+      !t.moving&&rest>.05?tr('resting'):'';
+    if(status){
+      g.save();g.font='9px -apple-system,sans-serif';
+      const w=Math.min(192,Math.max(62,g.measureText(status).width+12));
+      g.fillStyle='rgba(6,30,38,.78)';
+      g.fillRect(5,33,w,16);
+      txt(status,11,44,9,'#effff9');
+      g.restore();
+    }
+  }
 }
 
 function drawWorm(w,now){const x=w.x/28*320,y=s.t.side?CT-w.z/10*143:CT-w.y/17*(CT-WT);g.beginPath();for(let i=0;i<15;i++){const u=i/14,xx=x+(u-.5)*11,yy=y+Math.sin(u*Math.PI*2)*Math.cos(now/210+w.x)*3.4;i?g.lineTo(xx,yy):g.moveTo(xx,yy)}g.strokeStyle='#c35e74';g.lineWidth=2.1;g.lineCap='round';g.stroke()}
