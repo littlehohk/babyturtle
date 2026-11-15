@@ -10,7 +10,7 @@ An iPhone-friendly, bilingual (English / 繁體中文) browser adaptation of the
 
 ### Tank and controls
 
-The original BREST world is **28 × 17 × 10 cm**. The right-hand land platform begins at X = 18 cm and is level with the water surface; water continues underneath it. The turtle is approximately 3 cm long in the game.
+The browser game uses a **28 × 17 × 10 cm** world. Its right-hand land platform now begins at **X = 22.4 cm**, occupying **20% of the tank width**, in both Top and Side views (the original ESP32 project used X = 18 cm). The platform is at the water surface; **water remains beneath it**. The turtle is approximately 3 cm long in the game.
 
 - **Top / Side** (bottom-left controls) show two projections of the same 3D space; switching view does not move the turtle.
 - **Tap the water in Top view** to release a bloodworm at the surface. Worms sink at **0.08 cm/second** toward a randomly chosen mid-water level (5 cm) or bottom (0 cm). They disappear after 180 seconds if not eaten. The turtle pursues them and eats within reach; each eaten worm reduces hunger by 0.1.
@@ -71,7 +71,7 @@ The layout scales to fit an iPhone in portrait or landscape. In landscape orient
 
 本遊戲改編自 ESP32 **BREST 紅耳龜寶寶**水族箱，適合在 iPhone 的 Brave、Safari，以及電腦瀏覽器遊玩。頂部的 **繁體中文 / English** 按鈕可隨時切換語言，不會重新載入遊戲或重設烏龜。
 
-原作水族箱大小為 **28 × 17 × 10 厘米**。右側由 X = 18 厘米起設有與水面齊平的陸地平台，**平台下方仍有水**。遊戲中的龜寶寶身長約 3 厘米。
+網頁版水族箱大小為 **28 × 17 × 10 厘米**，陸地平台現由 **X = 22.4 厘米**開始，在俯視及側視模式均只佔水族箱**右側約五分之一的寬度**（原 ESP32 版本由 X = 18 厘米起）。平台與水面齊平，**平台下方仍有水**。遊戲中的龜寶寶身長約 3 厘米。
 
 - **俯視 / 側視：** 查看同一立體水族箱的不同角度。切換視角不會改變烏龜位置。
 - **俯視模式輕觸水面：** 投放一條紅蟲。紅蟲每秒下沉 0.08 厘米，隨機選擇停在半水深（5 厘米）或底部（0 厘米）；三分鐘內未被吃掉便消失。烏龜會追逐及吃掉紅蟲，每吃下一條，飢餓指數減少 0.1。
@@ -133,6 +133,12 @@ Feeding now requires the rendered mouth tip to meet the animated bloodworm itsel
 All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape, with modest front/rear proportional differences. The roots are drawn beneath the shell, not as narrow joints. In top view, diagonal pairs alternate; the hind kicks lag slightly. In side view, far limbs render behind the body, while near limbs are clipped under the shell rim. Each stroke extends on the power phase and folds back during recovery. The artwork is a procedural interpretation of the supplied BREST swimming references.
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
+
+## Narrower platform and 3D side-view turning / 縮窄平台及立體側視轉向
+
+**English:** Both views now show a **20%-width land area** on the right; the remaining 80% is open water. In Side view, the land shelf sits at the actual water surface, with water rendered below it. The turtle's body is raised above the shelf when walking or sleeping, so it remains visible. Side-view turns are no longer made by simply flattening the profile: a rounded dome with directional scute patterns, a distinct shell rim and plastron, visible far/near legs, and a neck/head that changes occlusion create approximate 45-degree front and rear views. The side-view mouth marker follows the same heading-dependent facial geometry, retaining strict mouth-only feeding. Saved turtles already on land are repositioned onto the narrower platform without resetting their age, health, or care history.
+
+**繁體中文：** 俯視及側視模式的陸地均縮至**右側約 20% 的寬度**，其餘約 80% 為水域。側視的陸地平台改為正確顯示於水面高度，下面仍有水。烏龜在平台上行走或睡覺時，其身體會顯示在平台上方，不再被平台遮蔽。側視轉向亦不再單純把平面的側身圖像壓扁，而是利用立體龜殼弧度、隨朝向變化的龜甲紋理、龜殼邊緣和腹甲，以及遠近四肢和頭頸遮擋關係，近似呈現前方或後方四十五度的姿態。進食的嘴尖位置亦配合新的朝向投影。已儲存並在陸地上的烏龜會移至新平台位置，而不會重設年齡、健康或飼養進度。
 
 ## Animation and feeding update / 動畫及餵食改良
 
