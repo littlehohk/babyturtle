@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Side-view movement and recovery visibility / 側視活動與呼吸恢復顯示
+
+**English:** In Side view, a conscious turtle now continues paddling while surfacing and makes subtle breathing/head and flipper movements during breathing recovery or short rests. Recovery periods after long dives can last **5 or 15 real minutes**, so the aquarium shows a localized **Breathing** label and approximate remaining minutes rather than appearing frozen. Brief **Resting**, **Surfacing for air**, and **Sleeping** labels distinguish temporary inactivity from a fault. The turtle chooses another roaming destination promptly when it reaches its previous target; it no longer waits unnecessarily for the old wandering timer. Genuine sleep remains stationary with closed eyes and tucked legs. No survival thresholds, breathing recovery durations, saved-game keys, or language-switch behaviour have changed.
+
+**繁體中文：** 側視模式中，清醒的烏龜在上浮換氣時會繼續划水；呼吸恢復或短暫休息時亦有輕微的呼吸、頭部及四肢動作。長時間潛水後，呼吸恢復可能需要**實際五分鐘或十五分鐘**。畫面會顯示「**呼吸恢復中**」及約略剩餘分鐘數，並用「正在休息」、「正在上浮換氣」和「睡眠中」區分暫時靜止的原因。到達原來的遊動目標後，烏龜會較快選擇下一個目的地，不必無故等候舊的漫游計時。真正睡覺時仍保持閉眼及收起四肢的靜止睡姿。原有生存條件、呼吸恢復時長、遊戲存檔識別碼及語言切換方式不變。
+
 ## Sleeping posture and shell geometry / 睡姿與龜殼造型
 
 **English:** During sleep, the turtle no longer paddles. All four legs fold close to the body, with only small tucked tips remaining visible. On land, the flat underside rests directly on the basking shelf; in water, the turtle settles to the aquarium floor and rests there. The head and neck relax slightly into the shell. The closed eyes retain a complete **circular green eye outline**, with a curved closed eyelid inside, following the supplied sleeping references. On waking, normal eye and movement drawings return. In Side view, the shell has a **rounded, domed upper carapace with a straight, flat lower edge and plastron**, rather than an oval bottom. Its length and earlier compact height are retained.
