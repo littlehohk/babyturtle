@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Thinner shell in side view / 側視龜殼厚度調整
+
+**English:** The shell and plastron are now **50% of their previous vertical thickness** in Side view only. Their horizontal length and the position of the lower shell rim are preserved. The head, neck and legs keep their existing proportions; Top view is unchanged.
+
+**繁體中文：** 側視模式的龜殼及腹甲**垂直厚度縮減至原先的 50%**，但保留原有的水平長度及龜殼下緣位置。頭部、頸部和四肢的比例不變；俯視模式亦不受影響。
+
 ## Diagonal swimming and walking gait / 對角划水與步行動作
 
 **English:** In the top-view reference, the limbs are numbered **1 = front-left, 2 = front-right, 3 = rear-right, 4 = rear-left** (with the turtle's head pointing upward). Swimming uses a repeating two-step diagonal gait: **step 1 — legs 1 and 3 swing forward while 2 and 4 swing backward; step 2 — the motions reverse**. Side view uses the same physical limb pairings, with near and far limbs changing visible layering as the turtle turns; the strokes follow its travel direction rather than merely flipping an animation.
