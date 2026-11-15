@@ -144,19 +144,51 @@ function txt(t,x,y,size=10,color='#fff',align='left'){g.font=size+'px -apple-sys
 function shellPattern(){g.strokeStyle='#6f7132';g.lineWidth=.8;for(let a=0;a<6;a++){const th=a*Math.PI/3;g.beginPath();g.moveTo(0,0);g.lineTo(Math.cos(th)*9,Math.sin(th)*7);g.stroke()}ell(0,0,5,4,'#678245')}
 // Procedural anatomy based on BREST reference pose sheets:
 // front flippers alternate sweeping strokes; hind paddles follow with a lag.
-function flipper(x,y,front,side,phase,walking=false){
-  g.save();g.translate(x,y);
-  const swing=(walking?0.48:0.68)*Math.sin(phase+(side<0?0:Math.PI)+(front?0:Math.PI*.75));
-  g.rotate(side*(front?.24:-.30)+swing);
-  g.scale(1,side);
-  const len=front?17:12;
-  g.strokeStyle='#334927';g.lineWidth=1.1;
-  g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(front?7:-7,5,front?2:-6,len-3);
-  g.quadraticCurveTo(front?-3:-11,len+4,front?-8:-9,len-4);
-  g.quadraticCurveTo(-4,4,0,0);g.closePath();g.fillStyle='#79a759';g.fill();g.stroke();
-  g.strokeStyle='#c7d66b';g.lineWidth=1;
-  g.beginPath();g.moveTo(-1,3);g.quadraticCurveTo(front?0:-6,10,front?-2:-8,len-2);g.stroke();
-  for(let i=0;i<3;i++){g.strokeStyle='#34472a';g.lineWidth=.8;g.beginPath();g.moveTo((front?-7:-9)+i*2,len-5);g.lineTo((front?-7:-9)+i*2.5,len+1+(i%2));g.stroke()}
+// Matching four-limb anatomy, modelled on the BREST swimming reference.
+// A broad upper limb disappears underneath the shell; no pin-like attachments.
+// The power stroke is broad and extended; the recovery stroke folds inward.
+function flipper(x,y,front,side,phase,walking=false,projection='top'){
+  g.save();
+  g.translate(x,y);
+  const swim=!walking,cycle=Math.sin(phase),lift=Math.cos(phase);
+  const power=(cycle+1)*.5;
+  const length=front?17.5:15.3;
+  const opening=swim?(front?.70:.55):.24;
+  const sweep=opening*cycle+(front?.07:-.23)*side;
+  g.rotate(sweep);
+  // In top view the limbs project outward to their own side; in side view
+  // both far and near limbs sweep down below the shell/belly.
+  g.scale(1,projection==='top'?side:1);
+  const extension=swim?.76+.24*power:.89;
+  const fold=swim?(1-power)*3.1:1.4;
+  g.scale(1,extension);
+  const tipX=(front?2.7:-5.0)+fold;
+  const tipY=length;
+  // Upper leg is broad enough to read as a shoulder/hip, not a stalk.
+  ell(0,1,5.9,4.7,'#587e3e');
+  g.beginPath();
+  g.moveTo(-5.0,-2.7);
+  g.bezierCurveTo(2.3,-4,8.0,2.1,tipX+5.0,tipY-5);
+  g.quadraticCurveTo(tipX+7.6,tipY+1.4,tipX+2.1,tipY+2.5);
+  g.lineTo(tipX-1.1,tipY+1.4);
+  g.quadraticCurveTo(tipX-5.9,tipY+5,tipX-7.1,tipY+.5);
+  g.bezierCurveTo(tipX-9,tipY-7,-9.1,5.9,-5.0,-2.7);
+  g.closePath();g.fillStyle='#7ba957';g.fill();
+  g.lineWidth=1.3;g.strokeStyle='#304b25';g.stroke();
+  // Long green/yellow striping follows the actual limb curvature.
+  g.beginPath();g.moveTo(-2,-.5);
+  g.bezierCurveTo(2.8,4.3,tipX+1.7,tipY-6,tipX+.7,tipY-.7);
+  g.strokeStyle='#b9d56d';g.lineWidth=1.6;g.stroke();
+  g.beginPath();g.moveTo(-4,1.4);
+  g.bezierCurveTo(-1,7.3,tipX-2.2,tipY-6,tipX-2.3,tipY-1.4);
+  g.strokeStyle='#447b39';g.lineWidth=.9;g.stroke();
+  // Three toes share the same shape on all four limbs.
+  for(let i=0;i<3;i++){
+    const xx=tipX-4.1+i*3.1;
+    g.beginPath();g.moveTo(xx,tipY-.5);
+    g.quadraticCurveTo(xx+1,tipY+1.8,xx-.1,tipY+4+(i===1?1:0));
+    g.strokeStyle='#35472b';g.lineWidth=1.1;g.stroke();
+  }
   g.restore();
 }
 function topFace(sleeping){
@@ -225,9 +257,10 @@ function drawTurtle(now){
     g.scale(facing*foreshorten,1);
     const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.1);
     g.rotate(-pitch*.65*facing);
-    // Draw rear paddles first and front paddles after the shell.
-    flipper(-10,3,false,-1,stroke);
-    flipper(-11,5,false,1,stroke+.5);
+    // Both FAR paddles originate well inside the body and are covered
+    // by the belly and the carapace. Their strokes oppose the near paddles.
+    flipper(-9,3.1,false,-1,stroke+Math.PI+.35,t.land,'side');
+    flipper(5,2.8,true,-1,stroke,t.land,'side');
     if(away&&profile<.5){
       ell(14,0,8,7,'#78a252');
       sideFace(t.sleep,true);
@@ -238,9 +271,16 @@ function drawTurtle(now){
     ell(0,-6,12.5,7.6,'#a3c14d');
     g.strokeStyle='#426d31';g.lineWidth=.95;
     for(let u=-9;u<=9;u+=6){g.beginPath();g.moveTo(u,-11);g.quadraticCurveTo(u+4,-6,u+5,-1);g.stroke()}
-    // Swimmer's flippers alternate long, sweeping strokes.
-    flipper(4,3,true,-1,stroke,t.land);
-    flipper(5,5,true,1,stroke+.22,t.land);
+    // Near paddles emerge from UNDER the shell rim, rather than being
+    // drawn on top of the shell. Same anatomy as the far paddles.
+    g.save();
+    g.beginPath();g.rect(-35,4.8,75,36);g.clip();
+    flipper(-9,4.1,false,1,stroke+.35,t.land,'side');
+    flipper(5,4.0,true,1,stroke+Math.PI,t.land,'side');
+    g.restore();
+    // Continuous lower shell/belly edge conceals the roots.
+    g.strokeStyle='#314a28';g.lineWidth=1.5;
+    g.beginPath();g.moveTo(-13,5.2);g.quadraticCurveTo(0,8.5,13,5.2);g.stroke();
     if(!away||profile>.52){
       ell(15,-.4,9.5,8,'#83ae60');
       ell(18,1,7,5.7,'#8eb566');
@@ -252,10 +292,13 @@ function drawTurtle(now){
     // Rotate +X to the turtle's heading; face and both red cheek spots
     // remain paired and symmetric at every angle.
     g.rotate(t.heading);
-    flipper(-8,-8,false,-1,stroke+.7,t.land);
-    flipper(-8,8,false,1,stroke+.7,t.land);
-    flipper(5,-9,true,-1,stroke,t.land);
-    flipper(5,9,true,1,stroke,t.land);
+    // Diagonal alternating paddling, as in the top-view reference.
+    // FL and RR drive together; FR and RL drive half a cycle later.
+    // Rear kick is slightly delayed and smaller than front sweep.
+    flipper(-8,-8,false,-1,stroke+Math.PI+.35,t.land,'top');
+    flipper(-8,8,false,1,stroke+.35,t.land,'top');
+    flipper(5,-9,true,-1,stroke,t.land,'top');
+    flipper(5,9,true,1,stroke+Math.PI,t.land,'top');
     poly([[-11,-2],[-23,0],[-11,3]],'#719c58');
     ell(16,0,9,8.5,'#7eae58');
     topFace(t.sleep);
