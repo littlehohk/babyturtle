@@ -134,6 +134,16 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Diagonal swimming and walking gait / 對角划水與步行動作
+
+**English:** In the top-view reference, the limbs are numbered **1 = front-left, 2 = front-right, 3 = rear-right, 4 = rear-left** (with the turtle's head pointing upward). Swimming uses a repeating two-step diagonal gait: **step 1 — legs 1 and 3 swing forward while 2 and 4 swing backward; step 2 — the motions reverse**. Side view uses the same physical limb pairings, with near and far limbs changing visible layering as the turtle turns; the strokes follow its travel direction rather than merely flipping an animation.
+
+Walking on land retains **the same 1+3 versus 2+4 alternating timing**. In top view, the leg drawings are shorter and tucked under the shell to imply bent joints. In side view, each walking leg changes from an extended paddle into a **Z-shaped shoulder–knee–foot articulation**, with a planted foot and alternating steps. Swimming retains the earlier compact limb proportions.
+
+**繁體中文：** 按俯視參考圖片，烏龜頭部朝上時，四肢編號為 **1＝左前肢、2＝右前肢、3＝右後肢、4＝左後肢**。游泳採用重複兩步的對角划水節奏：**第一步：1、3 向前，2、4 向後；第二步：1、3 向後，2、4 向前**。側視模式沿用相同的肢體組合；烏龜轉向時，會相應調整遠近四肢的顯示層次，划水方向亦會配合行進方向。
+
+在陸地步行時，**仍採用 1、3 與 2、4 交替的節奏**。俯視的四肢會縮短及收近龜殼，表現關節彎曲；側視的步行四肢則呈現明顯的 **Z 字形肩／髖部—膝／肘部—腳掌**構造，腳掌配合步伐落地。水中划水仍保留先前較小巧的四肢比例。
+
 ## Narrower platform and 3D side-view turning / 縮窄平台及立體側視轉向
 
 **English:** Both views now show a **20%-width land area** on the right; the remaining 80% is open water. In Side view, the land shelf sits at the actual water surface, with water rendered below it. The turtle's body is raised above the shelf when walking or sleeping, so it remains visible. Side-view turns are no longer made by simply flattening the profile: a rounded dome with directional scute patterns, a distinct shell rim and plastron, visible far/near legs, and a neck/head that changes occlusion create approximate 45-degree front and rear views. The side-view mouth marker follows the same heading-dependent facial geometry, retaining strict mouth-only feeding. Saved turtles already on land are repositioned onto the narrower platform without resetting their age, health, or care history.
