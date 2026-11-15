@@ -17,16 +17,16 @@
 <div class="row"><button id="close" data-i="done">Done — back to aquarium</button></div></div></div>
 <script>
 (()=>{'use strict';
-const $=id=>document.getElementById(id),cv=$('tank'),g=cv.getContext('2d'),W=320,H=240,WT=28,CT=220,LAND=18,FW=28,FD=17,FZ=9.2,SEC_DAY=86400;
+const $=id=>document.getElementById(id),cv=$('tank'),g=cv.getContext('2d'),W=320,H=240,WT=28,CT=220,LAND=22.4,FW=28,FD=17,FZ=9.2,SEC_DAY=86400;
 g.scale(3,3);
 const I={
 title:['Baby Red-eared Slider','紅耳龜寶寶'],subtitle:['BREST · virtual turtle aquarium','BREST · 虛擬烏龜水族箱'],settings:['Settings','設定'],settingsTitle:['Turtle settings','烏龜設定'],cityTab:['City & weather','城市及天氣'],cityIntro:["Changing your city preserves the turtle's age, health and care history.",'更改城市不會重設烏龜的年齡、健康及飼養記錄。'],findCity:['Find a city','搜尋城市'],search:['Search','搜尋'],temperatureFallback:['Manual outside temperature','手動設定戶外氣溫'],fallbackNote:['Use this if online weather is unavailable. Water temperature still changes naturally.','無法取得即時天氣時可手動設定戶外氣溫，水溫仍會正常變化。'],outside:['Outside temperature (°C)','戶外氣溫（°C）'],apply:['Apply temperature','套用氣溫'],ageTitle:['Turtle statistics','烏龜資料'],storageNote:['Progress is stored in this browser. Private browsing or clearing website data can erase it. English and Chinese share the same save.','進度儲存在此瀏覽器；私密瀏覽或清除網站資料可能令存檔消失。中英文使用同一存檔。'],careHeading:['How to care for your turtle','如何照顧烏龜'],ruleFeed:['Tap open water in Top view to place a bloodworm. Each worm eaten reduces Hunger by 0.1. Worms sink to mid-water or the bottom and disappear after three minutes.','在俯視模式輕觸水面投放紅蟲。每吃下一條，飢餓指數下降 0.1。紅蟲會沉至半水深或底部，三分鐘後消失。'],rulePlay:['Swipe to play or switch the Light. Each action reduces Boredom by 0.1.','滑動與烏龜玩耍，或開關燈光；每次令無聊指數下降 0.1。'],ruleView:['Top and Side show the same 3D tank. The brown platform occupies the right side, with water beneath it. The turtle can swim, dive and climb onto land.','俯視及側視顯示同一立體水族箱。右側棕色平台下仍有水；烏龜可以游泳、潛水及爬上陸地。'],ruleSleep:['Sleep happens automatically: three possible 15-minute daytime naps and night sleep after sunset and five minutes of darkness. Hold the tank for two seconds to request sleep/wake.','烏龜會自動睡覺：白天最多三次、每次十五分鐘的小睡；日落後持續關燈五分鐘，會準備夜眠。長按水族箱兩秒可要求睡覺或喚醒。'],ruleBreath:['Awake dives are limited to 20 minutes, sleeping dives to three hours. Surfacing and breathing recovery are automatic.','清醒潛水最多二十分鐘，睡眠潛水最多三小時，會自動上浮呼吸及恢復。'],ruleCare:['Health begins at 10. Hunger and Boredom outside 1–4 each cost 0.1 Health per hour; water outside 14–28°C costs 0.2 per hour. Good daytime care can restore 0.05 per hour (maximum 0.5 per day). At the end of a complete local day, sleeping longer than daylight adds 0.1 Health; otherwise deduct 0.3. Death occurs at Health 0 or Hunger 5 for more than one continuous hour.','健康初始為 10。飢餓及無聊指數低於 1 或高於 4，各每小時扣 0.1 健康；水溫低於 14°C 或高於 28°C，每小時扣 0.2。白天照顧良好每小時可回復 0.05（每日最多 0.5）。每個完整本地日結算時，睡眠比日照時間長則加 0.1，否則扣 0.3。健康降至零，或飢餓維持在 5 超過一小時，便會死亡。'],ruleThermal:['AirCon cools 1°C per 30 minutes, Heater warms 1.5°C per 30 minutes. With both off, water moves toward its natural target by 0.2°C every five minutes.','冷氣每三十分鐘降低 1°C，暖水器每三十分鐘提高 1.5°C。兩者關閉時，水溫每五分鐘以 0.2°C 的速度趨近自然目標。'],ruleNew:['After death, hold the bottom strip for two seconds to start a new turtle.','死亡後按住底部控制區兩秒即可養新龜。'],notAdvice:['These are fictional game rules, not actual turtle-care recommendations.','以上為虛構遊戲規則，並非真實烏龜飼養建議。'],done:['Done — back to aquarium','完成 — 返回水族箱'],how:['How to play','玩法說明'],weather:['Refresh weather','更新天氣'],fullscreen:['Full screen','全螢幕'],hint:['Tap the water in Top view to feed bloodworms · Swipe to play · Hold the tank for two seconds to sleep or wake · Top/Side and temperature controls are in the bottom strip.','俯視模式輕觸水面餵紅蟲 · 滑動玩耍 · 長按兩秒要求睡覺或喚醒 · 底部設有俯視、側視及溫度控制。'],top:['Top','俯視'],side:['Side','側視'],cool:['AirCon','冷氣'],heat:['Heater','暖水'],light:['Light','燈光'],on:['ON','開'],off:['OFF','關'],hunger:['Hunger','飢餓'],boredom:['Boredom','無聊'],health:['Health','健康'],water:['Water','水溫'],new:['HOLD 2s: NEW TURTLE','按住兩秒：養新龜'],deadHealth:['Health reached 0.0','健康降至 0.0'],deadHunger:['Died of Hunger','死於飢餓'],age:['Age','年齡'],sleep:['Sleeping','睡眠中'],breath:['Breathing','呼吸恢復中'],stale:['Offline weather — cached value','離線天氣 — 沿用上次數值'],saved:['Saved on this device','已儲存於此裝置'],cannotSave:['Saving is unavailable','無法儲存'],searching:['Searching…','搜尋中……'],noCity:['No matching cities','找不到相符城市'],cityError:['City search unavailable','無法搜尋城市'],weatherError:['Weather unavailable — keeping previous temperature','無法取得天氣 — 沿用現有氣溫'],weatherOK:['Weather updated','天氣已更新'],manualOK:['Manual temperature set','已設定氣溫'],invalid:['Enter a temperature between -90 and 60°C','請輸入 -90 至 60°C 的氣溫'],choose:['Choose a city','請選擇城市'],current:['Current city','目前城市'],newLife:['New turtle','新龜'],day:['Day','日']};
 let lang='en';try{lang=localStorage.getItem('brest-web-lang')==='zh'?'zh':'en'}catch(e){}
 const tr=k=>(I[k]||[k,k])[lang==='zh'?1:0],clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
 let loc={name:'Sha Tin, Hong Kong',lat:22.38,lon:114.19,timezone:'Asia/Hong_Kong'};
-const fresh=()=>({h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,napMask:0,lastNap:0}});
+const fresh=()=>({layoutV2:1,h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,napMask:0,lastNap:0}});
 let s=fresh(),worms=[],lastSave=0,lastLight=0,framePrev=performance.now(),hover=null,touch=null,settings=false,target={x:11,y:8,z:8},wander=0,play=0,rest=0,weatherBusy=false,notice='',noticeUntil=0;
-try{const p=JSON.parse(localStorage.getItem('brest-browser-v1')||'null');if(p&&p.version===1&&p.state&&Number.isFinite(p.state.hp)&&Number.isFinite(p.state.age)&&p.state.t){s=p.state;loc=p.location||loc;}}catch(e){}
+try{const p=JSON.parse(localStorage.getItem('brest-browser-v1')||'null');if(p&&p.version===1&&p.state&&Number.isFinite(p.state.hp)&&Number.isFinite(p.state.age)&&p.state.t){s=p.state;loc=p.location||loc;if(!s.layoutV2){if(s.t.land){s.t.x=clamp(s.t.x+LAND-18,LAND+1.5,26.5);s.t.z=10;}s.layoutV2=1;}}}catch(e){}
 function save(){try{localStorage.setItem('brest-browser-v1',JSON.stringify({version:1,state:s,location:loc}));lastSave=Date.now();$('saveMsg').textContent=tr('saved')+' · '+new Date().toLocaleTimeString()}catch(e){$('saveMsg').textContent=tr('cannotSave')}}
 function alertBar(v){notice=v;noticeUntil=Date.now()+3500}
 function syncLang(){document.documentElement.lang=lang==='zh'?'zh-Hant':'en';$('langBtn').textContent=lang==='zh'?'English':'繁體中文';document.querySelectorAll('[data-i]').forEach(n=>n.textContent=tr(n.dataset.i));$('query').placeholder=lang==='zh'?'例如：香港沙田':'Sha Tin, Hong Kong';document.title=lang==='zh'?'紅耳龜寶寶 — BREST':'Baby Red-eared Slider — BREST';updateStats()}
@@ -42,12 +42,12 @@ function dailyLight(ms){let seconds=0;const start=ms-SEC_DAY*1000;for(let a=star
 function startDay(key,now){if(key===s.dayKey)return;if(s.dayKey&&s.fullDay&&!s.dead){s.hp=clamp(s.hp+(s.sleepToday>s.daylight?.1:-.3),0,10);if(s.hp<=0)die('hp')}const previousDay=s.dayKey;s.dayKey=key;s.fullDay=Boolean(previousDay);s.sleepToday=0;s.daylight=dailyLight(now);s.good=0;s.goodDay=key;s.t.napMask=0}
 function breathStep(dt){const t=s.t;if(t.land||t.z>=9.2){if(t.dive>0){t.recovery=t.dive<=1200?5+5*clamp(t.dive/1200,0,1):t.dive<=3600?300:900;t.dive=0}t.recovery=Math.max(0,t.recovery-dt);t.surface=false;return}t.dive+=dt;let limit=t.sleep?10800:1200;if(t.dive>=limit-4)t.surface=true;if(t.surface){t.z=Math.min(9.2,t.z+9.2/4*dt);if(t.z>=9.2){t.recovery=t.dive<=1200?5+5*clamp(t.dive/1200,0,1):t.dive<=3600?300:900;t.dive=0;t.surface=false;t.sleep=false}}}
 function schedule(now){const t=s.t,day=daylight(now),key=localDay(now);if(key!==s.dayKey){let old=s.dayKey;startDay(key,now);if(!old)s.fullDay=false}if(!day&&!s.light){if(!t.darkSince)t.darkSince=now}else t.darkSince=0;if(t.sleep&&now>=t.sleepUntil){t.sleep=false;t.sleepUntil=0}
-if(!day&&!s.light&&t.darkSince&&now-t.darkSince>=300000&&!t.sleep&&t.recovery<=0){if(t.land){t.sleep=true;let sunrise=now+12*3600000;for(let probe=now+15*60000;probe<now+30*3600000;probe+=15*60000){if(daylight(probe)){sunrise=probe;break}}t.sleepUntil=sunrise}else target={x:24,y:8.5,z:10}}if(day&&!t.sleep&&!t.surface&&t.recovery<=0){let slots=[10,13,16];let h=0;try{h=Number(new Intl.DateTimeFormat('en-GB',{timeZone:loc.timezone,hour:'numeric',hour12:false}).format(new Date(now)))}catch(e){h=new Date(now).getHours()}for(let i=0;i<3;i++){if(h>=slots[i]&&h<slots[i]+1&&!(t.napMask&(1<<i))&&now-t.lastNap>=8100000){t.napMask|=1<<i;t.lastNap=now;t.sleep=true;t.sleepUntil=now+900000;break}}}}
+if(!day&&!s.light&&t.darkSince&&now-t.darkSince>=300000&&!t.sleep&&t.recovery<=0){if(t.land){t.sleep=true;let sunrise=now+12*3600000;for(let probe=now+15*60000;probe<now+30*3600000;probe+=15*60000){if(daylight(probe)){sunrise=probe;break}}t.sleepUntil=sunrise}else target={x:25.0,y:8.5,z:10}}if(day&&!t.sleep&&!t.surface&&t.recovery<=0){let slots=[10,13,16];let h=0;try{h=Number(new Intl.DateTimeFormat('en-GB',{timeZone:loc.timezone,hour:'numeric',hour12:false}).format(new Date(now)))}catch(e){h=new Date(now).getHours()}for(let i=0;i<3;i++){if(h>=slots[i]&&h<slots[i]+1&&!(t.napMask&(1<<i))&&now-t.lastNap>=8100000){t.napMask|=1<<i;t.lastNap=now;t.sleep=true;t.sleepUntil=now+900000;break}}}}
 function advance(dt,now){if(s.dead||dt<=0)return;dt=Math.min(dt,SEC_DAY*365);let left=dt,iterations=0;while(left>1e-6&&iterations++<5000&&!s.dead){const step=Math.min(left,60),at=now-(left-step)*1000;const t=s.t;schedule(at);const day=daylight(at);const aim=targetWater(s.outside),rate=s.thermal===1?-1/1800:s.thermal===2?1.5/1800:Math.sign(aim-s.water)*(.2/300);const actual=s.thermal===0?Math.min(step,Math.abs(aim-s.water)/(Math.abs(rate)||1)):step;const span=actual>1e-9?actual:step;const v=rate*span;s.water+=v;s.h=clamp(s.h+span*.1/1200,0,5);s.b=clamp(s.b+span*.1/1200,0,5);const penalty=(s.h<1||s.h>4?.1:0)+(s.b<1||s.b>4?.1:0)+(s.water<14||s.water>28?.2:0);const good=day&&!t.sleep&&penalty===0&&s.good<36000;const gain=good?.05:0;s.hp=clamp(s.hp+(gain-penalty)*span/3600,0,10);if(good)s.good+=span;if(t.sleep)s.sleepToday+=span;if(s.h>=5)s.hunger5+=span;else s.hunger5=0;s.age+=span;breathStep(span);if(s.hp<=0)die('hp');else if(s.hunger5>3600)die('hunger');left-=span}}
 function catchUp(){const now=Date.now();if(now>s.time){advance((now-s.time)/1000,now);s.time=now}save()}
 function reduce(field){s[field]=clamp(s[field]-.1,0,5);save()}
 function restart(){const temp=s.outside;s=fresh();s.outside=temp;s.water=targetWater(temp);worms=[];wander=0;save()}
-function feed(px,py){if(s.dead||s.t.side||px>=18/28*320||py<WT||py>=CT||worms.length>=16)return;const x=clamp(px/320*28,1,17.6),y=clamp((CT-py)/(CT-WT)*17,.5,16.5),angle=s.t.heading;worms.push({x,y,z:10,target:Math.random()<.5?5:0,life:0,notice:(x-s.t.x)*Math.cos(angle)+(y-s.t.y)*Math.sin(angle)<0?3:0})}
+function feed(px,py){if(s.dead||s.t.side||px>=LAND/FW*W||py<WT||py>=CT||worms.length>=16)return;const x=clamp(px/W*FW,1,LAND-.5),y=clamp((CT-py)/(CT-WT)*17,.5,16.5),angle=s.t.heading;worms.push({x,y,z:10,target:Math.random()<.5?5:0,life:0,notice:(x-s.t.x)*Math.cos(angle)+(y-s.t.y)*Math.sin(angle)<0?3:0})}
 // The rendered nose is 2.2 cm in front of the turtle's model origin.
 
 const MOUTH_REACH=2.2;
@@ -56,6 +56,8 @@ function turtleDrawScale(t){
 }
 // Return the tip of the VISIBLE nose (not a shell-centre or overlap radius)
 // in logical 320x240 canvas pixels. Geometry follows the exact view transforms.
+const SIDE_WATERLINE=CT-143;
+function sideBodyY(t,scale){return t.land?SIDE_WATERLINE-11.2*scale:CT-t.z/10*143-4;}
 function visibleMouth(t){
   const sc=turtleDrawScale(t),cx=t.x/28*320;
   if(!t.side){
@@ -125,7 +127,7 @@ function swim(dt,now){
       Math.hypot(a.x-t.x,a.y-t.y,a.z-t.z)-
       Math.hypot(b.x-t.x,b.y-t.y,b.z-t.z))[0]:null;
   let moveGoal=target;
-  if(wantsLand&&!t.land)moveGoal={x:23,y:8.5,z:10};
+  if(wantsLand&&!t.land)moveGoal={x:25.0,y:8.5,z:10};
   else if(play>0)play=Math.max(0,play-dt);
   else if(candidate&&!t.land){
     // Approach the worm from the correct direction: shell overlap is NOT eating.
@@ -137,13 +139,13 @@ function swim(dt,now){
               y:clamp(candidate.y-reach*uy,1,16),
               z:clamp(candidate.z-.18,0,9.2)};
   }else if(candidate&&t.land){
-    moveGoal={x:16,y:t.y,z:9.2};
+    moveGoal={x:LAND-2.5,y:t.y,z:9.2};
   }else if((wander-=dt)<=0){
     wander=rand(5,12);rest=Math.random()<.25?rand(2,8):0;
     const moveLand=t.land?Math.random()<.3:Math.random()<.14;
     moveGoal=moveLand?
-      {x:t.land?rand(2,15):rand(20,26),y:rand(2,15),z:t.land?8.9:10}:
-      {x:t.land?rand(20,26):rand(2,16.5),y:rand(2,15),z:t.land?10:rand(2,9.2)};
+      {x:t.land?rand(2,LAND-2.5):rand(LAND+1.6,26.1),y:rand(2,15),z:t.land?8.9:10}:
+      {x:t.land?rand(LAND+1.6,26.1):rand(2,LAND-2),y:rand(2,15),z:t.land?10:rand(2,9.2)};
   }
   target=moveGoal;
   if(rest>0&&!candidate&&!wantsLand){rest-=dt;t.moving=false;return;}
@@ -151,11 +153,11 @@ function swim(dt,now){
   const approach= candidate ? Math.atan2(candidate.y-t.y,candidate.x-t.x):Math.atan2(dy,dx);
   const delta=Math.atan2(Math.sin(approach-t.heading),Math.cos(approach-t.heading));
   t.heading+=clamp(delta,-2.7*dt,2.7*dt);
-  const crossing=(moveGoal.x>=18)!==t.land;
+  const crossing=(moveGoal.x>=LAND)!==t.land;
   if(crossing){
-    if(t.land&&t.x<19)t.land=false;
-    if(!t.land&&t.x>19.5){t.land=true;t.z=10}
-    if(t.x>16.5&&t.x<19.5)t.z=9.2+.8*clamp((t.x-16.5)/3,0,1);
+    if(t.land&&t.x<LAND+1)t.land=false;
+    if(!t.land&&t.x>LAND+1.5){t.land=true;t.z=10}
+    if(t.x>LAND-1.5&&t.x<LAND+1.5)t.z=9.2+.8*clamp((t.x-(LAND-1.5))/3,0,1);
   }
   const distance=Math.hypot(dx,dy,dz);
   const ox=t.x,oy=t.y,oz=t.z;
@@ -167,7 +169,7 @@ function swim(dt,now){
     t.z=clamp(t.z+dz*factor,0,10);
   }
   if(!crossing){
-    t.land=t.x>=19.5&&moveGoal.x>=18;
+    t.land=t.x>=LAND+1.5&&moveGoal.x>=LAND;
     if(t.land)t.z=10;
   }
   const moved=Math.hypot(t.x-ox,t.y-oy,t.z-oz);
@@ -293,7 +295,7 @@ function sideFace(sleeping,nearProfile){
 }
 function drawTurtle(now){
   const t=s.t,side=t.side;
-  const x=t.x/28*320, y=side?CT-t.z/10*143-4:CT-t.y/17*(CT-WT);
+  const x=t.x/28*320, y=side?sideBodyY(t,turtleDrawScale(t)):CT-t.y/17*(CT-WT);
   const underwater=!t.land;
   const depthScale=turtleDrawScale(t); // Same scale as the mouth contact geometry.
   const active=Boolean(t.moving)&&!t.sleep&&!s.dead&&t.recovery<=0;
@@ -366,8 +368,30 @@ function drawTurtle(now){
 
 function drawWorm(w,now){const x=w.x/28*320,y=s.t.side?CT-w.z/10*143:CT-w.y/17*(CT-WT);g.beginPath();for(let i=0;i<15;i++){const u=i/14,xx=x+(u-.5)*11,yy=y+Math.sin(u*Math.PI*2)*Math.cos(now/210+w.x)*3.4;i?g.lineTo(xx,yy):g.moveTo(xx,yy)}g.strokeStyle='#c35e74';g.lineWidth=2.1;g.lineCap='round';g.stroke()}
 function brightness(now){if(s.light)return 1;const e=sunElevation(now);if(e<=-12)return .08;if(e<-.833)return .08+.32*((e+12)/11.167);return .4+.6*Math.sqrt(clamp((e+.833)/35,0,1))}
-function render(now){g.clearRect(0,0,320,240);g.fillStyle='#afe6e9';g.fillRect(0,WT,320,CT-WT);if(s.t.side){g.fillStyle='#9fd5de';g.fillRect(0,WT,320,143);g.fillStyle='#7cb1b9';g.fillRect(0,171,320,49);g.fillStyle='#394945';g.fillRect(0,214,320,6);g.fillStyle=s.thermal===2?'#a84437':'#65432e';g.fillRect(18/28*320,WT,320-18/28*320,9);g.fillStyle='#5b7f88';g.fillRect(18/28*320,WT+10,320-18/28*320,3)}
-else{g.fillStyle='#8dd0d6';g.fillRect(0,WT,320,CT-WT);g.fillStyle=s.thermal===2?'#a24536':'#674733';g.fillRect(18/28*320,WT,320-18/28*320,CT-WT);for(let i=0;i<22;i++){const x=(i*41)%204,y=WT+((i*73)%185);ell(x,y,2,2,'#a2d4b5')}}
+function render(now){
+g.clearRect(0,0,320,240);
+const shoreX=LAND/FW*W,shoreW=W-shoreX,ground=SIDE_WATERLINE;
+g.fillStyle='#afe6e9';g.fillRect(0,WT,W,CT-WT);
+if(s.t.side){
+ g.fillStyle='#9fd5de';g.fillRect(0,WT,W,143);
+ g.fillStyle='#7cb1b9';g.fillRect(0,171,W,49);
+ g.fillStyle='#394945';g.fillRect(0,214,W,6);
+ // Side platform at the actual water surface, with water under the shelf.
+ g.fillStyle='#304954';g.fillRect(shoreX-2,ground,2,17);
+ g.fillStyle=s.thermal===2?'#a84437':'#65432e';
+ g.fillRect(shoreX,ground,shoreW,14);
+ g.fillStyle=s.thermal===2?'#c85c44':'#a5825c';
+ g.fillRect(shoreX,ground,shoreW,3);
+ g.fillStyle='#315966';g.fillRect(shoreX,ground+14,shoreW,2);
+ g.strokeStyle='#c1ebf3';g.lineWidth=.7;
+ g.beginPath();g.moveTo(0,ground);g.lineTo(shoreX-2,ground);g.stroke();
+}else{
+ g.fillStyle='#8dd0d6';g.fillRect(0,WT,W,CT-WT);
+ g.fillStyle=s.thermal===2?'#a24536':'#674733';
+ g.fillRect(shoreX,WT,shoreW,CT-WT);
+ g.fillStyle='#bd9d6e';g.fillRect(shoreX,WT,2,CT-WT);
+ for(let i=0;i<22;i++){const x=(i*41)%255,y=WT+((i*73)%185);if(x<shoreX-3)ell(x,y,2,2,'#a2d4b5')}
+}
 for(let i=0;i<8;i++){const x=11+i*27,y=CT-5-((now/1100*(i+2)+i*35)%(CT-WT-20));g.strokeStyle='#dbffff';g.lineWidth=.8;g.beginPath();g.arc(x,y,1.6+(i%2),0,Math.PI*2);g.stroke()}worms.forEach(w=>drawWorm(w,now));if(!s.dead)drawTurtle(now);else drawTurtle(now);const level=brightness(now);if(level<1){g.fillStyle='rgba(0,9,24,'+(.95*(1-level))+')';g.fillRect(0,WT,320,CT-WT)}
 g.fillStyle='#071016';g.fillRect(0,0,320,WT);g.fillRect(0,CT,320,20);let clock='--:--';try{clock=new Intl.DateTimeFormat(lang==='zh'?'zh-HK':'en-US',{timeZone:loc.timezone,hour:'numeric',minute:'2-digit',hour12:lang!=='zh'}).format(new Date())}catch(e){}txt(clock,4,10,9);txt(tr('settings'),133,10,9,'#a2edff');txt(loc.name.split(',')[0].slice(0,10)+' '+s.outside.toFixed(1)+'°',315,10,8,'#fff','right');txt(tr('hunger')+' '+s.h.toFixed(1),4,23,9);txt(tr('boredom')+' '+s.b.toFixed(1),91,23,9);txt(tr('health')+' '+s.hp.toFixed(1),195,23,9);const color=s.water<14?'#fff':s.water<18?'#fff0aa':s.water<=22?'#afdcff':s.water<=28?'#ffc0d4':'#ff4545';txt(tr('water')+' '+s.water.toFixed(1)+'°',250,23,8,color);
 if(s.dead){txt(tr('new'),160,233,10,'#fff','center');g.fillStyle='#f7dfab';g.fillRect(20,93,280,54);txt(s.cause==='hp'?tr('deadHealth'):tr('deadHunger'),160,116,16,'#513b25','center');txt(tr('age')+': '+Math.floor(s.age/86400)+' '+tr('day'),160,133,10,'#513b25','center')}
