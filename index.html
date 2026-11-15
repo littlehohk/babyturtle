@@ -57,7 +57,15 @@ function turtleDrawScale(t){
 // Return the tip of the VISIBLE nose (not a shell-centre or overlap radius)
 // in logical 320x240 canvas pixels. Geometry follows the exact view transforms.
 const SIDE_WATERLINE=CT-143;
-function sideBodyY(t,scale){return t.land?SIDE_WATERLINE-11.2*scale:CT-t.z/10*143-4;}
+// Rest the sleeping carapace on the land surface or the tank floor.
+// A walking turtle stays slightly higher because its legs support it.
+function sideBodyY(t,scale){
+  if(t.sleep){
+    const contact=t.land?SIDE_WATERLINE:CT-6;
+    return contact-5.9*scale;
+  }
+  return t.land?SIDE_WATERLINE-9.4*scale:CT-t.z/10*143-4;
+}
 // Camera projects world X horizontally and world Y into depth.  A
 // foreshortened *ellipsoid* is not a flat 2D sprite turned edge-on.
 function sidePose(t){
@@ -125,7 +133,10 @@ function swim(dt,now){
   }
   worms=worms.filter(w=>w.life<180);
   if(t.surface||t.sleep||t.recovery>0){
-    t.moving=false;t.vz=0;return;
+    // An underwater sleeper settles completely onto the aquarium floor.
+    // On land, remain on the basking platform. No paddling while asleep.
+    if(t.sleep&&!t.land&&!t.surface)t.z=0;
+    t.moving=false;t.vx=0;t.vy=0;t.vz=0;return;
   }
   const wantsLand=night&&t.darkSince&&now-t.darkSince>=300000;
   const candidate=(!wantsLand&&play<=0)?
@@ -283,13 +294,19 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
 }
 
 
+// Closed eyes have a COMPLETE round outline, like the sleeping references,
+// with a gently curved eyelid through the circular green eye pad.
 function closedEye(cx,cy,width=3.6){
-  g.beginPath();g.moveTo(cx-width,cy);
-  g.quadraticCurveTo(cx,cy+2.2,cx+width,cy);
-  g.strokeStyle='#274525';g.lineWidth=1.7;g.lineCap='round';g.stroke();
-  g.beginPath();g.moveTo(cx-width*.78,cy-.9);
-  g.quadraticCurveTo(cx,cy-1.4,cx+width*.78,cy-.9);
-  g.strokeStyle='#b3ce7e';g.lineWidth=.8;g.stroke();
+  g.save();
+  g.beginPath();g.arc(cx,cy,width,0,Math.PI*2);
+  g.fillStyle='#a3cc72';g.fill();
+  g.strokeStyle='#35512c';g.lineWidth=1.25;g.stroke();
+  g.beginPath();g.moveTo(cx-width*.77,cy+.15);
+  g.quadraticCurveTo(cx,cy+width*.67,cx+width*.77,cy-.15);
+  g.strokeStyle='#243d25';g.lineWidth=1.65;g.lineCap='round';g.stroke();
+  g.beginPath();g.arc(cx-width*.34,cy-width*.46,width*.18,Math.PI*1.05,Math.PI*1.7);
+  g.strokeStyle='#d4e692';g.lineWidth=.85;g.stroke();
+  g.restore();
 }
 function topFace(sleeping){
   if(sleeping){
@@ -349,6 +366,62 @@ function sideFace(sleeping,nearProfile){
 
 // Layered, continuously rotated side view. Shell width stays substantial
 // through 45°, 90° and 135° turns. Near/far limbs and head use occlusion.
+// The side shell has a single domed upper contour and a truly FLAT
+// plastron/underside, rather than two stacked elliptical silhouettes.
+function sideDomePath(r){
+  g.beginPath();
+  g.moveTo(-r,3.35);
+  g.bezierCurveTo(-r*1.03,-1.45,-r*.54,-5.9,0,-6.1);
+  g.bezierCurveTo(r*.54,-5.9,r*1.03,-1.45,r,3.35);
+  g.lineTo(-r,3.35);
+  g.closePath();
+}
+function drawSideDomedShell(r,p){
+  // Flat yellow plastron with a horizontal lower edge.
+  g.beginPath();g.moveTo(-r*.86,2.8);g.lineTo(r*.86,2.8);
+  g.lineTo(r*.75,5.6);g.lineTo(-r*.75,5.6);g.closePath();
+  g.fillStyle='#e4b857';g.fill();
+  g.strokeStyle='#4a4226';g.lineWidth=1.25;g.stroke();
+  for(const f of [-.47,0,.47]){
+    const x=f*r;
+    g.beginPath();g.moveTo(x,2.85);g.lineTo(x,5.55);
+    g.strokeStyle='#997936';g.lineWidth=.85;g.stroke();
+  }
+  // Rounded upper surface with a continuous flat bottom boundary.
+  sideDomePath(r);
+  g.fillStyle='#253f25';g.fill();
+  const sh=g.createLinearGradient(0,-7,0,4.3);
+  sh.addColorStop(0,'#c7e45f');
+  sh.addColorStop(.40,'#91bb43');
+  sh.addColorStop(.82,'#668f36');
+  sh.addColorStop(1,'#3b622f');
+  sideDomePath(r-.85);
+  g.fillStyle=sh;g.fill();
+  // Scutes are clipped inside the dome, following its curvature.
+  g.save();sideDomePath(r-.8);g.clip();
+  g.strokeStyle='#365b28';g.lineWidth=1.0;
+  for(const f of [-.69,-.35,0,.35,.69]){
+    const x=f*r;
+    g.beginPath();
+    g.moveTo(x,-5.7+Math.abs(f)*4.0);
+    g.bezierCurveTo(x-r*.10,-2.7,x+r*.09,.2,x,3.3);
+    g.stroke();
+  }
+  g.beginPath();g.moveTo(-r*.98,1.0);
+  g.bezierCurveTo(-r*.38,2.8,r*.38,2.8,r*.98,1.0);g.stroke();
+  for(let i=-2;i<=2;i++){
+    const x=i*r*.31;
+    const y=-2.5+Math.abs(i)*.5;
+    g.beginPath();g.ellipse(x,y,2.2,1.1,.2*p.sn,.3,Math.PI*1.8);
+    g.strokeStyle='#b2d44c';g.lineWidth=.9;g.stroke();
+  }
+  g.restore();
+  sideDomePath(r);
+  g.strokeStyle='#243b22';g.lineWidth=1.7;g.stroke();
+  // The lower rim is a straight, highlighted line.
+  g.beginPath();g.moveTo(-r,3.35);g.lineTo(r,3.35);
+  g.strokeStyle='#d0c066';g.lineWidth=2.0;g.stroke();
+}
 function drawSideTurtle3D(t,stroke){
   const p=sidePose(t),r=p.shellRadius;
   const legX=(front,side)=>(front?5.8:-8.5)*p.c-p.sn*(side*5.2);
@@ -356,72 +429,46 @@ function drawSideTurtle3D(t,stroke){
   const nearSide=p.c>=0?-1:1,farSide=-nearSide;
   const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.3);
   g.save();
-  g.rotate(-pitch*.13);
-  // Far paddles: behind plastron/carapace, even at oblique angles.
-  flipper(legX(false,farSide),2.9,false,farSide,stroke+gaitPhase(false,farSide),t.land,'side',p.c);
-  flipper(legX(true,farSide),2.8,true,farSide,stroke+gaitPhase(true,farSide),t.land,'side',p.c);
+  if(!t.sleep)g.rotate(-pitch*.13);
+  // Sleep pose: all four legs are fully tucked under the shell, still
+  // hinted at by tiny shaded pads along the lower body edge.
+  if(t.sleep){
+    ell(-r*.56,4.3,2.4,1.55,'#608a48');
+    ell(r*.52,4.3,2.4,1.55,'#608a48');
+  }else{
+    // Far paddles remain behind plastron/carapace while moving.
+    flipper(legX(false,farSide),2.9,false,farSide,stroke+gaitPhase(false,farSide),t.land,'side',p.c);
+    flipper(legX(true,farSide),2.8,true,farSide,stroke+gaitPhase(true,farSide),t.land,'side',p.c);
+  }
   // When travelling away from the viewer, the head is partially
   // hidden behind the domed shell; frontal turns bring it forward.
   if(p.toward<-.13)drawSideHead3D(t,p);
-  // Halve the side-view shell and plastron thickness, preserving their
-  // horizontal dimensions and the old lower rim height at y = 5.
-  // Neck, head and all four legs remain at their original size.
-  g.save();
-  g.translate(0,5);
-  g.scale(1,.5);
-  g.translate(0,-5);
-  ell(0,2.4,r*.98,7.8,'#4b4c2b');
-  ell(0,3,r*.92,6.7,'#d8b455');
-  for(let q=-2;q<=2;q++)ell(q*r*.36,4.8,1.2,1.7,'#856833');
-  ell(0,-4.8,r+1.2,11.2,'#253f26');
-  const grad=g.createRadialGradient(-r*.23,-12,1,1,-3,r*1.75);
-  grad.addColorStop(0,'#d4e76c');
-  grad.addColorStop(.34,'#91b646');
-  grad.addColorStop(.68,'#678c3f');
-  grad.addColorStop(1,'#345a30');
-  g.beginPath();g.ellipse(0,-5.3,r,10.4,0,0,Math.PI*2);
-  g.fillStyle=grad;g.fill();
-  g.save();
-  g.beginPath();g.ellipse(0,-5.3,r-.35,9.9,0,0,Math.PI*2);g.clip();
-  // Perspective-curved seams express shell height and thickness.
-  for(let i=-2;i<=2;i++){
-    const xx=i*r*.34;
-    g.beginPath();
-    g.moveTo(xx-r*.08,-15);
-    g.bezierCurveTo(xx+r*.14,-11,xx-r*.18,-5,xx+r*.08,4);
-    g.strokeStyle='#3a612b';g.lineWidth=1.05;g.stroke();
-    g.beginPath();
-    g.ellipse(xx,-9+(i%2)*1.4,2.3,1.1,.15*p.sn,0,Math.PI*1.9);
-    g.strokeStyle='#bdd654';g.lineWidth=.8;g.stroke();
-  }
-  for(const yy of [-10,-3]){
-    g.beginPath();g.moveTo(-r-2,yy);
-    g.bezierCurveTo(-r*.53,yy+3.3,r*.53,yy+3.3,r+2,yy);
-    g.strokeStyle='#436b2f';g.lineWidth=1;g.stroke();
-  }
-  g.restore();
-  // The brighter, curved lower lip is different from the upper shell:
-  // this prevents the turtle looking like a uniformly flat ellipse.
-  g.strokeStyle='#2e4024';g.lineWidth=2.4;
-  g.beginPath();g.ellipse(0,-5,r+1.25,11,0,.07,Math.PI*.94);g.stroke();
-  g.strokeStyle='#d0ba62';g.lineWidth=2.5;
-  g.beginPath();g.ellipse(0,1.5,r,5.8,0,.1,Math.PI-.1);g.stroke();
-  g.restore(); // Return to uncompressed head and leg coordinates.
+  drawSideDomedShell(r,p);
+
   if(p.toward>=-.13)drawSideHead3D(t,p);
-  // Near limbs are exposed below the shell rim; sockets stay embedded.
-  g.save();g.beginPath();g.rect(-r-9,4.8,2*r+18,36);g.clip();
-  flipper(legX(false,nearSide),4,false,nearSide,stroke+gaitPhase(false,nearSide),t.land,'side',p.c);
-  flipper(legX(true,nearSide),3.9,true,nearSide,stroke+gaitPhase(true,nearSide),t.land,'side',p.c);
-  g.restore();
-  g.strokeStyle='#334b28';g.lineWidth=1.4;
-  g.beginPath();g.moveTo(-r*.78,5);g.quadraticCurveTo(0,7.4,r*.78,5);g.stroke();
-  // The tapered tail trails on the opposite side of the head.
-  poly([[-p.c*r*.75,1.6],[-p.c*(r+7),3.5],[-p.c*r*.72,5.1]],'#78a458');
+  if(t.sleep){
+    // Two tucked paws just peep out from under the rim; no long flippers.
+    ell(-r*.49,4.5,2.0,1.1,'#719d4e');
+    ell(r*.46,4.5,2.0,1.1,'#719d4e');
+  }else{
+    g.save();g.beginPath();g.rect(-r-9,4.8,2*r+18,36);g.clip();
+    flipper(legX(false,nearSide),4,false,nearSide,stroke+gaitPhase(false,nearSide),t.land,'side',p.c);
+    flipper(legX(true,nearSide),3.9,true,nearSide,stroke+gaitPhase(true,nearSide),t.land,'side',p.c);
+    g.restore();
+    g.strokeStyle='#334b28';g.lineWidth=1.4;
+    g.beginPath();g.moveTo(-r*.78,5);g.quadraticCurveTo(0,7.4,r*.78,5);g.stroke();
+    // Tail stays tucked when sleeping.
+    poly([[-p.c*r*.75,1.6],[-p.c*(r+7),3.5],[-p.c*r*.72,5.1]],'#78a458');
+  }
   g.restore();
 }
 function drawSideHead3D(t,p){
   const cam=p.toward,front=clamp((cam+.15)/1.15,0,1),away=cam<-.38;
-  const hx=p.headX,hy=p.headY;
+  // Sleeping head/neck relax down toward the flat underside of the shell.
+  const hx=t.sleep?p.headX*.78:p.headX;
+  const hy=t.sleep?p.headY+1.4:p.headY;
+  const noseX=t.sleep?p.noseX*.78:p.noseX;
+  const noseY=t.sleep?p.noseY+1.4:p.noseY;
   // Rounded neck continuously emerges from shell, including 45° yaw.
   g.beginPath();
   g.moveTo(p.c*3.8,-3.5);
@@ -465,11 +512,11 @@ function drawSideHead3D(t,p){
     // Mouth outline terminates precisely at the nose used by collision.
     g.beginPath();
     g.moveTo(hx-2.5,hy+4.2);
-    g.quadraticCurveTo(p.noseX,hy+6.7,p.noseX,p.noseY);
+    g.quadraticCurveTo(noseX,hy+6.7,noseX,noseY);
     g.strokeStyle='#253e23';g.lineWidth=1.15;g.stroke();
     if(t.capture>.2){
-      g.beginPath();g.moveTo(p.noseX-1.8,p.noseY);
-      g.quadraticCurveTo(p.noseX,p.noseY+2.1,p.noseX+1.8,p.noseY);
+      g.beginPath();g.moveTo(noseX-1.8,noseY);
+      g.quadraticCurveTo(noseX,noseY+2.1,noseX+1.8,noseY);
       g.strokeStyle='#233324';g.stroke();
     }
   }
@@ -489,21 +536,34 @@ function drawTurtle(now){
     // Rotate +X to the turtle's heading; face and both red cheek spots
     // remain paired and symmetric at every angle.
     g.rotate(-t.heading); // Correct world Y-up -> canvas Y-down projection.
-    // Exact two-step cycle, with the turtle viewed head-up:
-    // 1 front-left + 3 rear-right move forward together;
-    // 2 front-right + 4 rear-left move backward together; then reverse.
-    flipper(-8,-8,false,-1,stroke+gaitPhase(false,-1),t.land,'top'); // 4
-    flipper(-8,8,false,1,stroke+gaitPhase(false,1),t.land,'top');   // 3
-    flipper(5,-9,true,-1,stroke+gaitPhase(true,-1),t.land,'top');  // 1
-    flipper(5,9,true,1,stroke+gaitPhase(true,1),t.land,'top');     // 2
-    poly([[-11,-2],[-23,0],[-11,3]],'#719c58');
-    ell(16,0,9,8.5,'#7eae58');
-    topFace(t.sleep);
-    shellTop();
-    // Top-view shell does not hide the face, eyes or chin patches.
-    ell(17,0,8.2,7.2,'#81aa5d');
-    topFace(t.sleep);
-    if(t.capture>.25){g.strokeStyle='#2b482a';g.lineWidth=1.1;g.beginPath();g.moveTo(22,-2);g.lineTo(24,0);g.lineTo(22,2);g.stroke()}
+    if(t.sleep){
+      // Rest on the platform or the tank floor: flattened pose,
+      // no paddling and only tiny tucked limb tips beneath the shell.
+      ell(-8,-8,3.1,2.2,'#709b4c');
+      ell(-8,8,3.1,2.2,'#709b4c');
+      ell(7,-8,3.1,2.2,'#709b4c');
+      ell(7,8,3.1,2.2,'#709b4c');
+      ell(13.5,0,8.6,7.6,'#7eab57');
+      shellTop();
+      ell(16,0,8.0,7.2,'#8bb661');
+      topFace(true);
+    }else{
+      // Step 1: front-left (1) + rear-right (3) forward.
+      // Step 2: front-right (2) + rear-left (4) forward.
+      flipper(-8,-8,false,-1,stroke+gaitPhase(false,-1),t.land,'top'); // 4
+      flipper(-8,8,false,1,stroke+gaitPhase(false,1),t.land,'top');   // 3
+      flipper(5,-9,true,-1,stroke+gaitPhase(true,-1),t.land,'top');  // 1
+      flipper(5,9,true,1,stroke+gaitPhase(true,1),t.land,'top');     // 2
+      poly([[-11,-2],[-23,0],[-11,3]],'#719c58');
+      ell(16,0,9,8.5,'#7eae58');
+      shellTop();
+      ell(17,0,8.2,7.2,'#81aa5d');
+      topFace(false);
+      if(t.capture>.25){
+        g.strokeStyle='#2b482a';g.lineWidth=1.1;
+        g.beginPath();g.moveTo(22,-2);g.lineTo(24,0);g.lineTo(22,2);g.stroke();
+      }
+    }
   }
   g.restore();
   if(t.sleep)txt('zZ',x+12*depthScale,y-17*depthScale,12*depthScale,'#fff');
