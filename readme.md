@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Sleeping eyes / 睡眠閉眼動畫
+
+**English:** When the turtle sleeps, both eyes close in Top view and any visible eyes close in Side view, including three-quarter frontal poses. The white eye areas and pupils are replaced by green eyelids and curved closed-eye lines. Eyes reopen as soon as the turtle wakes. This visual change does not affect the existing sleep or care rules.
+
+**繁體中文：** 烏龜進入睡眠狀態時，俯視模式中的雙眼會閉上；側視模式及面向觀眾的斜角姿態中，所有看得見的眼睛亦會閉上。原本白色的眼球與瞳孔會改為綠色眼瞼和弧形閉眼線條。醒來後眼睛立即重新張開。這項修改不影響原有的睡眠或飼養規則。
+
 ## Thinner shell in side view / 側視龜殼厚度調整
 
 **English:** The shell and plastron are now **50% of their previous vertical thickness** in Side view only. Their horizontal length and the position of the lower shell rim are preserved. The head, neck and legs keep their existing proportions; Top view is unchanged.
