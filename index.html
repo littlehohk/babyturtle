@@ -58,6 +58,16 @@ function turtleDrawScale(t){
 // in logical 320x240 canvas pixels. Geometry follows the exact view transforms.
 const SIDE_WATERLINE=CT-143;
 function sideBodyY(t,scale){return t.land?SIDE_WATERLINE-11.2*scale:CT-t.z/10*143-4;}
+// Camera projects world X horizontally and world Y into depth.  A
+// foreshortened *ellipsoid* is not a flat 2D sprite turned edge-on.
+function sidePose(t){
+  const c=Math.cos(t.heading),sn=Math.sin(t.heading),toward=-sn;
+  const shellRadius=Math.hypot(14*c,10.5*sn)+1.2;
+  const headX=15*c,headY=-.5+2.7*toward;
+  const noseX=toward>.6?headX+7*c*(1-toward):23*c;
+  const noseY=headY+(toward>.5?4.5+1.5*toward:2.8);
+  return {c,sn,toward,shellRadius,headX,headY,noseX,noseY};
+}
 function visibleMouth(t){
   const sc=turtleDrawScale(t),cx=t.x/28*320;
   if(!t.side){
@@ -66,12 +76,8 @@ function visibleMouth(t){
     return {x:cx+25*sc*Math.cos(t.heading),
             y:cy-25*sc*Math.sin(t.heading)};
   }
-  const cy=CT-t.z/10*143-4,c=Math.cos(t.heading),facing=c>=0?1:-1;
-  const projectedWidth=.16+.84*Math.abs(c);
-  const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.1);
-  const angle=-pitch*.65*facing;
-  return {x:cx+sc*facing*projectedWidth*(25*Math.cos(angle)-3*Math.sin(angle)),
-          y:cy+sc*(25*Math.sin(angle)+3*Math.cos(angle))};
+  const p=sidePose(t),cy=sideBodyY(t,sc);
+  return {x:cx+sc*p.noseX,y:cy+sc*p.noseY};
 }
 function mouthPoint(t){
   const pixel=visibleMouth(t);
@@ -293,6 +299,114 @@ function sideFace(sleeping,nearProfile){
   }
   if(sleeping){g.strokeStyle='#294b2c';g.lineWidth=1.4;g.beginPath();g.moveTo(15,-4);g.quadraticCurveTo(19,-2.8,22,-4);g.stroke()}
 }
+// Layered, continuously rotated side view. Shell width stays substantial
+// through 45°, 90° and 135° turns. Near/far limbs and head use occlusion.
+function drawSideTurtle3D(t,stroke){
+  const p=sidePose(t),r=p.shellRadius;
+  const legX=(front,side)=>(front?5.8:-8.5)*p.c-p.sn*(side*5.2);
+  const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.3);
+  g.save();
+  g.rotate(-pitch*.13);
+  // Far paddles: behind plastron/carapace, even at oblique angles.
+  flipper(legX(false,1),2.9,false,-1,stroke+Math.PI+.35,t.land,'side');
+  flipper(legX(true,1),2.8,true,-1,stroke,t.land,'side');
+  // When travelling away from the viewer, the head is partially
+  // hidden behind the domed shell; frontal turns bring it forward.
+  if(p.toward<-.13)drawSideHead3D(t,p);
+  ell(0,2.4,r*.98,7.8,'#4b4c2b');
+  ell(0,3,r*.92,6.7,'#d8b455');
+  for(let q=-2;q<=2;q++)ell(q*r*.36,4.8,1.2,1.7,'#856833');
+  ell(0,-4.8,r+1.2,11.2,'#253f26');
+  const grad=g.createRadialGradient(-r*.23,-12,1,1,-3,r*1.75);
+  grad.addColorStop(0,'#d4e76c');
+  grad.addColorStop(.34,'#91b646');
+  grad.addColorStop(.68,'#678c3f');
+  grad.addColorStop(1,'#345a30');
+  g.beginPath();g.ellipse(0,-5.3,r,10.4,0,0,Math.PI*2);
+  g.fillStyle=grad;g.fill();
+  g.save();
+  g.beginPath();g.ellipse(0,-5.3,r-.35,9.9,0,0,Math.PI*2);g.clip();
+  // Perspective-curved seams express shell height and thickness.
+  for(let i=-2;i<=2;i++){
+    const xx=i*r*.34;
+    g.beginPath();
+    g.moveTo(xx-r*.08,-15);
+    g.bezierCurveTo(xx+r*.14,-11,xx-r*.18,-5,xx+r*.08,4);
+    g.strokeStyle='#3a612b';g.lineWidth=1.05;g.stroke();
+    g.beginPath();
+    g.ellipse(xx,-9+(i%2)*1.4,2.3,1.1,.15*p.sn,0,Math.PI*1.9);
+    g.strokeStyle='#bdd654';g.lineWidth=.8;g.stroke();
+  }
+  for(const yy of [-10,-3]){
+    g.beginPath();g.moveTo(-r-2,yy);
+    g.bezierCurveTo(-r*.53,yy+3.3,r*.53,yy+3.3,r+2,yy);
+    g.strokeStyle='#436b2f';g.lineWidth=1;g.stroke();
+  }
+  g.restore();
+  // The brighter, curved lower lip is different from the upper shell:
+  // this prevents the turtle looking like a uniformly flat ellipse.
+  g.strokeStyle='#2e4024';g.lineWidth=2.4;
+  g.beginPath();g.ellipse(0,-5,r+1.25,11,0,.07,Math.PI*.94);g.stroke();
+  g.strokeStyle='#d0ba62';g.lineWidth=2.5;
+  g.beginPath();g.ellipse(0,1.5,r,5.8,0,.1,Math.PI-.1);g.stroke();
+  if(p.toward>=-.13)drawSideHead3D(t,p);
+  // Near limbs are exposed below the shell rim; sockets stay embedded.
+  g.save();g.beginPath();g.rect(-r-9,4.8,2*r+18,36);g.clip();
+  flipper(legX(false,-1),4,false,1,stroke+.35,t.land,'side');
+  flipper(legX(true,-1),3.9,true,1,stroke+Math.PI,t.land,'side');
+  g.restore();
+  g.strokeStyle='#334b28';g.lineWidth=1.4;
+  g.beginPath();g.moveTo(-r*.78,5);g.quadraticCurveTo(0,7.4,r*.78,5);g.stroke();
+  // The tapered tail trails on the opposite side of the head.
+  poly([[-p.c*r*.75,1.6],[-p.c*(r+7),3.5],[-p.c*r*.72,5.1]],'#78a458');
+  g.restore();
+}
+function drawSideHead3D(t,p){
+  const cam=p.toward,front=clamp((cam+.15)/1.15,0,1),away=cam<-.38;
+  const hx=p.headX,hy=p.headY;
+  // Rounded neck continuously emerges from shell, including 45° yaw.
+  g.beginPath();
+  g.moveTo(p.c*3.8,-3.5);
+  g.quadraticCurveTo(hx-p.c*5,hy-5.5,hx,hy-6.4);
+  g.quadraticCurveTo(hx+p.c*7,hy-3,hx+p.c*8,hy+3.5);
+  g.quadraticCurveTo(hx*.6,hy+7,p.c*2,5.3);
+  g.closePath();g.fillStyle=away?'#67934f':'#7ca853';g.fill();
+  g.strokeStyle='#355b30';g.lineWidth=1.1;g.stroke();
+  ell(hx,hy,8.3+front*1.6,7.7,'#749c52');
+  ell(hx-p.c,hy-1,7.1+front*1.3,6.6,'#97c168');
+  if(away){
+    // Rear three-quarter: both side stripes, face hidden by carapace.
+    for(const side of [-1,1])ell(hx+side*3.3,hy+.9,1.1,3.2,'#dd6340',side*.25);
+    ell(hx,hy-3,5.7,2,'#a5cc6d');
+  }else{
+    // Front three-quarter: the far eye emerges progressively as the
+    // head turns toward the viewer, like the supplied 45-degree frames.
+    const sep=2.9+2.3*front;
+    const ex=hx+p.c*3+sep*front*.52;
+    ell(ex,hy-3.1,3.45,3.8,'#fafff2');
+    ell(ex+p.c*.35,hy-3,2.35,2.7,'#25382a');
+    ell(ex-.7,hy-4.1,.9,1.05,'#fff');
+    if(front>.2){
+      const far=hx-sep*front;
+      ell(far,hy-3.2,2.25+front*.7,2.6+front*.7,'#f7fff2');
+      ell(far-.2,hy-3,1.55+front*.3,1.8+front*.3,'#283b29');
+      ell(far-.7,hy-4,.7,.85,'#fff');
+    }
+    ell(hx-4.9,hy+1,2.35,2.95,'#e45a37',-.2);
+    if(front>.38)ell(hx+5.4,hy+1,2.1,2.7,'#e76241',.2);
+    // Mouth outline terminates precisely at the nose used by collision.
+    g.beginPath();
+    g.moveTo(hx-2.5,hy+4.2);
+    g.quadraticCurveTo(p.noseX,hy+6.7,p.noseX,p.noseY);
+    g.strokeStyle='#253e23';g.lineWidth=1.15;g.stroke();
+    if(t.capture>.2){
+      g.beginPath();g.moveTo(p.noseX-1.8,p.noseY);
+      g.quadraticCurveTo(p.noseX,p.noseY+2.1,p.noseX+1.8,p.noseY);
+      g.strokeStyle='#233324';g.stroke();
+    }
+  }
+}
+
 function drawTurtle(now){
   const t=s.t,side=t.side;
   const x=t.x/28*320, y=side?sideBodyY(t,turtleDrawScale(t)):CT-t.y/17*(CT-WT);
@@ -302,45 +416,7 @@ function drawTurtle(now){
   const phase=t.stroke||0,stroke=active?phase:phase*.18;
   g.save();g.translate(x,y);g.scale(depthScale,depthScale);
   if(side){
-    const cosine=Math.cos(t.heading),frontness=Math.sin(t.heading);
-    const profile=Math.abs(cosine),faceViewer=frontness<-.18,away=frontness>.18;
-    const facing=cosine>=0?1:-1;
-    // Perspective yaw: interpolate profile -> three-quarter -> front/rear.
-    const foreshorten=.16+.84*profile;
-    g.scale(facing*foreshorten,1);
-    const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.1);
-    g.rotate(-pitch*.65*facing);
-    // Both FAR paddles originate well inside the body and are covered
-    // by the belly and the carapace. Their strokes oppose the near paddles.
-    flipper(-9,3.1,false,-1,stroke+Math.PI+.35,t.land,'side');
-    flipper(5,2.8,true,-1,stroke,t.land,'side');
-    if(away&&profile<.5){
-      ell(14,0,8,7,'#78a252');
-      sideFace(t.sleep,true);
-    }
-    ell(1,2,14,6,'#bbb864');
-    ell(0,-3,15,10,'#263d24');
-    ell(0,-4,13.5,9.5,'#8ca748');
-    ell(0,-6,12.5,7.6,'#a3c14d');
-    g.strokeStyle='#426d31';g.lineWidth=.95;
-    for(let u=-9;u<=9;u+=6){g.beginPath();g.moveTo(u,-11);g.quadraticCurveTo(u+4,-6,u+5,-1);g.stroke()}
-    // Near paddles emerge from UNDER the shell rim, rather than being
-    // drawn on top of the shell. Same anatomy as the far paddles.
-    g.save();
-    g.beginPath();g.rect(-35,4.8,75,36);g.clip();
-    flipper(-9,4.1,false,1,stroke+.35,t.land,'side');
-    flipper(5,4.0,true,1,stroke+Math.PI,t.land,'side');
-    g.restore();
-    // Continuous lower shell/belly edge conceals the roots.
-    g.strokeStyle='#314a28';g.lineWidth=1.5;
-    g.beginPath();g.moveTo(-13,5.2);g.quadraticCurveTo(0,8.5,13,5.2);g.stroke();
-    if(!away||profile>.52){
-      ell(15,-.4,9.5,8,'#83ae60');
-      ell(18,1,7,5.7,'#8eb566');
-      sideFace(t.sleep,profile<.45&&faceViewer);
-      if(t.capture>.25){g.strokeStyle='#263d28';g.lineWidth=1.3;g.beginPath();g.moveTo(20,4);g.quadraticCurveTo(22,6+3*t.capture,24,3);g.stroke()}
-    }
-    poly([[-12,0],[-25,3],[-12,5]],'#78a35c');
+    drawSideTurtle3D(t,stroke);
   }else{
     // Rotate +X to the turtle's heading; face and both red cheek spots
     // remain paired and symmetric at every angle.
