@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Visible, broad paddles when swimming toward the viewer / 正面及側面划水修正
+
+**English:** The four swimming flippers in Side view have been redrawn **wider and thicker**, retaining green body striping and a mostly horizontal rowing direction. The flipper projection now accounts for the turtle's **toward/away viewing direction**, so a turtle swimming straight toward the player spreads the two front and two hind flippers **outward on both sides** instead of projecting them inward beneath the carapace. Front and rear swimming flippers occupy slightly different heights, making the pairs distinct when viewed head-on. The clipping that previously hid the upper portions of near-side swimming paddles has been removed; clipping still applies to the downward, Z-shaped legs used for walking on land. The same **1+3 / 2+4** diagonal stroke timing remains intact, and sleeping legs remain tucked.
+
+**繁體中文：** 側視游泳的四肢現繪得**更寬、更厚**，並保留綠色條紋與主要橫向划水的方向。四肢投影現會考慮烏龜是**面向觀眾還是背向觀眾**；當牠正面游向玩家時，兩隻前腳及兩隻後腳均會**向身體兩側伸展**，不再反向縮進龜殼之下。前後肢的高度稍有分別，讓正面觀察時能分辨四肢。同時取消先前遮擋近側游泳腳掌上半部的裁切；陸上步行的向下 Z 字形四肢仍保留原有裁切。**1、3／2、4** 交替划水的節奏不變，睡眠時亦繼續收起四肢。
+
 ## Horizontal side-view swimming paddles / 側視橫向划水
 
 **English:** While swimming in Side view, all four limbs now extend and paddle predominantly **left–right**, alongside the turtle's body, rather than pointing down. The movement preserves the established diagonal two-step rhythm: legs **1 and 3** move together while **2 and 4** move in the opposing phase. A small vertical variation and direction-dependent foreshortening help the movement look natural as the turtle turns. The upper limb roots stay embedded under the shell. **Walking on land is unchanged:** the legs still bend downward into the Z-shaped walking pose; during **sleep** they remain tucked beneath the shell.
