@@ -205,45 +205,74 @@ function shellPattern(){g.strokeStyle='#6f7132';g.lineWidth=.8;for(let a=0;a<6;a
 // Matching four-limb anatomy, modelled on the BREST swimming reference.
 // A broad upper limb disappears underneath the shell; no pin-like attachments.
 // The power stroke is broad and extended; the recovery stroke folds inward.
-function flipper(x,y,front,side,phase,walking=false,projection='top'){
-  g.save();
-  g.translate(x,y);
-  // Half the previous linear dimensions: approximately one-quarter
-  // of the previous visible limb area. The origin stays under the shell.
+// Leg identity in the diagram: 1=front-left, 2=front-right,
+// 3=rear-right, 4=rear-left. Pairs (1,3) and (2,4) oppose each other.
+function gaitPhase(front,side){
+  const group13=(front&&side<0)||(!front&&side>0);
+  return group13?0:Math.PI;
+}
+// All four limbs retain the same paddle anatomy. Walking uses the same
+// diagonal gait but folds the limbs underneath the carapace.
+function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacing=1){
+  g.save();g.translate(x,y);
+  // Keep the compact limb dimensions established in the previous revision.
   g.scale(.5,.5);
-  const swim=!walking,cycle=Math.sin(phase),lift=Math.cos(phase);
-  const power=(cycle+1)*.5;
-  const length=front?17.5:15.3;
-  const opening=swim?(front?.70:.55):.24;
-  const sweep=opening*cycle+(front?.07:-.23)*side;
-  g.rotate(sweep);
-  // In top view the limbs project outward to their own side; in side view
-  // both far and near limbs sweep down below the shell/belly.
+  const cycle=Math.sin(phase),power=(cycle+1)*.5;
+  const amp=walking?.24:(front?.67:.54);
+  // Forward always means towards the head (+local X). In top view the
+  // near/far sides are reflected, so their *rotation* must also reverse.
+  // Side view projects the same stroke along the turtle's heading.
+  const bendRotation=projection==='top'?-side*amp*cycle:-amp*cycle*cameraFacing;
+  const restingSplay=projection==='top'?side*(front?.10:-.18):0;
+  g.rotate(bendRotation+restingSplay);
   g.scale(1,projection==='top'?side:1);
-  const extension=swim?.76+.24*power:.89;
-  const fold=swim?(1-power)*3.1:1.4;
+  if(walking&&projection==='side'){
+    // Two visible hinges make a Z-shaped planted leg: shoulder -> knee ->
+    // ankle. The foot reverses direction after the knee rather than
+    // remaining an extended swimming paddle.
+    const dir=(front?1:-1)*(cameraFacing>=0?1:-1);
+    const kneeX=dir*(6+cycle*1.4),kneeY=8;
+    const footX=kneeX-dir*(7+cycle*1.3),footY=17;
+    g.lineCap='round';g.lineJoin='round';
+    g.beginPath();
+    g.moveTo(-1,-1);g.lineTo(kneeX,kneeY);g.lineTo(footX,footY);
+    g.strokeStyle='#2e482b';g.lineWidth=9.1;g.stroke();
+    g.strokeStyle='#77a651';g.lineWidth=7.5;g.stroke();
+    g.strokeStyle='#c2d96e';g.lineWidth=1.35;g.stroke();
+    ell(-1,0,4.8,4.4,'#648e45');
+    ell(kneeX,kneeY,3.6,3.1,'#83b05c');
+    ell(footX,footY,3.8,2.1,'#81ad58');
+    for(let i=-1;i<=1;i++){
+      g.beginPath();g.moveTo(footX+i*2.1,footY);
+      g.lineTo(footX+i*2.25,footY+3+(i===0?.7:0));
+      g.strokeStyle='#35462c';g.lineWidth=1.05;g.stroke();
+    }
+    g.restore();return;
+  }
+  // A folded Z leg appears shorter from directly above; it shares the
+  // exact same 1&3/2&4 timing as swimming, but has less reach and spread.
+  if(walking&&projection==='top')g.scale(.83,.62);
+  const len=front?17.5:15.3;
+  const extension=walking?.82:(.76+.24*power);
+  const fold=walking?2.25:(1-power)*3.1;
   g.scale(1,extension);
-  const tipX=(front?2.7:-5.0)+fold;
-  const tipY=length;
-  // Upper leg is broad enough to read as a shoulder/hip, not a stalk.
+  const tipX=(front?2.7:-5)+fold,tipY=len;
   ell(0,1,5.9,4.7,'#587e3e');
   g.beginPath();
-  g.moveTo(-5.0,-2.7);
-  g.bezierCurveTo(2.3,-4,8.0,2.1,tipX+5.0,tipY-5);
+  g.moveTo(-5,-2.7);
+  g.bezierCurveTo(2.3,-4,8,2.1,tipX+5,tipY-5);
   g.quadraticCurveTo(tipX+7.6,tipY+1.4,tipX+2.1,tipY+2.5);
   g.lineTo(tipX-1.1,tipY+1.4);
   g.quadraticCurveTo(tipX-5.9,tipY+5,tipX-7.1,tipY+.5);
-  g.bezierCurveTo(tipX-9,tipY-7,-9.1,5.9,-5.0,-2.7);
+  g.bezierCurveTo(tipX-9,tipY-7,-9.1,5.9,-5,-2.7);
   g.closePath();g.fillStyle='#7ba957';g.fill();
   g.lineWidth=1.3;g.strokeStyle='#304b25';g.stroke();
-  // Long green/yellow striping follows the actual limb curvature.
   g.beginPath();g.moveTo(-2,-.5);
   g.bezierCurveTo(2.8,4.3,tipX+1.7,tipY-6,tipX+.7,tipY-.7);
   g.strokeStyle='#b9d56d';g.lineWidth=1.6;g.stroke();
   g.beginPath();g.moveTo(-4,1.4);
   g.bezierCurveTo(-1,7.3,tipX-2.2,tipY-6,tipX-2.3,tipY-1.4);
   g.strokeStyle='#447b39';g.lineWidth=.9;g.stroke();
-  // Three toes share the same shape on all four limbs.
   for(let i=0;i<3;i++){
     const xx=tipX-4.1+i*3.1;
     g.beginPath();g.moveTo(xx,tipY-.5);
@@ -252,6 +281,7 @@ function flipper(x,y,front,side,phase,walking=false,projection='top'){
   }
   g.restore();
 }
+
 function topFace(sleeping){
   // The two large eyes are visible at every heading in top projection.
   ell(15.4,-5,4.2,4.6,'#fff');
@@ -304,12 +334,14 @@ function sideFace(sleeping,nearProfile){
 function drawSideTurtle3D(t,stroke){
   const p=sidePose(t),r=p.shellRadius;
   const legX=(front,side)=>(front?5.8:-8.5)*p.c-p.sn*(side*5.2);
+  // The physical near/far sides change when the turtle turns around.
+  const nearSide=p.c>=0?-1:1,farSide=-nearSide;
   const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.3);
   g.save();
   g.rotate(-pitch*.13);
   // Far paddles: behind plastron/carapace, even at oblique angles.
-  flipper(legX(false,1),2.9,false,-1,stroke+Math.PI+.35,t.land,'side');
-  flipper(legX(true,1),2.8,true,-1,stroke,t.land,'side');
+  flipper(legX(false,farSide),2.9,false,farSide,stroke+gaitPhase(false,farSide),t.land,'side',p.c);
+  flipper(legX(true,farSide),2.8,true,farSide,stroke+gaitPhase(true,farSide),t.land,'side',p.c);
   // When travelling away from the viewer, the head is partially
   // hidden behind the domed shell; frontal turns bring it forward.
   if(p.toward<-.13)drawSideHead3D(t,p);
@@ -352,8 +384,8 @@ function drawSideTurtle3D(t,stroke){
   if(p.toward>=-.13)drawSideHead3D(t,p);
   // Near limbs are exposed below the shell rim; sockets stay embedded.
   g.save();g.beginPath();g.rect(-r-9,4.8,2*r+18,36);g.clip();
-  flipper(legX(false,-1),4,false,1,stroke+.35,t.land,'side');
-  flipper(legX(true,-1),3.9,true,1,stroke+Math.PI,t.land,'side');
+  flipper(legX(false,nearSide),4,false,nearSide,stroke+gaitPhase(false,nearSide),t.land,'side',p.c);
+  flipper(legX(true,nearSide),3.9,true,nearSide,stroke+gaitPhase(true,nearSide),t.land,'side',p.c);
   g.restore();
   g.strokeStyle='#334b28';g.lineWidth=1.4;
   g.beginPath();g.moveTo(-r*.78,5);g.quadraticCurveTo(0,7.4,r*.78,5);g.stroke();
@@ -421,13 +453,13 @@ function drawTurtle(now){
     // Rotate +X to the turtle's heading; face and both red cheek spots
     // remain paired and symmetric at every angle.
     g.rotate(-t.heading); // Correct world Y-up -> canvas Y-down projection.
-    // Diagonal alternating paddling, as in the top-view reference.
-    // FL and RR drive together; FR and RL drive half a cycle later.
-    // Rear kick is slightly delayed and smaller than front sweep.
-    flipper(-8,-8,false,-1,stroke+Math.PI+.35,t.land,'top');
-    flipper(-8,8,false,1,stroke+.35,t.land,'top');
-    flipper(5,-9,true,-1,stroke,t.land,'top');
-    flipper(5,9,true,1,stroke+Math.PI,t.land,'top');
+    // Exact two-step cycle, with the turtle viewed head-up:
+    // 1 front-left + 3 rear-right move forward together;
+    // 2 front-right + 4 rear-left move backward together; then reverse.
+    flipper(-8,-8,false,-1,stroke+gaitPhase(false,-1),t.land,'top'); // 4
+    flipper(-8,8,false,1,stroke+gaitPhase(false,1),t.land,'top');   // 3
+    flipper(5,-9,true,-1,stroke+gaitPhase(true,-1),t.land,'top');  // 1
+    flipper(5,9,true,1,stroke+gaitPhase(true,1),t.land,'top');     // 2
     poly([[-11,-2],[-23,0],[-11,3]],'#719c58');
     ell(16,0,9,8.5,'#7eae58');
     topFace(t.sleep);
