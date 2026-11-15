@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Horizontal side-view swimming paddles / 側視橫向划水
+
+**English:** While swimming in Side view, all four limbs now extend and paddle predominantly **left–right**, alongside the turtle's body, rather than pointing down. The movement preserves the established diagonal two-step rhythm: legs **1 and 3** move together while **2 and 4** move in the opposing phase. A small vertical variation and direction-dependent foreshortening help the movement look natural as the turtle turns. The upper limb roots stay embedded under the shell. **Walking on land is unchanged:** the legs still bend downward into the Z-shaped walking pose; during **sleep** they remain tucked beneath the shell.
+
+**繁體中文：** 側視游泳時，四肢現主要沿身體兩旁**左右橫向伸展及划水**，不再向下垂。動作保留原有兩步對角節奏：**1、3** 同步，**2、4** 以相反相位划水。配合少量上下角度變化及轉向時的透視縮短效果，令動作較自然。四肢根部仍藏在龜殼下。**陸上步行不變**，四肢繼續以向下彎曲的 **Z 字形**走動；**睡覺時**則收起四肢。
+
 ## Side-view movement and recovery visibility / 側視活動與呼吸恢復顯示
 
 **English:** In Side view, a conscious turtle now continues paddling while surfacing and makes subtle breathing/head and flipper movements during breathing recovery or short rests. Recovery periods after long dives can last **5 or 15 real minutes**, so the aquarium shows a localized **Breathing** label and approximate remaining minutes rather than appearing frozen. Brief **Resting**, **Surfacing for air**, and **Sleeping** labels distinguish temporary inactivity from a fault. The turtle chooses another roaming destination promptly when it reaches its previous target; it no longer waits unnecessarily for the old wandering timer. Genuine sleep remains stationary with closed eyes and tucked legs. No survival thresholds, breathing recovery durations, saved-game keys, or language-switch behaviour have changed.
