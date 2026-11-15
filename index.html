@@ -345,6 +345,13 @@ function drawSideTurtle3D(t,stroke){
   // When travelling away from the viewer, the head is partially
   // hidden behind the domed shell; frontal turns bring it forward.
   if(p.toward<-.13)drawSideHead3D(t,p);
+  // Halve the side-view shell and plastron thickness, preserving their
+  // horizontal dimensions and the old lower rim height at y = 5.
+  // Neck, head and all four legs remain at their original size.
+  g.save();
+  g.translate(0,5);
+  g.scale(1,.5);
+  g.translate(0,-5);
   ell(0,2.4,r*.98,7.8,'#4b4c2b');
   ell(0,3,r*.92,6.7,'#d8b455');
   for(let q=-2;q<=2;q++)ell(q*r*.36,4.8,1.2,1.7,'#856833');
@@ -381,6 +388,7 @@ function drawSideTurtle3D(t,stroke){
   g.beginPath();g.ellipse(0,-5,r+1.25,11,0,.07,Math.PI*.94);g.stroke();
   g.strokeStyle='#d0ba62';g.lineWidth=2.5;
   g.beginPath();g.ellipse(0,1.5,r,5.8,0,.1,Math.PI-.1);g.stroke();
+  g.restore(); // Return to uncompressed head and leg coordinates.
   if(p.toward>=-.13)drawSideHead3D(t,p);
   // Near limbs are exposed below the shell rim; sockets stay embedded.
   g.save();g.beginPath();g.rect(-r-9,4.8,2*r+18,36);g.clip();
