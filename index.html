@@ -516,17 +516,19 @@ function drawSideTurtle3D(t,stroke){
   // still renders behind the head, preserving correct overlap.
   const farFrontLegX=()=>{
     const root=legX(true,farSide);
-    if(t.land||t.sleep||p.toward<=.4)return root;
+    // Engage earlier, before the far foreleg is fully swallowed by the
+    // round head in a front three-quarter pose.
+    if(t.land||t.sleep||p.toward<=.22)return root;
     const axis=p.c+farSide*p.toward*.92;
     const dir=axis>=0?1:-1;
     const front=clamp((p.toward+.15)/1.15,0,1);
     const cheekEdge=p.headX+dir*(8.3+1.6*front);
-    // Minimum paddle reach at the retracted part of its stroke,
-    // including the short toes, in existing side-view drawing units.
-    const minTipReach=(.76*2/3)*(11.4+3.8);
-    const needed=dir*(cheekEdge-root)-minTipReach+2.3;
-    const easing=clamp((p.toward-.4)/.16,0,1);
-    return root+dir*clamp(needed,0,7)*easing;
+    // Maintain the current SHORT paddle; only its attachment shifts.
+    const minTipReach=(.76*(2/3))*(11.4+3.8);
+    const needed=dir*(cheekEdge-root)-minTipReach+3.2;
+    // Smoothly introduce the offset over a larger three-quarter range.
+    const easing=clamp((p.toward-.22)/.32,0,1);
+    return root+dir*clamp(needed,0,8.5)*easing;
   };
   const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.3);
   g.save();
