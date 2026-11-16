@@ -735,12 +735,14 @@ function wakeTurtle(now=Date.now()){
   t.wakeGraceUntil=now+300000;
   t.darkSince=0;
   rest=0;
-  wander=0;
+  wander=7; // Do not immediately roll another random rest after waking.
+  play=Math.max(play,2); // Short, guaranteed active movement after waking.
   // Give the turtle an actual new destination rather than leaving it
   // at the last resting position or at the centre of its old target.
   target=t.land
     ?{x:LAND-3.6,y:clamp(t.y+rand(-2,2),1,16),z:9.2}
-    :{x:clamp(t.x+rand(-5,5),1,LAND-2),y:clamp(t.y+rand(-4,4),1,16),z:clamp(t.z+rand(-2,2),1,9.2)};
+    :{x:clamp(t.x+(t.x<LAND/2?4:-4),1,LAND-2),
+      y:clamp(t.y+rand(-2,2),1,16),z:clamp(t.z+2,1,9.2)};
 }
 function control(x,y,kind){
   if(settings)return;
