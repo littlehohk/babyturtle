@@ -603,6 +603,18 @@ function drawSideHead3D(t,p){
     // head turns toward the viewer, like the supplied 45-degree frames.
     const sep=2.9+2.3*front;
     const ex=hx+p.c*3+sep*front*.52;
+    const far=hx-sep*front;
+    // A red-eared slider's scarlet patch sits BEHIND each eye, toward
+    // the neck/shell. Mirror its position with the turtle's heading:
+    // left-facing: ear right of eye; right-facing: ear left of eye.
+    // As the turtle turns head-on, the markings move to the cheeks.
+    const nearEarX=ex-p.c*5.1+1.35*headOn*(1-Math.abs(p.c));
+    ell(nearEarX,hy+1.45,2.2,2.55,'#e45a37',-.22*p.c);
+    if(front>.38){
+      const farEarX=far-p.c*2.4-.25*headOn;
+      ell(farEarX,hy+1.5,2.1,2.5,'#e76241',.18*p.c);
+    }
+    // Draw the eyes AFTER the ear patches so their outlines remain crisp.
     if(t.sleep){
       ell(ex,hy-3.1,3.45,2.9,'#8eb966');
       closedEye(ex,hy-3.1,3.3);
@@ -612,7 +624,6 @@ function drawSideHead3D(t,p){
       ell(ex-.7,hy-4.1,.9,1.05,'#fff');
     }
     if(front>.2){
-      const far=hx-sep*front;
       if(t.sleep){
         ell(far,hy-3.2,2.35+front*.65,2.4,'#8eb966');
         closedEye(far,hy-3.2,2.25+front*.55);
@@ -622,8 +633,6 @@ function drawSideHead3D(t,p){
         ell(far-.7,hy-4,.7,.85,'#fff');
       }
     }
-    ell(hx-4.9,hy+1,2.35,2.95,'#e45a37',-.2);
-    if(front>.38)ell(hx+5.4,hy+1,2.1,2.7,'#e76241',.2);
     // A centered, gently curved smile sits on the rounded chin when
     // looking at the viewer. Other yaw angles keep the profile mouth.
     g.beginPath();
