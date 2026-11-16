@@ -152,6 +152,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 **繁體中文：** 側視模式中的紅耳斑現改為位於**眼睛後方、靠近頸部的位置**，不再靠近鼻端。烏龜向左或向右游泳時，紅耳斑會隨方向正確鏡像；轉向正面時，則自然移至兩頰。繪畫順序亦改為先畫耳斑、再畫眼睛，以保留清晰的眼部輪廓。頭型、四肢層次、活動動畫及存檔均維持不變。
 
+## Broader far-front-leg visibility / 擴大斜角前肢可見範圍
+
+**English:** The far front flipper's three-quarter-view visibility adjustment now starts at a gentler forward angle (**toward > 0.22**, formerly 0.4), blends in across a wider heading range, and permits a slightly larger outward root shift (up to **8.5 drawing units**, previously 7). This is to reduce disappearance behind the rounded head at intermediate front-facing angles. The leg itself stays short, and its inner portion is still rendered **behind** the head. Top view, swimming gait, land walking, sleeping and saved progress are unchanged.
+
+**繁體中文：** 較遠一側前肢的斜角可見度調整，現在會於較小的正面轉向角度開始（**toward 大於 0.22**，原為 0.4），並在更廣的轉向範圍逐步生效；肢體根部可向外微調最多 **8.5 個繪圖單位**（原為 7），減少中間斜角時整隻前肢被圓形頭部遮沒的情況。四肢原有較短的長度不變，前肢靠內的部分仍會畫在**頭部後方**。俯視、划水節奏、陸上步行、睡眠及遊戲進度均不受影響。
+
 ## Far front leg visibility at three-quarter angles / 側視斜角前肢可見度
 
 **English:** At some Side-view three-quarter swimming angles, the **far/right front leg** was completely hidden by the turtle's rounded head, even though its proper drawing layer was behind the head. The renderer now offsets that leg's attachment slightly outboard as the turtle turns toward the viewer, ensuring that a small portion of the paddle remains visible beyond the cheek. The offset varies smoothly with heading, does not lengthen the already shortened paddles, and keeps their inner portion **behind** the head rather than drawing a leg across the face. Walking, sleeping, top view and saved progress are unaffected.
