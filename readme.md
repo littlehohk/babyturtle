@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Compact side-view swimming flippers / 側視游泳短肢修正
+
+**English:** The horizontal side-view swimming paddles have been shortened by approximately one third compared with the prior oversized version: their nominal front and rear reaches are now **13.2 and 12.2 drawing units** (formerly 20 and 18.8), with a smaller stroke amplitude, shorter paddle tips and shorter claws. The **broader flipper thickness is preserved**, and all four limbs still extend outward beyond the shell when the turtle swims towards the viewer. The 1+3 / 2+4 diagonal alternation, top-view animations, Z-shaped walking legs, tucked sleeping legs and saved progress are unaffected.
+
+**繁體中文：** 側視橫向划水的四肢，比先前過長的版本**縮短約三分之一**：前肢與後肢的基準長度改為 **13.2 與 12.2 繪圖單位**（原為 20 與 18.8），並減小划動幅度、腳掌末端及爪尖的延伸。四肢依然**保留較寬厚的造型**；烏龜正面游向觀眾時，四肢仍可在龜殼兩側看見。1、3／2、4 的對角交替、俯視動畫、陸上 Z 字形步行、睡眠收肢及遊戲存檔均不受影響。
+
 ## Visible, broad paddles when swimming toward the viewer / 正面及側面划水修正
 
 **English:** The four swimming flippers in Side view have been redrawn **wider and thicker**, retaining green body striping and a mostly horizontal rowing direction. The flipper projection now accounts for the turtle's **toward/away viewing direction**, so a turtle swimming straight toward the player spreads the two front and two hind flippers **outward on both sides** instead of projecting them inward beneath the carapace. Front and rear swimming flippers occupy slightly different heights, making the pairs distinct when viewed head-on. The clipping that previously hid the upper portions of near-side swimming paddles has been removed; clipping still applies to the downward, Z-shaped legs used for walking on land. The same **1+3 / 2+4** diagonal stroke timing remains intact, and sleeping legs remain tucked.
