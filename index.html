@@ -501,6 +501,9 @@ function drawSideTurtle3D(t,stroke){
   };
   // The physical near/far sides change when the turtle turns around.
   const nearSide=p.c>=0?-1:1,farSide=-nearSide;
+  // When the face looks toward the player, the head is the closest
+  // surface: even the near-side front flipper must sit BEHIND its outline.
+  const headInFront=!t.land&&p.toward>.4;
   const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.3);
   g.save();
   if(!t.sleep)g.rotate(-pitch*.13);
@@ -519,7 +522,7 @@ function drawSideTurtle3D(t,stroke){
   if(p.toward<-.13)drawSideHead3D(t,p);
   drawSideDomedShell(r,p);
 
-  if(p.toward>=-.13)drawSideHead3D(t,p);
+  if(p.toward>=-.13&&!headInFront)drawSideHead3D(t,p);
   if(t.sleep){
     // Two tucked paws just peep out from under the rim; no long flippers.
     ell(-r*.49,4.5,2.0,1.1,'#719d4e');
@@ -539,10 +542,16 @@ function drawSideTurtle3D(t,stroke){
     // Tail stays tucked when sleeping.
     poly([[-p.c*r*.75,1.6],[-p.c*(r+7),3.5],[-p.c*r*.72,5.1]],'#78a458');
   }
+  // Draw the facing head LAST: its round cheeks and chin cover the
+  // inboard ends of both front paddles, not vice versa.
+  if(headInFront)drawSideHead3D(t,p);
   g.restore();
 }
 function drawSideHead3D(t,p){
   const cam=p.toward,front=clamp((cam+.15)/1.15,0,1),away=cam<-.38;
+  // Increase vertical curvature only as the face turns to the viewer:
+  // a front-facing face should be round, not a flat-bottomed oval.
+  const headOn=clamp((cam-.35)/.65,0,1);
   // Sleeping head/neck relax down toward the flat underside of the shell.
   const hx=t.sleep?p.headX*.78:p.headX;
   const hy=t.sleep?p.headY+1.4:p.headY;
@@ -556,8 +565,11 @@ function drawSideHead3D(t,p){
   g.quadraticCurveTo(hx*.6,hy+7,p.c*2,5.3);
   g.closePath();g.fillStyle=away?'#67934f':'#7ca853';g.fill();
   g.strokeStyle='#355b30';g.lineWidth=1.1;g.stroke();
-  ell(hx,hy,8.3+front*1.6,7.7,'#749c52');
-  ell(hx-p.c,hy-1,7.1+front*1.3,6.6,'#97c168');
+  // The two circular contours make a full, curved lower jaw. Profile
+  // proportions are retained, while the frontal chin becomes rounded.
+  ell(hx,hy,8.3+front*1.6,7.7+2.55*headOn,'#749c52');
+  ell(hx-p.c,hy-1+.36*headOn,7.1+front*1.3,
+      6.6+2.45*headOn,'#97c168');
   if(away){
     // Rear three-quarter: both side stripes, face hidden by carapace.
     for(const side of [-1,1])ell(hx+side*3.3,hy+.9,1.1,3.2,'#dd6340',side*.25);
@@ -588,10 +600,16 @@ function drawSideHead3D(t,p){
     }
     ell(hx-4.9,hy+1,2.35,2.95,'#e45a37',-.2);
     if(front>.38)ell(hx+5.4,hy+1,2.1,2.7,'#e76241',.2);
-    // Mouth outline terminates precisely at the nose used by collision.
+    // A centered, gently curved smile sits on the rounded chin when
+    // looking at the viewer. Other yaw angles keep the profile mouth.
     g.beginPath();
-    g.moveTo(hx-2.5,hy+4.2);
-    g.quadraticCurveTo(noseX,hy+6.7,noseX,noseY);
+    if(headOn>.68){
+      g.moveTo(hx-2.7,noseY-.45);
+      g.quadraticCurveTo(hx,noseY+1.45,hx+2.7,noseY-.45);
+    }else{
+      g.moveTo(hx-2.5,hy+4.2);
+      g.quadraticCurveTo(noseX,hy+6.7,noseX,noseY);
+    }
     g.strokeStyle='#253e23';g.lineWidth=1.15;g.stroke();
     if(t.capture>.2){
       g.beginPath();g.moveTo(noseX-1.8,noseY);
