@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Fix: turtle stationary after waking / 修正喚醒後無法移動
+
+**English:** The movement lock could occur because the turtle retained **underwater dive time and a breathing-recovery timer while already on land**. That obsolete timer blocked walking or re-entering the water, even though the turtle was awake. The game now clears underwater dive/recovery state on the dry basking platform, while retaining the usual recovery requirement **in water**. A manual wake now has five minutes before automatic nighttime sleep can resume, immediately selects a new swimming/walking destination and bypasses randomly assigned rest. Turning the light on also wakes the turtle. The animation loop is now resilient to isolated canvas errors. The existing saved turtle and care history are preserved.
+
+**繁體中文：** 烏龜醒來後仍無法活動，可能是因為牠已經上岸，卻仍保留**水中潛水時間與呼吸恢復計時**。這項過時的恢復狀態會阻止牠步行或再次下水。現在烏龜在乾燥的平台上會清除水中潛水及恢復狀態；但**在水中**仍沿用原有的呼吸恢復規則。手動喚醒後有五分鐘的夜間清醒緩衝期，會立即設定新的游泳或步行目標，不會隨機再停下休息；開燈亦可喚醒牠。動畫主循環亦能應付個別畫布繪圖錯誤。原有存檔與飼養紀錄不變。
+
 ## Wake-up and animation reliability / 喚醒及動畫持續運作
 
 **English:** The turtle's animation loop has a recovery guard: an isolated canvas rendering exception is logged but no longer permanently stops all future animation frames. The normal nighttime sleep schedule remains, but **holding the tank for two seconds to wake the turtle** now gives it a five-minute grace period before darkness can put it back to sleep; it receives a definite swimming/walking destination and begins moving immediately rather than randomly resting again. Turning **Light ON** also wakes a sleeping turtle and prevents nighttime sleep while illuminated. During lengthy breathing recovery, swimming paddles are animated at a more noticeable slow rate, with the existing recovery rules unchanged. Saved care data and the former front-facing head/leg appearance are preserved. Natural sleep, death, and deliberate rests can still make the turtle stationary.
