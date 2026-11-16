@@ -146,6 +146,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 **繁體中文：** 動畫主循環現加入錯誤恢復機制：偶發的畫布繪圖錯誤會記錄下來，但不會令往後的動畫畫格永久停止。夜間自動睡眠的規則維持不變，但**長按水族箱兩秒喚醒烏龜**後，會有五分鐘的清醒緩衝期，夜色不會即時令牠再睡；牠會得到明確的新移動目標並立即開始游泳或步行，不會立刻隨機休息。**開燈**亦可喚醒睡著的烏龜，亮燈期間不會因夜色入睡。長時間呼吸恢復時，四肢會以較容易察覺的慢速划動，但原有恢復規則不變。原有飼養存檔及正面頭部、四肢外觀均保留。真正睡眠、死亡或主動短暫休息時，烏龜仍可能靜止。
 
+## Side-view red ear markings / 側視紅耳斑位置
+
+**English:** The red-ear markings are now positioned **behind the eyes, toward the neck**, instead of toward the snout. Their placement mirrors correctly as the turtle swims left or right. At front-facing angles, the markings transition naturally to the cheeks. The markings are drawn before the eyes to preserve clear eye contours. The turtle's head shape, limb layering, movement patterns and saved progress remain unchanged.
+
+**繁體中文：** 側視模式中的紅耳斑現改為位於**眼睛後方、靠近頸部的位置**，不再靠近鼻端。烏龜向左或向右游泳時，紅耳斑會隨方向正確鏡像；轉向正面時，則自然移至兩頰。繪畫順序亦改為先畫耳斑、再畫眼睛，以保留清晰的眼部輪廓。頭型、四肢層次、活動動畫及存檔均維持不變。
+
 ## Far front leg visibility at three-quarter angles / 側視斜角前肢可見度
 
 **English:** At some Side-view three-quarter swimming angles, the **far/right front leg** was completely hidden by the turtle's rounded head, even though its proper drawing layer was behind the head. The renderer now offsets that leg's attachment slightly outboard as the turtle turns toward the viewer, ensuring that a small portion of the paddle remains visible beyond the cheek. The offset varies smoothly with heading, does not lengthen the already shortened paddles, and keeps their inner portion **behind** the head rather than drawing a leg across the face. Walking, sleeping, top view and saved progress are unaffected.
