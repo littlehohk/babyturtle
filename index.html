@@ -24,7 +24,7 @@ title:['Baby Red-eared Slider','紅耳龜寶寶'],subtitle:['BREST · virtual tu
 let lang='en';try{lang=localStorage.getItem('brest-web-lang')==='zh'?'zh':'en'}catch(e){}
 const tr=k=>(I[k]||[k,k])[lang==='zh'?1:0],clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
 let loc={name:'Sha Tin, Hong Kong',lat:22.38,lon:114.19,timezone:'Asia/Hong_Kong'};
-const fresh=()=>({layoutV2:1,h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,napMask:0,lastNap:0}});
+const fresh=()=>({layoutV2:1,h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,wakeGraceUntil:0,napMask:0,lastNap:0}});
 let s=fresh(),worms=[],lastSave=0,lastLight=0,framePrev=performance.now(),hover=null,touch=null,settings=false,target={x:11,y:8,z:8},wander=0,play=0,rest=0,weatherBusy=false,notice='',noticeUntil=0;
 try{const p=JSON.parse(localStorage.getItem('brest-browser-v1')||'null');if(p&&p.version===1&&p.state&&Number.isFinite(p.state.hp)&&Number.isFinite(p.state.age)&&p.state.t){s=p.state;loc=p.location||loc;if(!s.layoutV2){if(s.t.land){s.t.x=clamp(s.t.x+LAND-18,LAND+1.5,26.5);s.t.z=10;}s.layoutV2=1;}}}catch(e){}
 function save(){try{localStorage.setItem('brest-browser-v1',JSON.stringify({version:1,state:s,location:loc}));lastSave=Date.now();$('saveMsg').textContent=tr('saved')+' · '+new Date().toLocaleTimeString()}catch(e){$('saveMsg').textContent=tr('cannotSave')}}
@@ -42,7 +42,7 @@ function dailyLight(ms){let seconds=0;const start=ms-SEC_DAY*1000;for(let a=star
 function startDay(key,now){if(key===s.dayKey)return;if(s.dayKey&&s.fullDay&&!s.dead){s.hp=clamp(s.hp+(s.sleepToday>s.daylight?.1:-.3),0,10);if(s.hp<=0)die('hp')}const previousDay=s.dayKey;s.dayKey=key;s.fullDay=Boolean(previousDay);s.sleepToday=0;s.daylight=dailyLight(now);s.good=0;s.goodDay=key;s.t.napMask=0}
 function breathStep(dt){const t=s.t;if(t.land||t.z>=9.2){if(t.dive>0){t.recovery=t.dive<=1200?5+5*clamp(t.dive/1200,0,1):t.dive<=3600?300:900;t.dive=0}t.recovery=Math.max(0,t.recovery-dt);t.surface=false;return}t.dive+=dt;let limit=t.sleep?10800:1200;if(t.dive>=limit-4)t.surface=true;if(t.surface){t.z=Math.min(9.2,t.z+9.2/4*dt);if(t.z>=9.2){t.recovery=t.dive<=1200?5+5*clamp(t.dive/1200,0,1):t.dive<=3600?300:900;t.dive=0;t.surface=false;t.sleep=false}}}
 function schedule(now){const t=s.t,day=daylight(now),key=localDay(now);if(key!==s.dayKey){let old=s.dayKey;startDay(key,now);if(!old)s.fullDay=false}if(!day&&!s.light){if(!t.darkSince)t.darkSince=now}else t.darkSince=0;if(t.sleep&&now>=t.sleepUntil){t.sleep=false;t.sleepUntil=0}
-if(!day&&!s.light&&t.darkSince&&now-t.darkSince>=300000&&!t.sleep&&t.recovery<=0){if(t.land){t.sleep=true;let sunrise=now+12*3600000;for(let probe=now+15*60000;probe<now+30*3600000;probe+=15*60000){if(daylight(probe)){sunrise=probe;break}}t.sleepUntil=sunrise}else target={x:25.0,y:8.5,z:10}}if(day&&!t.sleep&&!t.surface&&t.recovery<=0){let slots=[10,13,16];let h=0;try{h=Number(new Intl.DateTimeFormat('en-GB',{timeZone:loc.timezone,hour:'numeric',hour12:false}).format(new Date(now)))}catch(e){h=new Date(now).getHours()}for(let i=0;i<3;i++){if(h>=slots[i]&&h<slots[i]+1&&!(t.napMask&(1<<i))&&now-t.lastNap>=8100000){t.napMask|=1<<i;t.lastNap=now;t.sleep=true;t.sleepUntil=now+900000;break}}}}
+if(!day&&!s.light&&t.darkSince&&now-t.darkSince>=300000&&!t.sleep&&t.recovery<=0&&now>=(t.wakeGraceUntil||0)){if(t.land){t.sleep=true;let sunrise=now+12*3600000;for(let probe=now+15*60000;probe<now+30*3600000;probe+=15*60000){if(daylight(probe)){sunrise=probe;break}}t.sleepUntil=sunrise}else target={x:25.0,y:8.5,z:10}}if(day&&!t.sleep&&!t.surface&&t.recovery<=0){let slots=[10,13,16];let h=0;try{h=Number(new Intl.DateTimeFormat('en-GB',{timeZone:loc.timezone,hour:'numeric',hour12:false}).format(new Date(now)))}catch(e){h=new Date(now).getHours()}for(let i=0;i<3;i++){if(h>=slots[i]&&h<slots[i]+1&&!(t.napMask&(1<<i))&&now-t.lastNap>=8100000){t.napMask|=1<<i;t.lastNap=now;t.sleep=true;t.sleepUntil=now+900000;break}}}}
 function advance(dt,now){if(s.dead||dt<=0)return;dt=Math.min(dt,SEC_DAY*365);let left=dt,iterations=0;while(left>1e-6&&iterations++<5000&&!s.dead){const step=Math.min(left,60),at=now-(left-step)*1000;const t=s.t;schedule(at);const day=daylight(at);const aim=targetWater(s.outside),rate=s.thermal===1?-1/1800:s.thermal===2?1.5/1800:Math.sign(aim-s.water)*(.2/300);const actual=s.thermal===0?Math.min(step,Math.abs(aim-s.water)/(Math.abs(rate)||1)):step;const span=actual>1e-9?actual:step;const v=rate*span;s.water+=v;s.h=clamp(s.h+span*.1/1200,0,5);s.b=clamp(s.b+span*.1/1200,0,5);const penalty=(s.h<1||s.h>4?.1:0)+(s.b<1||s.b>4?.1:0)+(s.water<14||s.water>28?.2:0);const good=day&&!t.sleep&&penalty===0&&s.good<36000;const gain=good?.05:0;s.hp=clamp(s.hp+(gain-penalty)*span/3600,0,10);if(good)s.good+=span;if(t.sleep)s.sleepToday+=span;if(s.h>=5)s.hunger5+=span;else s.hunger5=0;s.age+=span;breathStep(span);if(s.hp<=0)die('hp');else if(s.hunger5>3600)die('hunger');left-=span}}
 function catchUp(){const now=Date.now();if(now>s.time){advance((now-s.time)/1000,now);s.time=now}save()}
 function reduce(field){s[field]=clamp(s[field]-.1,0,5);save()}
@@ -148,7 +148,7 @@ function swim(dt,now){
     // Breathing recovery can last 5–15 real minutes after long dives.
     // Remain at the surface, but keep slow visible limb/head motion.
     t.moving=false;t.vx=0;t.vy=0;t.vz=0;
-    t.stroke=(t.stroke||0)+dt*.38;
+    t.stroke=(t.stroke||0)+dt*1.3;
     if(play>0)play=Math.max(0,play-dt);
     return;
   }
@@ -629,7 +629,8 @@ function drawTurtle(now){
   // Gently animate an awake turtle even while it is resting or breathing.
   // Sleep remains fully motionless.
   const idleBreath=!t.sleep&&!s.dead&&!active?Math.sin(now/720)*.18:0;
-  const stroke=active?phase:phase*.18+idleBreath;
+  const stroke=active||(!t.sleep&&!s.dead&&t.recovery>0)
+    ?phase:phase*.18+idleBreath;
   g.save();g.translate(x,y);g.scale(depthScale,depthScale);
   if(side){
     // A small buoyant movement and slow breathing animation prevent
@@ -725,7 +726,31 @@ g.fillStyle='#071016';g.fillRect(0,0,320,WT);g.fillRect(0,CT,320,20);let clock='
 if(s.dead){txt(tr('new'),160,233,10,'#fff','center');g.fillStyle='#f7dfab';g.fillRect(20,93,280,54);txt(s.cause==='hp'?tr('deadHealth'):tr('deadHunger'),160,116,16,'#513b25','center');txt(tr('age')+': '+Math.floor(s.age/86400)+' '+tr('day'),160,133,10,'#513b25','center')}
 else{const buttons=[['top',0,45,s.t.side===false],['side',45,90,s.t.side],['cool',90,175,s.thermal===1],['heat',175,250,s.thermal===2],['light',250,320,s.light]];for(const [k,a,b,on] of buttons){g.fillStyle='#14313b';g.fillRect(a+1,221,b-a-2,18);txt(tr(k)+(on&&k!=='top'&&k!=='side'?' '+tr('on'):''),(a+b)/2,233,9,'#fff','center');if(on){g.fillStyle='#64f3ff';g.fillRect(a+2,238,b-a-4,2)}}}
 if(noticeUntil>Date.now()){g.fillStyle='#132f38df';g.fillRect(0,201,320,18);txt(notice,160,214,9,'#fff','center')}}
-function control(x,y,kind){if(settings)return;if(kind==='hold'){if(s.dead)restart();else{s.t.sleep=!s.t.sleep;s.t.sleepUntil=s.t.sleep?Date.now()+900000:0;save()}return}if(s.dead)return;if(kind==='swipe'&&y>=WT&&y<CT){reduce('b');play=1.5;target={x:x<160?24:4,y:rand(3,14),z:s.t.z};return}if(kind!=='tap')return;if(y<16&&x>=110&&x<170){open(false);return}if(y>=WT&&y<CT)feed(x,y);else if(y>=CT){if(x<90){s.t.side=x>=45;save()}else if(x<175){s.thermal=s.thermal===1?0:1;save()}else if(x<250){s.thermal=s.thermal===2?0:2;save()}else if(Date.now()-lastLight>=1000){lastLight=Date.now();s.light=!s.light;reduce('b');if(s.light)s.t.darkSince=0;play=.6;save()}}}
+// Explicit waking must not be cancelled instantly by the night scheduler.
+// A five-minute wake window permits swimming/playing even after sunset.
+function wakeTurtle(now=Date.now()){
+  const t=s.t;
+  t.sleep=false;
+  t.sleepUntil=0;
+  t.wakeGraceUntil=now+300000;
+  t.darkSince=0;
+  rest=0;
+  wander=0;
+  // Give the turtle an actual new destination rather than leaving it
+  // at the last resting position or at the centre of its old target.
+  target=t.land
+    ?{x:LAND-3.6,y:clamp(t.y+rand(-2,2),1,16),z:9.2}
+    :{x:clamp(t.x+rand(-5,5),1,LAND-2),y:clamp(t.y+rand(-4,4),1,16),z:clamp(t.z+rand(-2,2),1,9.2)};
+}
+function control(x,y,kind){
+  if(settings)return;
+  if(kind==='hold'){
+    if(s.dead)restart();
+    else if(s.t.sleep){wakeTurtle();save()}
+    else{s.t.sleep=true;s.t.sleepUntil=Date.now()+900000;save()}
+    return;
+  }
+  if(s.dead)return;if(kind==='swipe'&&y>=WT&&y<CT){reduce('b');play=1.5;target={x:x<160?24:4,y:rand(3,14),z:s.t.z};return}if(kind!=='tap')return;if(y<16&&x>=110&&x<170){open(false);return}if(y>=WT&&y<CT)feed(x,y);else if(y>=CT){if(x<90){s.t.side=x>=45;save()}else if(x<175){s.thermal=s.thermal===1?0:1;save()}else if(x<250){s.thermal=s.thermal===2?0:2;save()}else if(Date.now()-lastLight>=1000){lastLight=Date.now();s.light=!s.light;reduce('b');if(s.light){s.t.darkSince=0;if(s.t.sleep)wakeTurtle()}play=.6;save()}}}
 function where(e){const r=cv.getBoundingClientRect();return {x:clamp((e.clientX-r.left)/r.width*320,0,320),y:clamp((e.clientY-r.top)/r.height*240,0,240)}}cv.addEventListener('pointerdown',e=>{e.preventDefault();cv.setPointerCapture(e.pointerId);const p=where(e);touch={...p,sx:p.x,sy:p.y,t:performance.now(),distance:0,id:e.pointerId}});cv.addEventListener('pointermove',e=>{if(!touch||touch.id!==e.pointerId)return;const p=where(e);touch.x=p.x;touch.y=p.y;touch.distance=Math.max(touch.distance,Math.hypot(touch.sx-p.x,touch.sy-p.y))});cv.addEventListener('pointerup',e=>{if(!touch||touch.id!==e.pointerId)return;const p=touch;touch=null;const ms=performance.now()-p.t;if(ms>=2000&&p.distance<12){control(p.sx,p.sy,'hold')}else if(p.distance>=30&&ms>=60&&ms<=1500){control(p.x,p.y,'swipe')}else if(p.distance<12&&ms<750)control(p.sx,p.sy,'tap')});cv.addEventListener('pointercancel',()=>{touch=null});
 function open(how){settings=true;$('overlay').classList.add('visible');tab(how);$('manual').value=s.outside.toFixed(1);$('cityStatus').textContent=tr('current')+': '+loc.name;updateStats()}function tab(how){$('howPanel').classList.toggle('hide',!how);$('cityPanel').classList.toggle('hide',how);$('tabHow').classList.toggle('active',how);$('tabCity').classList.toggle('active',!how)}function close(){settings=false;$('overlay').classList.remove('visible');save()}
 $('settingsBtn').onclick=()=>open(false);$('howBtn').onclick=()=>open(true);$('tabHow').onclick=()=>tab(true);$('tabCity').onclick=()=>tab(false);$('close').onclick=close;
@@ -735,7 +760,28 @@ async function refresh(show=false,moved=false){if(weatherBusy)return;weatherBusy
 $('weatherBtn').onclick=()=>refresh(true);
 $('screenBtn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}catch(e){}};
 function viewport(){const h=window.visualViewport?.height||window.innerHeight;document.documentElement.style.setProperty('--vh',h+'px')}viewport();window.addEventListener('resize',viewport);window.addEventListener('orientationchange',viewport);window.visualViewport?.addEventListener('resize',viewport);
-function frame(now){const dt=Math.min(.05,Math.max(0,(now-framePrev)/1000));framePrev=now;const delta=Math.max(0,(Date.now()-s.time)/1000);if(delta>0){advance(Math.min(delta,3600*24*365),Date.now());s.time=Date.now()}swim(dt,Date.now());render(now);if(Date.now()-lastSave>30000)save();if(touch&&performance.now()-touch.t>=2000&&touch.distance<12){const p=touch;touch=null;control(p.sx,p.sy,'hold')}requestAnimationFrame(frame)}
+// Never abandon requestAnimationFrame if one drawing operation fails.
+function frame(now){
+  try{
+    const dt=Math.min(.05,Math.max(0,(now-framePrev)/1000));
+    framePrev=now;
+    const delta=Math.max(0,(Date.now()-s.time)/1000);
+    if(delta>0){advance(Math.min(delta,3600*24*365),Date.now());s.time=Date.now()}
+    swim(dt,Date.now());
+    render(now);
+    if(Date.now()-lastSave>30000)save();
+    if(touch&&performance.now()-touch.t>=2000&&touch.distance<12){
+      const p=touch;touch=null;control(p.sx,p.sy,'hold');
+    }
+  }catch(e){
+    // Keep the simulation alive if the current device encounters an
+    // isolated canvas/rendering problem; still surface it to developers.
+    console.error('BREST animation frame error',e);
+    framePrev=now;
+  }finally{
+    requestAnimationFrame(frame);
+  }
+}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)save();else catchUp()});window.addEventListener('pagehide',save);syncLang();catchUp();refresh();setInterval(()=>refresh(),1800000);requestAnimationFrame(frame);
 })();
 </script></body></html>
