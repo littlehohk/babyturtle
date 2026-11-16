@@ -152,6 +152,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 **繁體中文：** 側視模式中的紅耳斑現改為位於**眼睛後方、靠近頸部的位置**，不再靠近鼻端。烏龜向左或向右游泳時，紅耳斑會隨方向正確鏡像；轉向正面時，則自然移至兩頰。繪畫順序亦改為先畫耳斑、再畫眼睛，以保留清晰的眼部輪廓。頭型、四肢層次、活動動畫及存檔均維持不變。
 
+## Side-view land-walking legs based on front/rear reference / 側視陸上步行四肢造型
+
+**English:** The side-view **walking** legs have been redrawn to follow the supplied front and rear reference: **thick, muscular upper limbs splayed diagonally from the body; bent elbows/knees; short lower segments folding back toward the belly; broad, flattened feet; and small distinct claws**. The walking stroke is now driven by the elbow and ankle joints rather than rotating the whole leg downward. Opposite diagonal pairs still alternate (legs 1+3 versus 2+4), with a small foot lift during the swing phase. At forward-facing and rear-facing angles, the legs splay to either side of the shell. The existing narrower swimming paddles, land surface, tucked sleeping legs, top-view appearance, game rules, and saved progress remain unchanged.
+
+**繁體中文：** 側視模式的**陸上步行**四肢現按提供的正面及背面參考圖片重新繪製：**粗壯的上臂／大腿向外斜伸、手肘／膝關節明顯彎曲、較短的下段折向腹部、寬扁的腳掌，以及清楚可見的小爪尖**。步行動作現在由關節的屈伸帶動，不再把整條腿向下擺動。兩組對角四肢依然交替（1、3 與 2、4），擺腿時腳掌稍微提起；正面或背面觀察時，四肢會分別向龜殼兩側張開。原有較短的游泳四肢、平台、睡眠收肢、俯視造型、遊戲規則及存檔均不變。
+
 ## Broader far-front-leg visibility / 擴大斜角前肢可見範圍
 
 **English:** The far front flipper's three-quarter-view visibility adjustment now starts at a gentler forward angle (**toward > 0.22**, formerly 0.4), blends in across a wider heading range, and permits a slightly larger outward root shift (up to **8.5 drawing units**, previously 7). This is to reduce disappearance behind the rounded head at intermediate front-facing angles. The leg itself stays short, and its inner portion is still rendered **behind** the head. Top view, swimming gait, land walking, sleeping and saved progress are unchanged.
