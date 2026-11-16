@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Additional one-third reduction in swimming leg length / 再縮短游泳四肢
+
+**English:** The side-view swimming flippers have been shortened by **a further one-third** compared with the immediately preceding version. This reduces their projected horizontal reach, including the feet and claws, without reducing their broad vertical thickness. The front-leg roots are positioned slightly nearer the shell rim to keep all four legs visible when swimming toward the player. Top-view limbs, land-walking Z-shaped legs, the sleeping pose, diagonal paddling rhythm, and save data remain unchanged.
+
+**繁體中文：** 側視游泳四肢的水平長度，包括腳掌和爪尖，較上一版本**再縮短三分之一**，但保留原有的寬厚形狀。前肢根部稍為移近龜殼邊緣，以確保正面游向玩家時仍可看到四肢。俯視四肢、陸上 Z 字形步行、睡眠姿態、對角划水節奏及遊戲存檔均不變。
+
 ## Compact side-view swimming flippers / 側視游泳短肢修正
 
 **English:** The horizontal side-view swimming paddles have been shortened by approximately one third compared with the prior oversized version: their nominal front and rear reaches are now **13.2 and 12.2 drawing units** (formerly 20 and 18.8), with a smaller stroke amplitude, shorter paddle tips and shorter claws. The **broader flipper thickness is preserved**, and all four limbs still extend outward beyond the shell when the turtle swims towards the viewer. The 1+3 / 2+4 diagonal alternation, top-view animations, Z-shaped walking legs, tucked sleeping legs and saved progress are unaffected.
