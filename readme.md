@@ -146,6 +146,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 **繁體中文：** 動畫主循環現加入錯誤恢復機制：偶發的畫布繪圖錯誤會記錄下來，但不會令往後的動畫畫格永久停止。夜間自動睡眠的規則維持不變，但**長按水族箱兩秒喚醒烏龜**後，會有五分鐘的清醒緩衝期，夜色不會即時令牠再睡；牠會得到明確的新移動目標並立即開始游泳或步行，不會立刻隨機休息。**開燈**亦可喚醒睡著的烏龜，亮燈期間不會因夜色入睡。長時間呼吸恢復時，四肢會以較容易察覺的慢速划動，但原有恢復規則不變。原有飼養存檔及正面頭部、四肢外觀均保留。真正睡眠、死亡或主動短暫休息時，烏龜仍可能靜止。
 
+## Far front leg visibility at three-quarter angles / 側視斜角前肢可見度
+
+**English:** At some Side-view three-quarter swimming angles, the **far/right front leg** was completely hidden by the turtle's rounded head, even though its proper drawing layer was behind the head. The renderer now offsets that leg's attachment slightly outboard as the turtle turns toward the viewer, ensuring that a small portion of the paddle remains visible beyond the cheek. The offset varies smoothly with heading, does not lengthen the already shortened paddles, and keeps their inner portion **behind** the head rather than drawing a leg across the face. Walking, sleeping, top view and saved progress are unaffected.
+
+**繁體中文：** 烏龜以側視斜角游向玩家時，**較遠一側的右前肢**有時完全被圓形頭部遮住，雖然繪畫層次本身正確。現在會按烏龜轉向的角度，把這隻前肢的起點稍稍向身體外側移動，確保部分腳掌在臉頰外仍可見。移動幅度會隨角度平滑變化，**不會把原本已縮短的四肢加長**，而且四肢靠近頭部的位置仍然藏在頭部後面，不會橫跨臉部。步行、睡眠、俯視及遊戲存檔均不受影響。
+
 ## Rounded front-facing chin and correct leg layering / 正面圓下巴及前肢遮擋修正
 
 **English:** In Side view, when the turtle swims toward the viewer, the lower head now has a fuller, **rounded chin** rather than a flat-looking underside. The head's vertical curvature increases smoothly as its face turns toward the camera, while the side-profile shape is preserved. The front-facing mouth is also drawn as a small centered curve. For front-facing swimming angles, the **head is rendered after the flippers**, covering their inner portions so that the turtle's right front leg does not appear in front of its cheek or chin. Paddle length, diagonal 1+3/2+4 swimming rhythm, sleeping posture, land-walking legs, language switch and save data remain unchanged.
