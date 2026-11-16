@@ -510,6 +510,24 @@ function drawSideTurtle3D(t,stroke){
   // When the face looks toward the player, the head is the closest
   // surface: even the near-side front flipper must sit BEHIND its outline.
   const headInFront=!t.land&&p.toward>.4;
+  // In a front three-quarter view the far front paddle may be completely
+  // covered by the rounded face. Shift its ROOT slightly outboard (not
+  // its length) so the tip peeks out beyond the cheek. The inner portion
+  // still renders behind the head, preserving correct overlap.
+  const farFrontLegX=()=>{
+    const root=legX(true,farSide);
+    if(t.land||t.sleep||p.toward<=.4)return root;
+    const axis=p.c+farSide*p.toward*.92;
+    const dir=axis>=0?1:-1;
+    const front=clamp((p.toward+.15)/1.15,0,1);
+    const cheekEdge=p.headX+dir*(8.3+1.6*front);
+    // Minimum paddle reach at the retracted part of its stroke,
+    // including the short toes, in existing side-view drawing units.
+    const minTipReach=(.76*2/3)*(11.4+3.8);
+    const needed=dir*(cheekEdge-root)-minTipReach+2.3;
+    const easing=clamp((p.toward-.4)/.16,0,1);
+    return root+dir*clamp(needed,0,7)*easing;
+  };
   const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.3);
   g.save();
   if(!t.sleep)g.rotate(-pitch*.13);
@@ -521,7 +539,7 @@ function drawSideTurtle3D(t,stroke){
   }else{
     // Far paddles remain behind plastron/carapace while moving.
     flipper(legX(false,farSide),t.land?2.9:4.1,false,farSide,stroke+gaitPhase(false,farSide),t.land,'side',p.c,p.toward);
-    flipper(legX(true,farSide),t.land?2.8:1.6,true,farSide,stroke+gaitPhase(true,farSide),t.land,'side',p.c,p.toward);
+    flipper(farFrontLegX(),t.land?2.8:1.6,true,farSide,stroke+gaitPhase(true,farSide),t.land,'side',p.c,p.toward);
   }
   // When travelling away from the viewer, the head is partially
   // hidden behind the domed shell; frontal turns bring it forward.
