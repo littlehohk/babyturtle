@@ -261,34 +261,36 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
     // hides every leg under the shell.
     const axis=(front?1:-1)*cameraFacing+side*cameraToward*.92;
     const outward=axis>=0?1:-1;
-    const reach=(front?20:18.8)+3.2*Math.sin(phase);
-    const length=Math.max(15.6,reach);
+    // Compact paddles: about one-third shorter than the previous version.
+    // Keep the wider side-view thickness and outward head-on projection.
+    const reach=(front?13.2:12.2)+1.8*Math.sin(phase);
+    const length=Math.max(11.4,reach);
     // Front legs paddle along the upper flank; hind legs paddle lower.
     // This separation keeps BOTH front and hind flippers visible when
     // the turtle is looking straight towards the player.
-    const tipY=(front?-2.65:3.45)+Math.cos(phase)*.85;
+    const tipY=(front?-2.2:2.9)+Math.cos(phase)*.7;
     g.scale(outward,1);
     ell(0,0,4.9,4.05,'#557f3d');
     g.beginPath();
     g.moveTo(-3.7,-3.0);
-    g.bezierCurveTo(2.5,-5.2,length*.45,tipY-5.8,length-3.0,tipY-4.6);
-    g.quadraticCurveTo(length+2.9,tipY-5.15,length+4.3,tipY-.8);
-    g.quadraticCurveTo(length+5.2,tipY+3.3,length+1.2,tipY+5.1);
-    g.quadraticCurveTo(length-3.0,tipY+5.65,length-5.2,tipY+4.35);
-    g.bezierCurveTo(length*.46,tipY+5.4,1.6,4.7,-3.7,3.0);
+    g.bezierCurveTo(2.2,-4.3,length*.45,tipY-4.6,length-2.2,tipY-3.7);
+    g.quadraticCurveTo(length+2.0,tipY-4.0,length+3.0,tipY-.7);
+    g.quadraticCurveTo(length+3.6,tipY+2.4,length+.8,tipY+3.9);
+    g.quadraticCurveTo(length-2.2,tipY+4.2,length-4.0,tipY+3.2);
+    g.bezierCurveTo(length*.46,tipY+4.2,1.6,4.5,-3.7,3.0);
     g.closePath();
     g.fillStyle='#7faa55';g.fill();
     g.strokeStyle='#304b25';g.lineWidth=1.75;g.stroke();
     // A bright longitudinal stripe emphasizes the broad paddle surface.
     g.beginPath();g.moveTo(-1.6,-1.25);
-    g.bezierCurveTo(length*.33,tipY-2.2,length*.73,tipY-1.1,length+2.4,tipY-1.4);
+    g.bezierCurveTo(length*.33,tipY-1.9,length*.73,tipY-1.0,length+1.8,tipY-1.1);
     g.strokeStyle='#d1e47b';g.lineWidth=1.75;g.stroke();
     g.beginPath();g.moveTo(-1.4,1.9);
-    g.bezierCurveTo(length*.36,tipY+2.65,length*.70,tipY+2.8,length+1.5,tipY+2.45);
+    g.bezierCurveTo(length*.36,tipY+2.35,length*.70,tipY+2.4,length+1.2,tipY+2.0);
     g.strokeStyle='#4a7b37';g.lineWidth=1.15;g.stroke();
     for(let j=-1;j<=1;j++){
-      g.beginPath();g.moveTo(length+2.7,tipY+j*2.2);
-      g.lineTo(length+5.8+(j===0?.85:0),tipY+j*2.75);
+      g.beginPath();g.moveTo(length+1.8,tipY+j*1.8);
+      g.lineTo(length+3.8+(j===0?.6:0),tipY+j*2.2);
       g.strokeStyle='#32452c';g.lineWidth=1.05;g.stroke();
     }
     g.restore();return;
