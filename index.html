@@ -249,10 +249,10 @@ function gaitPhase(front,side){
 // diagonal gait but folds the limbs underneath the carapace.
 function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacing=1,cameraToward=0){
   g.save();g.translate(x,y);
-  // A broader side-view swim paddle. Top-view limbs and bent walking
-  // legs retain their earlier compact proportions.
+  // Further shorten only swimming legs in Side view by one-third.
+  // Keep their vertical thickness; Top view, walking and sleep are unchanged.
   const sideSwimming=projection==='side'&&!walking;
-  g.scale(sideSwimming?.76:.5,sideSwimming?.84:.5);
+  g.scale(sideSwimming?.76*(2/3):.5,sideSwimming?.84:.5);
   const cycle=Math.sin(phase),power=(cycle+1)*.5;
   if(sideSwimming){
     // Projection of the physical front/rear direction and the physical
@@ -490,7 +490,15 @@ function drawSideDomedShell(r,p){
 }
 function drawSideTurtle3D(t,stroke){
   const p=sidePose(t),r=p.shellRadius;
-  const legX=(front,side)=>(front?5.8:-8.5)*p.c-p.sn*(side*5.2);
+  const legX=(front,side)=>{
+    const base=(front?5.8:-8.5)*p.c-p.sn*(side*5.2);
+    // As the swimming paddles shorten, keep each shoulder attached near
+    // the rim so its tip remains visible beyond the shell in profile.
+    // Do not change the articulated walking legs.
+    if(t.land||!front)return base;
+    const axis=p.c+side*p.toward*.92;
+    return base+(axis>=0?1:-1)*2.35;
+  };
   // The physical near/far sides change when the turtle turns around.
   const nearSide=p.c>=0?-1:1,farSide=-nearSide;
   const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.3);
