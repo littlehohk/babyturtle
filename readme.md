@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Wake-up and animation reliability / 喚醒及動畫持續運作
+
+**English:** The turtle's animation loop has a recovery guard: an isolated canvas rendering exception is logged but no longer permanently stops all future animation frames. The normal nighttime sleep schedule remains, but **holding the tank for two seconds to wake the turtle** now gives it a five-minute grace period before darkness can put it back to sleep; it receives a definite swimming/walking destination and begins moving immediately rather than randomly resting again. Turning **Light ON** also wakes a sleeping turtle and prevents nighttime sleep while illuminated. During lengthy breathing recovery, swimming paddles are animated at a more noticeable slow rate, with the existing recovery rules unchanged. Saved care data and the former front-facing head/leg appearance are preserved. Natural sleep, death, and deliberate rests can still make the turtle stationary.
+
+**繁體中文：** 動畫主循環現加入錯誤恢復機制：偶發的畫布繪圖錯誤會記錄下來，但不會令往後的動畫畫格永久停止。夜間自動睡眠的規則維持不變，但**長按水族箱兩秒喚醒烏龜**後，會有五分鐘的清醒緩衝期，夜色不會即時令牠再睡；牠會得到明確的新移動目標並立即開始游泳或步行，不會立刻隨機休息。**開燈**亦可喚醒睡著的烏龜，亮燈期間不會因夜色入睡。長時間呼吸恢復時，四肢會以較容易察覺的慢速划動，但原有恢復規則不變。原有飼養存檔及正面頭部、四肢外觀均保留。真正睡眠、死亡或主動短暫休息時，烏龜仍可能靜止。
+
 ## Rounded front-facing chin and correct leg layering / 正面圓下巴及前肢遮擋修正
 
 **English:** In Side view, when the turtle swims toward the viewer, the lower head now has a fuller, **rounded chin** rather than a flat-looking underside. The head's vertical curvature increases smoothly as its face turns toward the camera, while the side-profile shape is preserved. The front-facing mouth is also drawn as a small centered curve. For front-facing swimming angles, the **head is rendered after the flippers**, covering their inner portions so that the turtle's right front leg does not appear in front of its cheek or chin. Paddle length, diagonal 1+3/2+4 swimming rhythm, sleeping posture, land-walking legs, language switch and save data remain unchanged.
