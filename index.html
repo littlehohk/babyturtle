@@ -305,30 +305,67 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
   // Forward always means towards the head (+local X). In top view the
   // near/far sides are reflected, so their *rotation* must also reverse.
   // Side view projects the same stroke along the turtle's heading.
-  const bendRotation=projection==='top'?-side*amp*cycle:-amp*cycle*cameraFacing;
+  // Land-walking paws must stay planted; their stepping is articulated
+  // at the elbow/ankle instead of rotating a whole leg around the socket.
+  const bendRotation=projection==='side'&&walking?0:
+    projection==='top'?-side*amp*cycle:-amp*cycle*cameraFacing;
   const restingSplay=projection==='top'?side*(front?.10:-.18):0;
   g.rotate(bendRotation+restingSplay);
   g.scale(1,projection==='top'?side:1);
   if(walking&&projection==='side'){
-    // Two visible hinges make a Z-shaped planted leg: shoulder -> knee ->
-    // ankle. The foot reverses direction after the knee rather than
-    // remaining an extended swimming paddle.
-    const dir=(front?1:-1)*(cameraFacing>=0?1:-1);
-    const kneeX=dir*(6+cycle*1.4),kneeY=8;
-    const footX=kneeX-dir*(7+cycle*1.3),footY=17;
+    // Walking reference (front and rear): stout outward-splayed upper
+    // limbs, distinct bent elbow/knee, short return segment, broad
+    // planted paws and little claws.  No downward swimming paddles.
+    // The leg's world-side gives an outward splay in head-on views;
+    // its front/rear position takes over as the turtle turns profile.
+    const axis=(front?1:-1)*cameraFacing+side*cameraToward*.88;
+    const dir=axis>=0?1:-1;
+    const phaseStep=cycle; // diagonal 1+3 / 2+4 timing remains unchanged
+    const lift=Math.max(0,phaseStep)*(front?1.25:.9);
+    const elbowX=dir*(8.6+1.6*phaseStep);
+    const elbowY=5.5-.45*phaseStep;
+    const ankleX=dir*(4.3+2.3*phaseStep);
+    const ankleY=10.4-lift;
+    const pawX=ankleX+dir*5.0;
+    const pawY=12.3-lift;
     g.lineCap='round';g.lineJoin='round';
-    g.beginPath();
-    g.moveTo(-1,-1);g.lineTo(kneeX,kneeY);g.lineTo(footX,footY);
-    g.strokeStyle='#2e482b';g.lineWidth=9.1;g.stroke();
-    g.strokeStyle='#77a651';g.lineWidth=7.5;g.stroke();
-    g.strokeStyle='#c2d96e';g.lineWidth=1.35;g.stroke();
-    ell(-1,0,4.8,4.4,'#648e45');
-    ell(kneeX,kneeY,3.6,3.1,'#83b05c');
-    ell(footX,footY,3.8,2.1,'#81ad58');
+
+    // Rounded muscular shoulder/hip blending into the body.
+    ell(0,1,5.5,4.8,'#557b3c');
+    // Strong diagonal upper segment, with a clear elbow silhouette.
+    g.beginPath();g.moveTo(-dir*1,-.7);
+    g.quadraticCurveTo(dir*4.6,1.8,elbowX,elbowY);
+    g.strokeStyle='#2b492a';g.lineWidth=11;g.stroke();
+    g.strokeStyle='#78a64f';g.lineWidth=8.8;g.stroke();
+    g.beginPath();g.moveTo(dir*.8,-1.1);
+    g.quadraticCurveTo(dir*4,1.0,elbowX-dir*.8,elbowY-1);
+    g.strokeStyle='#b7d56c';g.lineWidth=1.65;g.stroke();
+
+    // Fold back toward the belly, producing the bent, Z-like stance.
+    ell(elbowX,elbowY,4.5,4.0,'#628e43');
+    g.beginPath();g.moveTo(elbowX,elbowY);
+    g.quadraticCurveTo(dir*6.2,8.0,ankleX,ankleY);
+    g.strokeStyle='#304c2a';g.lineWidth=9.5;g.stroke();
+    g.strokeStyle='#7daa54';g.lineWidth=7.1;g.stroke();
+    g.beginPath();g.moveTo(elbowX-dir*.7,elbowY+1);
+    g.quadraticCurveTo(dir*6.4,7.7,ankleX,ankleY-1);
+    g.strokeStyle='#c0d975';g.lineWidth=1.2;g.stroke();
+
+    // Wide, flattened, forward-facing foot; the paw stays near ground
+    // level while the alternate diagonal pair lifts for its next step.
+    ell(ankleX,ankleY,4.6,3.2,'#67964b');
+    ell(pawX,pawY,6.2,2.95,'#81af57',dir*.08);
+    g.beginPath();g.moveTo(pawX-dir*2.5,pawY-1.1);
+    g.lineTo(pawX+dir*3.1,pawY-1);
+    g.strokeStyle='#bfda72';g.lineWidth=1.35;g.stroke();
     for(let i=-1;i<=1;i++){
-      g.beginPath();g.moveTo(footX+i*2.1,footY);
-      g.lineTo(footX+i*2.25,footY+3+(i===0?.7:0));
-      g.strokeStyle='#35462c';g.lineWidth=1.05;g.stroke();
+      const y=pawY+i*1.65;
+      g.beginPath();g.moveTo(pawX+dir*3,y);
+      g.quadraticCurveTo(pawX+dir*5.7,y-.3,pawX+dir*(7.0+(i===0?.8:0)),y+i*.6);
+      g.strokeStyle='#36482b';g.lineWidth=1.35;g.stroke();
+      g.beginPath();g.moveTo(pawX+dir*(6.6+(i===0?.8:0)),y+i*.6);
+      g.lineTo(pawX+dir*(8+(i===0?1:0)),y+i*.8);
+      g.strokeStyle='#e3dca1';g.lineWidth=1.05;g.stroke();
     }
     g.restore();return;
   }
