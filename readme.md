@@ -134,6 +134,12 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
 
+## Rounded front-facing chin and correct leg layering / 正面圓下巴及前肢遮擋修正
+
+**English:** In Side view, when the turtle swims toward the viewer, the lower head now has a fuller, **rounded chin** rather than a flat-looking underside. The head's vertical curvature increases smoothly as its face turns toward the camera, while the side-profile shape is preserved. The front-facing mouth is also drawn as a small centered curve. For front-facing swimming angles, the **head is rendered after the flippers**, covering their inner portions so that the turtle's right front leg does not appear in front of its cheek or chin. Paddle length, diagonal 1+3/2+4 swimming rhythm, sleeping posture, land-walking legs, language switch and save data remain unchanged.
+
+**繁體中文：** 在側視模式中，烏龜正面游向玩家時，頭部下方改為**較圓潤的下巴**，不再顯得平直；頭部轉向觀眾時，臉部下緣的圓弧會逐漸加深，側面輪廓則維持原狀。正面嘴巴亦會顯示為置中的短弧線。正面游泳時，程式會**先繪製四肢，再繪製頭部**，使前肢靠近身體的部分藏在頭部後面，避免右前肢遮擋臉頰或下巴。四肢長度、1、3／2、4 對角划水節奏、睡姿、陸上步行、語言切換及存檔均不改變。
+
 ## Additional one-third reduction in swimming leg length / 再縮短游泳四肢
 
 **English:** The side-view swimming flippers have been shortened by **a further one-third** compared with the immediately preceding version. This reduces their projected horizontal reach, including the feet and claws, without reducing their broad vertical thickness. The front-leg roots are positioned slightly nearer the shell rim to keep all four legs visible when swimming toward the player. Top-view limbs, land-walking Z-shaped legs, the sleeping pose, diagonal paddling rhythm, and save data remain unchanged.
