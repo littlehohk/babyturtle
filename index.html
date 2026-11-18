@@ -54,11 +54,11 @@ function catchUp(){const now=Date.now();if(now>s.time){advance((now-s.time)/1000
 function reduce(field){s[field]=clamp(s[field]-.1,0,5);save()}
 function restart(){const temp=s.outside;s=fresh();s.outside=temp;s.water=targetWater(temp);worms=[];wander=0;save()}
 function feed(px,py){if(s.dead||s.t.side||px>=LAND/FW*W||py<WT||py>=CT||worms.length>=16)return;const x=clamp(px/W*FW,1,LAND-.5),y=clamp((CT-py)/(CT-WT)*17,.5,16.5),angle=s.t.heading;worms.push({x,y,z:10,target:Math.random()<.5?5:0,life:0,notice:(x-s.t.x)*Math.cos(angle)+(y-s.t.y)*Math.sin(angle)<0?3:0})}
-// The rendered nose is 2.2 cm in front of the turtle's model origin.
+// Base mouth reach is 2.2 cm; the projected tip moves with neck extension.
 
 const MOUTH_REACH=2.2;
 // The former head pose corresponds exactly to NECK_SHORT.
-const NECK_COMPACT=0,NECK_SHORT=4,NECK_LONG=10.5,NECK_EXTEND_RATE=18;
+const NECK_COMPACT=0,NECK_SHORT=4,NECK_LONG=16,NECK_EXTEND_RATE=18;
 function neckReach(t){
   if(Number.isFinite(t.neckReach))return clamp(t.neckReach,NECK_COMPACT,NECK_LONG);
   return t.sleep?NECK_COMPACT:NECK_SHORT; // older save data
@@ -290,7 +290,7 @@ function swim(dt,now){
         const index=worms.indexOf(candidate);
         if(index>=0){
           worms.splice(index,1);reduce('h');t.capture=1;
-          t.feedStage='retract';t.postFeed=.75;t.feedElapsed=0;
+          t.feedStage='retract';t.postFeed=2.5;t.feedElapsed=0;
         }
       }else if(t.feedElapsed>4){
         // A worm may sink while the turtle extends: re-approach rather
