@@ -24,7 +24,7 @@ title:['Baby Red-eared Slider','紅耳龜寶寶'],subtitle:['BREST · virtual tu
 let lang='en';try{lang=localStorage.getItem('brest-web-lang')==='zh'?'zh':'en'}catch(e){}
 const tr=k=>(I[k]||[k,k])[lang==='zh'?1:0],clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
 let loc={name:'Sha Tin, Hong Kong',lat:22.38,lon:114.19,timezone:'Asia/Hong_Kong'};
-const fresh=()=>({layoutV2:1,h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,wakeGraceUntil:0,napMask:0,lastNap:0}});
+const fresh=()=>({layoutV2:1,h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,wakeGraceUntil:0,napMask:0,lastNap:0,neckReach:4,feedStage:'',feedElapsed:0,postFeed:0}});
 let s=fresh(),worms=[],lastSave=0,lastLight=0,framePrev=performance.now(),hover=null,touch=null,settings=false,target={x:11,y:8,z:8},wander=0,play=0,rest=0,weatherBusy=false,notice='',noticeUntil=0;
 try{const p=JSON.parse(localStorage.getItem('brest-browser-v1')||'null');if(p&&p.version===1&&p.state&&Number.isFinite(p.state.hp)&&Number.isFinite(p.state.age)&&p.state.t){s=p.state;loc=p.location||loc;if(!s.layoutV2){if(s.t.land){s.t.x=clamp(s.t.x+LAND-18,LAND+1.5,26.5);s.t.z=10;}s.layoutV2=1;}}}catch(e){}
 function save(){try{localStorage.setItem('brest-browser-v1',JSON.stringify({version:1,state:s,location:loc}));lastSave=Date.now();$('saveMsg').textContent=tr('saved')+' · '+new Date().toLocaleTimeString()}catch(e){$('saveMsg').textContent=tr('cannotSave')}}
@@ -57,6 +57,21 @@ function feed(px,py){if(s.dead||s.t.side||px>=LAND/FW*W||py<WT||py>=CT||worms.le
 // The rendered nose is 2.2 cm in front of the turtle's model origin.
 
 const MOUTH_REACH=2.2;
+// The former head pose corresponds exactly to NECK_SHORT.
+const NECK_COMPACT=0,NECK_SHORT=4,NECK_LONG=10.5,NECK_EXTEND_RATE=18;
+function neckReach(t){
+  if(Number.isFinite(t.neckReach))return clamp(t.neckReach,NECK_COMPACT,NECK_LONG);
+  return t.sleep?NECK_COMPACT:NECK_SHORT; // older save data
+}
+function moveNeck(t,goal,dt,speed=NECK_EXTEND_RATE){
+  const old=neckReach(t);
+  t.neckReach=clamp(old+clamp(goal-old,-speed*dt,speed*dt),NECK_COMPACT,NECK_LONG);
+}
+function neckShortOrRest(t,dt){
+  const hold=(t.postFeed||0)>0;
+  t.postFeed=Math.max(0,(t.postFeed||0)-dt);
+  moveNeck(t,t.moving||hold?NECK_SHORT:NECK_COMPACT,dt,13);
+}
 function turtleDrawScale(t){
   return t.side?(.67+.33*(1-t.y/17)):(t.land?1:.56+.44*clamp(t.z/9.2,0,1));
 }
@@ -77,8 +92,9 @@ function sideBodyY(t,scale){
 function sidePose(t){
   const c=Math.cos(t.heading),sn=Math.sin(t.heading),toward=-sn;
   const shellRadius=Math.hypot(14*c,10.5*sn)+1.2;
-  const headX=15*c,headY=-.5+2.7*toward;
-  const noseX=toward>.6?headX+7*c*(1-toward):23*c;
+  const n=neckReach(t);
+  const headX=(11+n)*c,headY=-.5+2.7*toward+(n-NECK_SHORT)*toward*.22;
+  const noseX=toward>.6?headX+7*c*(1-toward):headX+8*c;
   const noseY=headY+(toward>.5?4.5+1.5*toward:2.8);
   return {c,sn,toward,shellRadius,headX,headY,noseX,noseY};
 }
@@ -87,8 +103,9 @@ function visibleMouth(t){
   if(!t.side){
     const cy=CT-t.y/17*(CT-WT);
     // The top-view canvas has downward-positive Y; world Y is upward-positive.
-    return {x:cx+25*sc*Math.cos(t.heading),
-            y:cy-25*sc*Math.sin(t.heading)};
+    const tip=25+(neckReach(t)-NECK_SHORT);
+    return {x:cx+tip*sc*Math.cos(t.heading),
+            y:cy-tip*sc*Math.sin(t.heading)};
   }
   const p=sidePose(t),cy=sideBodyY(t,sc);
   return {x:cx+sc*p.noseX,y:cy+sc*p.noseY};
@@ -99,7 +116,8 @@ function mouthPoint(t){
   // changes therefore cannot make the torso accidentally count as the mouth.
   return t.side?
     {x:pixel.x*28/320,
-     y:t.y+Math.sin(t.heading)*MOUTH_REACH*turtleDrawScale(t),
+     y:t.y+Math.sin(t.heading)*(MOUTH_REACH+
+       (neckReach(t)-NECK_SHORT)*28/320)*turtleDrawScale(t),
      z:(CT-pixel.y)*10/143}:
     {x:pixel.x*28/320,
      y:(CT-pixel.y)*17/(CT-WT),
@@ -436,6 +454,21 @@ function topFace(sleeping){
   ell(11.5,7,2.3,2.9,'#ec6343',.3);
 }
 
+// A short flexible tube, hidden by shell at root and head at tip.
+function topNeck(n){
+  if(n<.35)return;
+  const tip=11+n;
+  g.beginPath();g.moveTo(7,-5.9);
+  g.quadraticCurveTo(11,-5.2,tip,-4.9);
+  g.lineTo(tip,4.9);
+  g.quadraticCurveTo(11,5.2,7,5.9);
+  g.closePath();g.fillStyle='#709a4b';g.fill();
+  g.strokeStyle='#385c2f';g.lineWidth=.95;g.stroke();
+  g.beginPath();g.moveTo(10,-2.5);g.lineTo(tip-.8,-2.2);
+  g.strokeStyle='#b2cd74';g.lineWidth=1.15;g.stroke();
+  g.beginPath();g.moveTo(10,2.1);g.lineTo(tip-.8,1.9);
+  g.strokeStyle='#426e38';g.lineWidth=.75;g.stroke();
+}
 function shellTop(){
   ell(-1,0,14,11,'#293e20');
   ell(-1,0,12.5,9.7,'#a3ba50');
@@ -616,9 +649,10 @@ function drawSideHead3D(t,p){
   // a front-facing face should be round, not a flat-bottomed oval.
   const headOn=clamp((cam-.35)/.65,0,1);
   // Sleeping head/neck relax down toward the flat underside of the shell.
-  const hx=t.sleep?p.headX*.78:p.headX;
+  // Artwork and contact use the same neck-extended face coordinates.
+  const hx=p.headX;
   const hy=t.sleep?p.headY+1.4:p.headY;
-  const noseX=t.sleep?p.noseX*.78:p.noseX;
+  const noseX=p.noseX;
   const noseY=t.sleep?p.noseY+1.4:p.noseY;
   // Rounded neck continuously emerges from shell, including 45° yaw.
   g.beginPath();
@@ -717,33 +751,36 @@ function drawTurtle(now){
     // Rotate +X to the turtle's heading; face and both red cheek spots
     // remain paired and symmetric at every angle.
     g.rotate(-t.heading); // Correct world Y-up -> canvas Y-down projection.
+    const n=neckReach(t),shift=n-NECK_SHORT;
     if(t.sleep){
-      // Rest on the platform or the tank floor: flattened pose,
-      // no paddling and only tiny tucked limb tips beneath the shell.
+      // Head rests against the shell; all four legs remain tucked.
       ell(-8,-8,3.1,2.2,'#709b4c');
       ell(-8,8,3.1,2.2,'#709b4c');
       ell(7,-8,3.1,2.2,'#709b4c');
       ell(7,8,3.1,2.2,'#709b4c');
-      ell(13.5,0,8.6,7.6,'#7eab57');
+      topNeck(n);
       shellTop();
+      g.save();g.translate(shift,0);
       ell(16,0,8.0,7.2,'#8bb661');
       topFace(true);
+      g.restore();
     }else{
-      // Step 1: front-left (1) + rear-right (3) forward.
-      // Step 2: front-right (2) + rear-left (4) forward.
+      // Walking/swimming: short neck. Feeding: long. Resting: tucked.
       flipper(-8,-8,false,-1,stroke+gaitPhase(false,-1),t.land,'top'); // 4
       flipper(-8,8,false,1,stroke+gaitPhase(false,1),t.land,'top');   // 3
       flipper(5,-9,true,-1,stroke+gaitPhase(true,-1),t.land,'top');  // 1
       flipper(5,9,true,1,stroke+gaitPhase(true,1),t.land,'top');     // 2
       poly([[-11,-2],[-23,0],[-11,3]],'#719c58');
-      ell(16,0,9,8.5,'#7eae58');
+      topNeck(n);
       shellTop();
+      g.save();g.translate(shift,0);
       ell(17,0,8.2,7.2,'#81aa5d');
       topFace(false);
       if(t.capture>.25){
         g.strokeStyle='#2b482a';g.lineWidth=1.1;
         g.beginPath();g.moveTo(22,-2);g.lineTo(24,0);g.lineTo(22,2);g.stroke();
       }
+      g.restore();
     }
   }
   g.restore();
