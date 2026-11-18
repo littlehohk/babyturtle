@@ -152,6 +152,24 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 **繁體中文：** 側視模式中的紅耳斑現改為位於**眼睛後方、靠近頸部的位置**，不再靠近鼻端。烏龜向左或向右游泳時，紅耳斑會隨方向正確鏡像；轉向正面時，則自然移至兩頰。繪畫順序亦改為先畫耳斑、再畫眼睛，以保留清晰的眼部輪廓。頭型、四肢層次、活動動畫及存檔均維持不變。
 
+## Animated neck and bloodworm feeding / 頸部伸縮及捕食紅蟲
+
+**English:** The turtle's neck now responds to its activity in **both Top and Side views**:
+
+- **Swimming or walking:** a natural short neck, with the head slightly forward of the shell.
+- **Resting or sleeping:** the neck retracts fully and the head settles against the body (no exposed neck).
+- **Feeding:** the turtle first swims toward the bloodworm with a short neck. When close enough and aligned, it pauses its body, extends a **visibly long neck** to place its mouth at the worm, consumes the worm only after both physical and screen-space mouth contact, then retracts smoothly to the normal short-neck pose. Afterwards, regular movement or resting resumes. If the worm sinks or moves out of reach, the turtle realigns or approaches again instead of freezing.
+
+The head's drawn position and the collision point use the same neck extension. The diagonal swimming gait, curled sleeping legs, walking animation, breathing rules, language switching and persistent care history remain unchanged. Earlier save files are accepted.
+
+**繁體中文：** 烏龜的頸部現於**俯視及側視模式**均會隨活動改變：
+
+- **游泳或步行：** 伸出自然的短頸，頭部稍為離開龜殼。
+- **休息或睡眠：** 頸部完全縮回，頭部貼近身體，不露出頸部。
+- **捕食：** 烏龜先以短頸游近紅蟲，靠近並調整好方向後，身體暫停前進，再伸出**明顯較長的頸部**，以嘴巴接觸紅蟲。只有嘴部在實際空間及畫面投影均接觸紅蟲後，才算成功進食。之後頸部平滑縮回正常短頸，然後繼續活動或休息。如紅蟲下沉或偏離，牠會重新調整方向、游近，而不會一直保持伸頸姿態。
+
+頭部繪圖位置與進食碰撞判定採用相同的伸頸長度。原有對角划水節奏、睡眠收肢、步行動畫、呼吸規則、語言切換及飼養存檔均不改變；舊存檔仍可使用。
+
 ## Side-view land-walking legs based on front/rear reference / 側視陸上步行四肢造型
 
 **English:** The side-view **walking** legs have been redrawn to follow the supplied front and rear reference: **thick, muscular upper limbs splayed diagonally from the body; bent elbows/knees; short lower segments folding back toward the belly; broad, flattened feet; and small distinct claws**. The walking stroke is now driven by the elbow and ankle joints rather than rotating the whole leg downward. Opposite diagonal pairs still alternate (legs 1+3 versus 2+4), with a small foot lift during the swing phase. At forward-facing and rear-facing angles, the legs splay to either side of the shell. The existing narrower swimming paddles, land surface, tucked sleeping legs, top-view appearance, game rules, and saved progress remain unchanged.
