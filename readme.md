@@ -152,6 +152,18 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 **繁體中文：** 側視模式中的紅耳斑現改為位於**眼睛後方、靠近頸部的位置**，不再靠近鼻端。烏龜向左或向右游泳時，紅耳斑會隨方向正確鏡像；轉向正面時，則自然移至兩頰。繪畫順序亦改為先畫耳斑、再畫眼睛，以保留清晰的眼部輪廓。頭型、四肢層次、活動動畫及存檔均維持不變。
 
+## Slower powered turning, shorter feeding neck and coasting / 減慢轉向、縮短捕食頸部及滑行
+
+**English:**
+- **Feeding:** The *extra extension beyond the usual short neck* is now **half** its former length (6 instead of 12 logical drawing units; full reach setting 10 rather than 16). The turtle still approaches the worm and extends to bite, then retracts. Mouth-contact collision and save compatibility remain intact.
+- **Turning:** Rotation is slower: at most **1.05 radians/second in water** and **0.82 radians/second on land**, compared with the previous 2.7 radians/second. The turtle paddles or takes alternating diagonal steps as it turns **clockwise or anticlockwise**, including when it must rotate nearly in place. Larger heading changes reduce forward travel until the body faces its target, avoiding sideways sliding.
+- **Gliding:** After about **7 seconds of uninterrupted swimming**, or on entering a voluntary rest, the turtle can coast on existing momentum for approximately **1.15 seconds**, covering a short distance while gradually slowing down. Its paddle pose remains **still throughout the glide**. Ordinary swimming, resting or feeding then resumes as appropriate. Food, play and the need to surface take priority over coasting.
+
+**繁體中文：**
+- **捕食：** 頸部較平日短頸*額外伸出的部分*縮短為原來的 **一半**（由 12 減至 6 個繪圖單位；最長伸頸設定由 16 改為 10）。烏龜仍會先游近紅蟲，再伸頭接觸及吞食，之後縮回頸部。嘴部接觸判定及舊存檔相容性維持不變。
+- **轉向：** 減慢轉向速度：水中最多每秒 **1.05 弧度**，陸上最多每秒 **0.82 弧度**（之前為 2.7 弧度）。無論順時針或逆時針，烏龜轉向時會同時划水，或以對角交替的步伐踏步；即使原地轉向亦會活動四肢。大幅轉向時會先減慢前進，避免身體側滑。
+- **滑行：** 連續游泳約 **7 秒**後，或開始自主休息時，烏龜可依靠原有動量在水中滑行約 **1.15 秒**，逐漸減速並前進一小段距離；**滑行期間四肢停止划動**。之後按情況繼續游泳、休息或捕食；捕食、玩耍和上浮換氣會優先於滑行。
+
 ## Animated neck and bloodworm feeding / 頸部伸縮及捕食紅蟲
 
 **English:** The turtle's neck now responds to its activity in **both Top and Side views**:
