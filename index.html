@@ -24,7 +24,7 @@ title:['Baby Red-eared Slider','紅耳龜寶寶'],subtitle:['BREST · virtual tu
 let lang='en';try{lang=localStorage.getItem('brest-web-lang')==='zh'?'zh':'en'}catch(e){}
 const tr=k=>(I[k]||[k,k])[lang==='zh'?1:0],clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
 let loc={name:'Sha Tin, Hong Kong',lat:22.38,lon:114.19,timezone:'Asia/Hong_Kong'};
-const fresh=()=>({layoutV2:1,h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,wakeGraceUntil:0,napMask:0,lastNap:0,neckReach:4,feedStage:'',feedElapsed:0,postFeed:0}});
+const fresh=()=>({layoutV2:1,h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,wakeGraceUntil:0,napMask:0,lastNap:0,neckReach:4,feedStage:'',feedElapsed:0,postFeed:0,turning:false,turnDirection:0,swimRun:0,glideTime:0,glideStroke:0}});
 let s=fresh(),worms=[],lastSave=0,lastLight=0,framePrev=performance.now(),hover=null,touch=null,settings=false,target={x:11,y:8,z:8},wander=0,play=0,rest=0,weatherBusy=false,notice='',noticeUntil=0;
 try{const p=JSON.parse(localStorage.getItem('brest-browser-v1')||'null');if(p&&p.version===1&&p.state&&Number.isFinite(p.state.hp)&&Number.isFinite(p.state.age)&&p.state.t){s=p.state;loc=p.location||loc;if(!s.layoutV2){if(s.t.land){s.t.x=clamp(s.t.x+LAND-18,LAND+1.5,26.5);s.t.z=10;}s.layoutV2=1;}}}catch(e){}
 function save(){try{localStorage.setItem('brest-browser-v1',JSON.stringify({version:1,state:s,location:loc}));lastSave=Date.now();$('saveMsg').textContent=tr('saved')+' · '+new Date().toLocaleTimeString()}catch(e){$('saveMsg').textContent=tr('cannotSave')}}
@@ -58,7 +58,7 @@ function feed(px,py){if(s.dead||s.t.side||px>=LAND/FW*W||py<WT||py>=CT||worms.le
 
 const MOUTH_REACH=2.2;
 // The former head pose corresponds exactly to NECK_SHORT.
-const NECK_COMPACT=0,NECK_SHORT=4,NECK_LONG=16,NECK_EXTEND_RATE=18;
+const NECK_COMPACT=0,NECK_SHORT=4,NECK_LONG=10,NECK_EXTEND_RATE=18;
 function neckReach(t){
   if(Number.isFinite(t.neckReach))return clamp(t.neckReach,NECK_COMPACT,NECK_LONG);
   return t.sleep?NECK_COMPACT:NECK_SHORT; // older save data
@@ -147,6 +147,39 @@ function mouthContact(t,w,phase){
   return {world,screen};
 }
 
+// A short passive coast starts when a period of active swimming ends.
+// No flipper phase is advanced during this glide: momentum decays naturally.
+function startGlide(t){
+  if(t.land||t.sleep||(t.glideTime||0)>0)return false;
+  const vx=t.vx||0,vy=t.vy||0,vz=t.vz||0;
+  const speed=Math.hypot(vx,vy,vz);
+  if(speed<.24)return false;
+  const drift=Math.min(1.25,speed*.72);
+  t.glideVx=vx/speed*drift;
+  t.glideVy=vy/speed*drift;
+  t.glideVz=vz/speed*drift;
+  t.glideTime=1.15;
+  t.glideDuration=1.15;
+  t.glideStroke=t.stroke||0;
+  t.swimRun=0;
+  t.moving=false;t.turning=false;
+  return true;
+}
+function advanceGlide(t,dt){
+  const time=Math.max(0,(t.glideTime||0)-dt);
+  const fraction=time/Math.max(.1,t.glideDuration||1.15);
+  // Squared easing slows the turtle down progressively without paddling.
+  const easing=fraction*fraction;
+  const vx=(t.glideVx||0)*easing,vy=(t.glideVy||0)*easing,vz=(t.glideVz||0)*easing;
+  t.x=clamp(t.x+vx*dt,1,26.5);
+  t.y=clamp(t.y+vy*dt,1,16);
+  t.z=clamp(t.z+vz*dt,0,9.2);
+  t.vx=vx;t.vy=vy;t.vz=vz;
+  t.glideTime=time;
+  t.moving=false;t.turning=false;t.stroke=t.glideStroke||0;
+  moveNeck(t,NECK_SHORT,dt,13);
+  if(time<=0){t.vx=0;t.vy=0;t.vz=0}
+}
 function approachAngleForFeeding(t,ux,uy){
   const a=Math.atan2(uy,ux)-t.heading;
   return Math.abs(Math.atan2(Math.sin(a),Math.cos(a)));
@@ -161,12 +194,14 @@ function swim(dt,now){
   }
   worms=worms.filter(w=>w.life<180);
   if(t.sleep){
+    t.glideTime=0;t.swimRun=0;t.turning=false;
     t.feedStage='';t.feedElapsed=0;t.postFeed=0;
     moveNeck(t,NECK_COMPACT,dt,14);
     if(!t.land&&!t.surface)t.z=0;
     t.moving=false;t.vx=0;t.vy=0;t.vz=0;return;
   }
   if(t.surface){
+    t.glideTime=0;t.swimRun=0;t.turning=false;
     // The original code suspended every swimming stroke while surfacing.
     // A conscious turtle must keep paddling during its ascent.
     t.moving=true;t.vx=0;t.vy=0;t.vz=2.3;
@@ -175,6 +210,7 @@ function swim(dt,now){
     return;
   }
   if(t.recovery>0){
+    t.glideTime=0;t.swimRun=0;t.turning=false;
     // Breathing recovery can last 5–15 real minutes after long dives.
     // Remain at the surface, but keep slow visible limb/head motion.
     t.moving=false;t.vx=0;t.vy=0;t.vz=0;
@@ -188,6 +224,20 @@ function swim(dt,now){
     worms.filter(w=>w.notice<=0).sort((a,b)=>
       Math.hypot(a.x-t.x,a.y-t.y,a.z-t.z)-
       Math.hypot(b.x-t.x,b.y-t.y,b.z-t.z))[0]:null;
+  // Prioritise food, the route to land, or a play action over coasting.
+  if((t.glideTime||0)>0){
+    if(!candidate&&!wantsLand&&play<=0&&!t.land){
+      advanceGlide(t,dt);return;
+    }
+    t.glideTime=0;t.swimRun=0;
+  }
+  // Even without a random rest, occasionally coast after sustained
+  // swimming. The following short rest prevents immediate repaddling.
+  if(!candidate&&!t.land&&!wantsLand&&play<=0&&
+     (t.swimRun||0)>7.0&&startGlide(t)){
+    rest=Math.max(rest,rand(.4,.9));
+    advanceGlide(t,dt);return;
+  }
   if(!candidate||t.land||wantsLand){
     if(t.feedStage==='extend'||t.feedStage==='approach')
       t.feedStage='retract';
@@ -239,8 +289,11 @@ function swim(dt,now){
   }
   target=moveGoal;
   if(rest>0&&!candidate&&!wantsLand){
+    if(!t.land&&t.moving&&startGlide(t)){
+      advanceGlide(t,dt);return;
+    }
     rest=Math.max(0,rest-dt);
-    t.moving=false;t.vx=0;t.vy=0;t.vz=0;
+    t.moving=false;t.turning=false;t.vx=0;t.vy=0;t.vz=0;
     neckShortOrRest(t,dt);
     return;
   }
@@ -252,7 +305,13 @@ function swim(dt,now){
   const dx=moveGoal.x-t.x,dy=moveGoal.y-t.y,dz=moveGoal.z-t.z;
   const approach= candidate ? Math.atan2(candidate.y-t.y,candidate.x-t.x):Math.atan2(dy,dx);
   const delta=Math.atan2(Math.sin(approach-t.heading),Math.cos(approach-t.heading));
-  t.heading+=clamp(delta,-2.7*dt,2.7*dt);
+  // Turning takes time: swimming strokes or footfalls must rotate the
+  // animal; it cannot pivot instantly without moving its limbs.
+  const maxYaw=(t.land?.82:1.05)*dt;
+  const yaw=clamp(delta,-maxYaw,maxYaw);
+  t.heading+=yaw;
+  t.turning=Math.abs(yaw)>.0004;
+  t.turnDirection=t.turning?Math.sign(yaw):0;
   const crossing=(moveGoal.x>=LAND)!==t.land;
   if(crossing){
     if(t.land&&t.x<LAND+1)t.land=false;
@@ -263,7 +322,11 @@ function swim(dt,now){
   const ox=t.x,oy=t.y,oz=t.z;
   if(distance>.025){
     const speed=play>0?4.2:t.land?.9:candidate?2.6:1.6;
-    const factor=Math.min(1,speed*dt/distance);
+    // During sharp turns, paddle/step nearly on the spot until facing
+    // the travel direction. This avoids sideways sliding during a turn.
+    const alignment=Math.abs(delta);
+    const propulsion=alignment>.75?0:Math.max(.35,Math.cos(alignment));
+    const factor=Math.min(1,speed*dt/distance)*propulsion;
     t.x=clamp(t.x+dx*factor,1,26.5);
     t.y=clamp(t.y+dy*factor,1,16);
     t.z=clamp(t.z+dz*factor,0,10);
@@ -277,7 +340,13 @@ function swim(dt,now){
   t.vx=t.moving?(t.x-ox)/dt:0;
   t.vy=t.moving?(t.y-oy)/dt:0;
   t.vz=t.moving?(t.z-oz)/dt:0;
-  t.stroke=(t.stroke||0)+(t.moving?dt*(t.land?5:7):dt*.7);
+  // Paddle/step animation also runs while turning in place; reversing
+  // the turn reverses the stepping/paddling phase progression.
+  t.stroke=(t.stroke||0)+(t.turning
+    ?dt*t.turnDirection*(t.land?6:7.5)
+    :t.moving?dt*(t.land?5:7):dt*.7);
+  t.swimRun=!t.land&&t.moving&&!candidate
+    ?(t.swimRun||0)+dt:0;
   t.capture=Math.max(0,(t.capture||0)-dt*2.8);
   if(t.feedStage==='extend'&&candidate&&!t.land){
     t.feedElapsed=(t.feedElapsed||0)+dt;
@@ -783,13 +852,15 @@ function drawTurtle(now){
   const x=t.x/28*320, y=side?sideBodyY(t,turtleDrawScale(t)):CT-t.y/17*(CT-WT);
   const underwater=!t.land;
   const depthScale=turtleDrawScale(t); // Same scale as the mouth contact geometry.
-  const active=Boolean(t.moving)&&!t.sleep&&!s.dead&&t.recovery<=0;
+  const gliding=(t.glideTime||0)>0;
+  const active=Boolean(t.moving||t.turning)&&!gliding&&!t.sleep&&!s.dead&&t.recovery<=0;
   const phase=t.stroke||0;
   // Gently animate an awake turtle even while it is resting or breathing.
   // Sleep remains fully motionless.
-  const idleBreath=!t.sleep&&!s.dead&&!active?Math.sin(now/720)*.18:0;
-  const stroke=active||(!t.sleep&&!s.dead&&t.recovery>0)
-    ?phase:phase*.18+idleBreath;
+  const idleBreath=!t.sleep&&!s.dead&&!active&&!gliding?Math.sin(now/720)*.18:0;
+  const stroke=gliding?(Number.isFinite(t.glideStroke)?t.glideStroke:phase):
+    active||(!t.sleep&&!s.dead&&t.recovery>0)
+      ?phase:phase*.18+idleBreath;
   g.save();g.translate(x,y);g.scale(depthScale,depthScale);
   if(side){
     // A small buoyant movement and slow breathing animation prevent
