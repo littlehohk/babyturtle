@@ -414,9 +414,32 @@ function gaitPhase(front,side){
   const group13=(front&&side<0)||(!front&&side>0);
   return group13?0:Math.PI;
 }
-// All four limbs retain the same paddle anatomy. Walking uses the same
-// diagonal gait but folds the limbs underneath the carapace.
-function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacing=1,cameraToward=0){
+// Top view is the gait reference. This returns a foot centre in
+// body-local coordinates AFTER the Top-view limb rotation/scaling.
+// Both views consume the same cycle and diagonal timing, so changing
+// views cannot reverse a stroke or change which leg leads.
+function topLegTip(front,side,cycle,walking,resting=false){
+  const power=(cycle+1)*.5;
+  const amp=walking?.24:(front?.67:.54);
+  const angle=-side*amp*cycle+side*(front?.10:-.18);
+  const reduction=walking&&!resting?.83:1;
+  const spread=walking&&!resting?.62:1;
+  const extension=resting?1:walking?.82:(.76+.24*power);
+  const fold=resting?0:walking?2.25:(1-power)*3.1;
+  const x=.5*reduction*((front?2.7:-5)+fold);
+  const y=.5*side*spread*extension*(front?17.5:15.3);
+  return {x:x*Math.cos(angle)-y*Math.sin(angle),
+          y:x*Math.sin(angle)+y*Math.cos(angle)};
+}
+function projectedLegStroke(front,side,cycle,walking,cameraFacing,cameraToward){
+  const moved=topLegTip(front,side,cycle,walking);
+  const neutral=topLegTip(front,side,0,walking);
+  return cameraFacing*(moved.x-neutral.x)+
+         cameraToward*(moved.y-neutral.y);
+}
+// All four limbs retain one shared paddle silhouette. Walking has a
+// different bent profile but follows the SAME projected top-view gait.
+function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacing=1,cameraToward=0,resting=false){
   g.save();g.translate(x,y);
   // A turtle's legs must have the SAME silhouette and physical scale
   // in both projections. The old Side view used a separate tiny,
@@ -424,18 +447,22 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
   // vertical rotation. Reuse the normal Top-view paddle below instead.
   const sideSwimming=projection==='side'&&!walking;
   g.scale(.5,.5);
-  const cycle=Math.sin(phase),power=(cycle+1)*.5;
+  // When resting, ignore stored phase: all four appendages return to
+  // their natural, fully extended and bilaterally symmetrical pose.
+  const cycle=resting?0:Math.sin(phase),power=(cycle+1)*.5;
   if(sideSwimming){
     // Project the physical front/rear and near/far side into the
     // viewing plane. Mirror left/right while preserving all four limbs.
     const axis=(front?1:-1)*cameraFacing+side*cameraToward*.92;
     const outward=axis>=0?1:-1;
-    // Side-view swimming is HORIZONTAL only. The whole paddle points
-    // outward at a fixed angle; its stroke moves fore/aft horizontally.
-    // No animated shoulder rotation, tilt or tip-height variation.
-    // Keep the shared Top-view silhouette and uniform .5x scale.
+    // Project the exact Top-view foot motion to Side-view screen X.
+    // Retain the requested HORIZONTAL-only stroke (screen Y is fixed).
+    // The shoulder remains attached to the body; the paddle translates
+    // fore/aft from its shared neutral position, not a separate sine.
+    const dx=resting?0:projectedLegStroke(
+      front,side,cycle,false,cameraFacing,cameraToward);
+    g.translate(dx,0);
     g.scale(outward,1);
-    g.translate(4.5*cycle,0);
     g.rotate(-Math.PI/2);
   }
   const amp=walking?.24:(front?.67:.54);
@@ -458,14 +485,16 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
     const axis=(front?1:-1)*cameraFacing+side*cameraToward*.88;
     const dir=axis>=0?1:-1;
     const phaseStep=cycle; // diagonal 1+3 / 2+4 timing remains unchanged
-    // Side-view land steps also move HORIZONTALLY only. Hold the
-    // elbow, ankle and foot heights constant through the gait cycle,
-    // changing their fore/aft positions without any vertical lift.
-    const elbowX=dir*(8.6+2.5*phaseStep);
+    // Use that same Top-view projected stride for land walking.
+    // The shoulder stays fixed; knee and ankle follow the projection,
+    // and feet remain at a fixed height in Side view.
+    const stride=resting?0:projectedLegStroke(
+      front,side,phaseStep,true,cameraFacing,cameraToward);
+    const elbowX=dir*8.6+stride*.44;
     const elbowY=5.5;
-    const ankleX=dir*(4.3+3.1*phaseStep);
+    const ankleX=dir*4.3+stride*.78;
     const ankleY=10.4;
-    const pawX=ankleX+dir*(5.0+.85*phaseStep);
+    const pawX=dir*9.3+stride;
     const pawY=12.3;
     g.lineCap='round';g.lineJoin='round';
 
@@ -510,12 +539,12 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
   }
   // A folded Z leg appears shorter from directly above; it shares the
   // exact same 1&3/2&4 timing as swimming, but has less reach and spread.
-  if(walking&&projection==='top')g.scale(.83,.62);
+  if(walking&&projection==='top'&&!resting)g.scale(.83,.62);
   const len=front?17.5:15.3;
-  const extension=walking?.82:(.76+.24*power);
+  const extension=resting?1:sideSwimming?.88:walking?.82:(.76+.24*power);
   // Keep local sideways offset fixed for Side-view swimming: after the
   // 90-degree rotation, local X becomes SCREEN Y.
-  const fold=sideSwimming?1.5:walking?2.25:(1-power)*3.1;
+  const fold=resting?0:sideSwimming?1.5:walking?2.25:(1-power)*3.1;
   g.scale(1,extension);
   const tipX=(front?2.7:-5)+fold,tipY=len;
   ell(0,1,5.9,4.7,'#587e3e');
@@ -687,7 +716,7 @@ function drawSideDomedShell(r,p){
   g.beginPath();g.moveTo(-r,3.35);g.lineTo(r,3.35);
   g.strokeStyle='#d0c066';g.lineWidth=2.0;g.stroke();
 }
-function drawSideTurtle3D(t,stroke){
+function drawSideTurtle3D(t,stroke,resting=false){
   const p=sidePose(t),r=p.shellRadius;
   const legX=(front,side)=>{
     const base=(front?5.8:-8.5)*p.c-p.sn*(side*5.2);
@@ -712,7 +741,7 @@ function drawSideTurtle3D(t,stroke){
     const root=legX(true,farSide);
     // Engage earlier, before the far foreleg is fully swallowed by the
     // round head in a front three-quarter pose.
-    if(t.land||t.sleep||p.toward<=.22)return root;
+    if(t.land||t.sleep||resting||p.toward<=.22)return root;
     const axis=p.c+farSide*p.toward*.92;
     const dir=axis>=0?1:-1;
     const front=clamp((p.toward+.15)/1.15,0,1);
@@ -734,8 +763,8 @@ function drawSideTurtle3D(t,stroke){
     ell(r*.52,4.3,2.4,1.55,'#608a48');
   }else{
     // Far paddles remain behind plastron/carapace while moving.
-    flipper(legX(false,farSide),t.land?2.9:4.1,false,farSide,stroke+gaitPhase(false,farSide),t.land,'side',p.c,p.toward);
-    flipper(farFrontLegX(),t.land?2.8:1.6,true,farSide,stroke+gaitPhase(true,farSide),t.land,'side',p.c,p.toward);
+    flipper(legX(false,farSide),t.land?2.9:4.1,false,farSide,stroke+gaitPhase(false,farSide),t.land,'side',p.c,p.toward,resting);
+    flipper(farFrontLegX(),t.land?2.8:1.6,true,farSide,stroke+gaitPhase(true,farSide),t.land,'side',p.c,p.toward,resting);
   }
   // When travelling away from the viewer, the head is partially
   // hidden behind the domed shell; frontal turns bring it forward.
@@ -764,8 +793,8 @@ function drawSideTurtle3D(t,stroke){
     if(t.land){
       g.save();g.beginPath();g.rect(-r-9,4.8,2*r+18,36);g.clip();
     }
-    flipper(legX(false,nearSide),t.land?4:4.1,false,nearSide,stroke+gaitPhase(false,nearSide),t.land,'side',p.c,p.toward);
-    flipper(legX(true,nearSide),t.land?3.9:1.6,true,nearSide,stroke+gaitPhase(true,nearSide),t.land,'side',p.c,p.toward);
+    flipper(legX(false,nearSide),t.land?4:4.1,false,nearSide,stroke+gaitPhase(false,nearSide),t.land,'side',p.c,p.toward,resting);
+    flipper(legX(true,nearSide),t.land?3.9:1.6,true,nearSide,stroke+gaitPhase(true,nearSide),t.land,'side',p.c,p.toward,resting);
     if(t.land)g.restore();
     g.strokeStyle='#334b28';g.lineWidth=1.4;
     g.beginPath();g.moveTo(-r*.78,5);g.quadraticCurveTo(0,7.4,r*.78,5);g.stroke();
@@ -866,11 +895,16 @@ function drawTurtle(now){
   const depthScale=turtleDrawScale(t); // Same scale as the mouth contact geometry.
   const gliding=(t.glideTime||0)>0;
   const active=Boolean(t.moving||t.turning)&&!gliding&&!t.sleep&&!s.dead&&t.recovery<=0;
+  // Idle means an actual symmetrical, extended limb stance, not a
+  // slowed replay of the last stroke. Feeding and gliding are excluded.
+  const resting=!t.sleep&&!active&&!gliding&&!s.dead&&
+    t.feedStage!=='approach'&&t.feedStage!=='extend'&&
+    t.feedStage!=='retract';
   const phase=t.stroke||0;
   // Gently animate an awake turtle even while it is resting or breathing.
   // Sleep remains fully motionless.
   const idleBreath=!t.sleep&&!s.dead&&!active&&!gliding?Math.sin(now/720)*.18:0;
-  const stroke=gliding?(Number.isFinite(t.glideStroke)?t.glideStroke:phase):
+  const stroke=resting?0:gliding?(Number.isFinite(t.glideStroke)?t.glideStroke:phase):
     active||(!t.sleep&&!s.dead&&t.recovery>0)
       ?phase:phase*.18+idleBreath;
   g.save();g.translate(x,y);g.scale(depthScale,depthScale);
@@ -882,14 +916,13 @@ function drawTurtle(now){
       const buoyancy=t.recovery>0?.75:(active?.28:.42);
       g.translate(0,Math.sin(now/(t.recovery>0?520:760))*buoyancy);
     }
-    drawSideTurtle3D(t,stroke);
+    drawSideTurtle3D(t,stroke,resting);
   }else{
     // Rotate +X to the turtle's heading; face and both red cheek spots
     // remain paired and symmetric at every angle.
     g.rotate(-t.heading); // Correct world Y-up -> canvas Y-down projection.
     const n=neckReach(t),shift=n-NECK_MOVE;
-    const restingHead=!t.sleep&&!active&&!gliding&&
-      t.recovery<=0&&t.feedStage!=='extend'&&n<=NECK_REST+.65;
+    const restingHead=resting&&n<=NECK_REST+.65;
     if(t.sleep){
       // The entire sleeping head is INSIDE the carapace except its
       // little snout: no eye, full face or exposed neck is drawn.
@@ -902,10 +935,10 @@ function drawTurtle(now){
       ell(15.3,-.35,.45,.4,'#35542e');
     }else{
       // All four limbs retain the exact diagonal 1+3 / 2+4 gait.
-      flipper(-8,-8,false,-1,stroke+gaitPhase(false,-1),t.land,'top'); // 4
-      flipper(-8,8,false,1,stroke+gaitPhase(false,1),t.land,'top');   // 3
-      flipper(5,-9,true,-1,stroke+gaitPhase(true,-1),t.land,'top');  // 1
-      flipper(5,9,true,1,stroke+gaitPhase(true,1),t.land,'top');     // 2
+      flipper(-8,-8,false,-1,stroke+gaitPhase(false,-1),t.land,'top',1,0,resting); // 4
+      flipper(-8,8,false,1,stroke+gaitPhase(false,1),t.land,'top',1,0,resting);   // 3
+      flipper(5,-9,true,-1,stroke+gaitPhase(true,-1),t.land,'top',1,0,resting);  // 1
+      flipper(5,9,true,1,stroke+gaitPhase(true,1),t.land,'top',1,0,resting);     // 2
       poly([[-11,-2],[-23,0],[-11,3]],'#719c58');
       // At rest the head is rendered FIRST: the shell covers its back
       // and eyes, with only its forward face peeking outside the rim.
