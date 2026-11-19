@@ -152,35 +152,31 @@ All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape
 
 **繁體中文：** 側視模式中的紅耳斑現改為位於**眼睛後方、靠近頸部的位置**，不再靠近鼻端。烏龜向左或向右游泳時，紅耳斑會隨方向正確鏡像；轉向正面時，則自然移至兩頰。繪畫順序亦改為先畫耳斑、再畫眼睛，以保留清晰的眼部輪廓。頭型、四肢層次、活動動畫及存檔均維持不變。
 
-## Slower powered turning, shorter feeding neck and coasting / 減慢轉向、縮短捕食頸部及滑行
+## Head retraction and four activity-dependent poses / 頭部縮入龜殼及四種活動姿態
 
-**English:**
-- **Feeding:** The *extra extension beyond the usual short neck* is now **half** its former length (6 instead of 12 logical drawing units; full reach setting 10 rather than 16). The turtle still approaches the worm and extends to bite, then retracts. Mouth-contact collision and save compatibility remain intact.
-- **Turning:** Rotation is slower: at most **1.05 radians/second in water** and **0.82 radians/second on land**, compared with the previous 2.7 radians/second. The turtle paddles or takes alternating diagonal steps as it turns **clockwise or anticlockwise**, including when it must rotate nearly in place. Larger heading changes reduce forward travel until the body faces its target, avoiding sideways sliding.
-- **Gliding:** After about **7 seconds of uninterrupted swimming**, or on entering a voluntary rest, the turtle can coast on existing momentum for approximately **1.15 seconds**, covering a short distance while gradually slowing down. Its paddle pose remains **still throughout the glide**. Ordinary swimming, resting or feeding then resumes as appropriate. Food, play and the need to surface take priority over coasting.
+**English:** The head is now drawn partly **inside or outside the shell**, with the shell visually covering the tucked portion in both Top and Side views. Transitions between active poses are gradual:
 
-**繁體中文：**
-- **捕食：** 頸部較平日短頸*額外伸出的部分*縮短為原來的 **一半**（由 12 減至 6 個繪圖單位；最長伸頸設定由 16 改為 10）。烏龜仍會先游近紅蟲，再伸頭接觸及吞食，之後縮回頸部。嘴部接觸判定及舊存檔相容性維持不變。
-- **轉向：** 減慢轉向速度：水中最多每秒 **1.05 弧度**，陸上最多每秒 **0.82 弧度**（之前為 2.7 弧度）。無論順時針或逆時針，烏龜轉向時會同時划水，或以對角交替的步伐踏步；即使原地轉向亦會活動四肢。大幅轉向時會先減慢前進，避免身體側滑。
-- **滑行：** 連續游泳約 **7 秒**後，或開始自主休息時，烏龜可依靠原有動量在水中滑行約 **1.15 秒**，逐漸減速並前進一小段距離；**滑行期間四肢停止划動**。之後按情況繼續游泳、休息或捕食；捕食、玩耍和上浮換氣會優先於滑行。
+- **Sleeping:** the head is almost completely hidden inside the shell. **Only a small snout tip protrudes**, with no visible eyes or neck. The original tucked-leg and flat resting-body pose remains.
+- **Resting:** the neck is retracted to a very short position; the head sits close to the shell and **its rear portion is hidden under the rim**.
+- **Swimming or walking:** the head extends slightly farther, showing a **short visible neck**. The same short-neck position is held while gliding.
+- **Approaching and biting a bloodworm:** the turtle swims to the worm using its short neck, then extends to a **moderately longer feeding neck** once close and aligned. It eats only when the actual rendered mouth tip contacts the worm in the physical model and on screen. The neck then retracts smoothly to its ordinary short-neck pose, or to its resting pose if it stops.
 
-## Animated neck and bloodworm feeding / 頸部伸縮及捕食紅蟲
+The current feeding extension is deliberately modest: **3.5 additional drawing units beyond the moving pose** (feeding reach 7.5, moving reach 4), rather than the previously longer reach of 10 or 16. Existing game saves are compatible.
 
-**English:** The turtle's neck now responds to its activity in **both Top and Side views**:
+**繁體中文：** 烏龜的頭部現可隨活動**縮入或伸出龜殼**，俯視及側視均以龜殼遮蓋收起的頭部；不同活動姿態之間會平滑過渡：
 
-- **Swimming or walking:** a natural short neck, with the head slightly forward of the shell.
-- **Resting or sleeping:** the neck retracts fully and the head settles against the body (no exposed neck).
-- **Feeding:** the turtle first swims toward the bloodworm with a short neck. When close enough and aligned, it pauses its body, extends a **visibly long neck** to place its mouth at the worm, consumes the worm only after both physical and screen-space mouth contact, then retracts smoothly to the normal short-neck pose. Afterwards, regular movement or resting resumes. If the worm sinks or moves out of reach, the turtle realigns or approaches again instead of freezing.
+- **睡覺：** 頭部幾乎完全藏在龜殼內，**只有一小截鼻尖露出**，看不見眼睛及頸部。原有四肢收起及平躺睡姿維持不變。
+- **休息：** 頸部縮得非常短，頭部貼近龜殼，**頭部後方仍藏在龜殼邊緣之下**。
+- **游泳或步行：** 頭部稍為向前伸出，露出**短頸**；在水中滑行時亦保持短頸。
+- **靠近及吞食紅蟲：** 烏龜先以短頸游近紅蟲，靠近並對準後才伸出**稍長的捕食頸部**。只有畫面上的嘴尖與紅蟲在實際空間及畫面投影均接觸時才會吞食；之後頸部平滑縮回平日短頸，若停下休息則再縮近龜殼。
 
-The head's drawn position and the collision point use the same neck extension. The diagonal swimming gait, curled sleeping legs, walking animation, breathing rules, language switching and persistent care history remain unchanged. Earlier save files are accepted.
+捕食時比正常短頸**額外伸出 3.5 個繪圖單位**（捕食設定 7.5，活動設定 4），較舊有的 10 或 16 更短。舊存檔可以繼續使用。
 
-**繁體中文：** 烏龜的頸部現於**俯視及側視模式**均會隨活動改變：
+## Repeated swimming paddles and passive glides / 游泳時反覆划水及滑行
 
-- **游泳或步行：** 伸出自然的短頸，頭部稍為離開龜殼。
-- **休息或睡眠：** 頸部完全縮回，頭部貼近身體，不露出頸部。
-- **捕食：** 烏龜先以短頸游近紅蟲，靠近並調整好方向後，身體暫停前進，再伸出**明顯較長的頸部**，以嘴巴接觸紅蟲。只有嘴部在實際空間及畫面投影均接觸紅蟲後，才算成功進食。之後頸部平滑縮回正常短頸，然後繼續活動或休息。如紅蟲下沉或偏離，牠會重新調整方向、游近，而不會一直保持伸頸姿態。
+**English:** Ordinary swimming now repeats an approximately **0.8-second paddling burst** followed by a **0.34-second glide**. During every glide, the turtle continues moving forward a short distance under its existing momentum, gradually decelerates and **holds all four paddles stationary**. It then resumes paddling and repeats. When transitioning into a voluntary rest, a slightly longer **0.65-second glide** may occur first. Gliding is only used in water and is interrupted when urgent activities such as feeding, play or heading toward land take priority. Turning remains powered by animated paddling or footsteps; angular speed is limited to **1.05 radians/second in water** and **0.82 radians/second on land**.
 
-頭部繪圖位置與進食碰撞判定採用相同的伸頸長度。原有對角划水節奏、睡眠收肢、步行動畫、呼吸規則、語言切換及飼養存檔均不改變；舊存檔仍可使用。
+**繁體中文：** 平常游泳現會反覆進行約 **0.8 秒划水**，接著約 **0.34 秒滑行**。每次滑行期間，烏龜憑原有動量向前移動一小段並逐漸減速，**四肢暫停划動，維持原有姿態**；之後再開始划水，如此循環。開始自主休息時，可先滑行約 **0.65 秒**。只有水中會出現滑行；捕食、玩耍或需要上岸等情況優先。轉向時仍以划水或踏步帶動，水中最大轉向速度為每秒 **1.05 弧度**，陸上為每秒 **0.82 弧度**。
 
 ## Side-view land-walking legs based on front/rear reference / 側視陸上步行四肢造型
 
