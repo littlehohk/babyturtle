@@ -418,52 +418,25 @@ function gaitPhase(front,side){
 // diagonal gait but folds the limbs underneath the carapace.
 function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacing=1,cameraToward=0){
   g.save();g.translate(x,y);
-  // Further shorten only swimming legs in Side view by one-third.
-  // Keep their vertical thickness; Top view, walking and sleep are unchanged.
+  // A turtle's legs must have the SAME silhouette and physical scale
+  // in both projections. The old Side view used a separate tiny,
+  // horizontally stretched paddle with a moving tip but no whole-leg
+  // vertical rotation. Reuse the normal Top-view paddle below instead.
   const sideSwimming=projection==='side'&&!walking;
-  g.scale(sideSwimming?.76*(2/3):.5,sideSwimming?.84:.5);
+  g.scale(.5,.5);
   const cycle=Math.sin(phase),power=(cycle+1)*.5;
   if(sideSwimming){
-    // Projection of the physical front/rear direction and the physical
-    // left/right side. Toward = -sin(heading) is ESSENTIAL: at a head-on
-    // angle, using cos(heading) alone reverses the flippers inward and
-    // hides every leg under the shell.
+    // Project the physical front/rear and near/far side into the
+    // viewing plane. Mirror left/right while preserving all four limbs.
     const axis=(front?1:-1)*cameraFacing+side*cameraToward*.92;
     const outward=axis>=0?1:-1;
-    // Strong, easily visible VERTICAL paddle strokes. Earlier versions
-    // varied only the paddle silhouette near the body, so the hand
-    // appeared to slide sideways as the shell occluded the middle.
-    // Keep the shoulder rooted and HORIZONTAL reach constant. Move the
-    // whole visible foot well above and below the shell silhouette.
-    // Opposite diagonal limbs still use their existing phase offsets.
-    const length=front?13.2:12.2;
-    const verticalStroke=Math.sin(phase);
-    const tipY=(front?-2.2:2.9)+(front?15.5:14)*verticalStroke;
+    // The shared paddle is drawn down (+Y). Rotate it to point outward
+    // (toward +X), then swing the WHOLE appendage UP and DOWN around
+    // its shoulder by +/-1.12 radians, not just the little foot tip.
+    // This gives dominant VERTICAL displacement with modest horizontal
+    // foreshortening, and an identical leg size to Top view.
     g.scale(outward,1);
-    ell(0,0,4.9,4.05,'#557f3d');
-    g.beginPath();
-    g.moveTo(-3.7,-3.0);
-    g.bezierCurveTo(2.2,-4.3,length*.45,tipY-4.6,length-2.2,tipY-3.7);
-    g.quadraticCurveTo(length+2.0,tipY-4.0,length+3.0,tipY-.7);
-    g.quadraticCurveTo(length+3.6,tipY+2.4,length+.8,tipY+3.9);
-    g.quadraticCurveTo(length-2.2,tipY+4.2,length-4.0,tipY+3.2);
-    g.bezierCurveTo(length*.46,tipY+4.2,1.6,4.5,-3.7,3.0);
-    g.closePath();
-    g.fillStyle='#7faa55';g.fill();
-    g.strokeStyle='#304b25';g.lineWidth=1.75;g.stroke();
-    // A bright longitudinal stripe emphasizes the broad paddle surface.
-    g.beginPath();g.moveTo(-1.6,-1.25);
-    g.bezierCurveTo(length*.33,tipY-1.9,length*.73,tipY-1.0,length+1.8,tipY-1.1);
-    g.strokeStyle='#d1e47b';g.lineWidth=1.75;g.stroke();
-    g.beginPath();g.moveTo(-1.4,1.9);
-    g.bezierCurveTo(length*.36,tipY+2.35,length*.70,tipY+2.4,length+1.2,tipY+2.0);
-    g.strokeStyle='#4a7b37';g.lineWidth=1.15;g.stroke();
-    for(let j=-1;j<=1;j++){
-      g.beginPath();g.moveTo(length+1.8,tipY+j*1.8);
-      g.lineTo(length+3.8+(j===0?.6:0),tipY+j*2.2);
-      g.strokeStyle='#32452c';g.lineWidth=1.05;g.stroke();
-    }
-    g.restore();return;
+    g.rotate(-Math.PI/2+1.12*cycle);
   }
   const amp=walking?.24:(front?.67:.54);
   // Forward always means towards the head (+local X). In top view the
@@ -471,7 +444,7 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
   // Side view projects the same stroke along the turtle's heading.
   // Land-walking paws must stay planted; their stepping is articulated
   // at the elbow/ankle instead of rotating a whole leg around the socket.
-  const bendRotation=projection==='side'&&walking?0:
+  const bendRotation=sideSwimming||projection==='side'&&walking?0:
     projection==='top'?-side*amp*cycle:-amp*cycle*cameraFacing;
   const restingSplay=projection==='top'?side*(front?.10:-.18):0;
   g.rotate(bendRotation+restingSplay);
