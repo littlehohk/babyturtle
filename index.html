@@ -456,13 +456,16 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
     const axis=(front?1:-1)*cameraFacing+side*cameraToward*.92;
     const outward=axis>=0?1:-1;
     // Project the exact Top-view foot motion to Side-view screen X.
-    // Retain the requested HORIZONTAL-only stroke (screen Y is fixed).
-    // The shoulder remains attached to the body; the paddle translates
-    // fore/aft from its shared neutral position, not a separate sine.
+    // Retain horizontal-only movement: the paddle stays at a fixed
+    // screen height. Horizontal foreshortening at the ROOT (rather than
+    // translating the entire leg) keeps the shoulder attached.
     const dx=resting?0:projectedLegStroke(
       front,side,cycle,false,cameraFacing,cameraToward);
-    g.translate(dx,0);
-    g.scale(outward,1);
+    // The visible distal toe is roughly half this length from the root
+    // after the common 0.5x limb scale.
+    const neutralToeReach=.5*((front?17.5:15.3)*.88+4.5);
+    const projectedScale=clamp(1+dx/(outward*neutralToeReach),.5,1.5);
+    g.scale(outward*projectedScale,1);
     g.rotate(-Math.PI/2);
   }
   const amp=walking?.24:(front?.67:.54);
