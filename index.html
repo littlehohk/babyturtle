@@ -432,13 +432,15 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
     const outward=axis>=0?1:-1;
     // Compact paddles: about one-third shorter than the previous version.
     // Keep the wider side-view thickness and outward head-on projection.
-    const reach=(front?13.2:12.2)+1.8*Math.sin(phase);
+    const reach=(front?13.2:12.2)+2.3*Math.sin(phase);
     const length=Math.max(11.4,reach);
-    // Front legs paddle along the upper flank; hind legs paddle lower.
-    // This separation keeps BOTH front and hind flippers visible when
-    // the turtle is looking straight towards the player.
-    const tipY=(front?-2.2:2.9)+Math.cos(phase)*.7;
+    // The paddle swings about the shoulder in a broad, clearly visible
+    // arc, not merely stretching by a pixel or two.  Because rotation
+    // happens AFTER the outward mirror, left and right facing angles
+    // retain their own correct silhouette and opposite gait phases.
+    const tipY=(front?-2.2:2.9)+Math.cos(phase)*1.45;
     g.scale(outward,1);
+    g.rotate(.38*Math.sin(phase));
     ell(0,0,4.9,4.05,'#557f3d');
     g.beginPath();
     g.moveTo(-3.7,-3.0);
@@ -484,12 +486,15 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
     const axis=(front?1:-1)*cameraFacing+side*cameraToward*.88;
     const dir=axis>=0?1:-1;
     const phaseStep=cycle; // diagonal 1+3 / 2+4 timing remains unchanged
-    const lift=Math.max(0,phaseStep)*(front?1.25:.9);
-    const elbowX=dir*(8.6+1.6*phaseStep);
-    const elbowY=5.5-.45*phaseStep;
-    const ankleX=dir*(4.3+2.3*phaseStep);
+    // Broader step cycle: the elbow swings visibly, the ankle returns
+    // farther under the belly, and the paw lifts higher on each stride.
+    // Keep the same stout bent limb and flat, short planted foot.
+    const lift=Math.max(0,phaseStep)*(front?2.5:2.0);
+    const elbowX=dir*(8.6+2.65*phaseStep);
+    const elbowY=5.5-.85*phaseStep;
+    const ankleX=dir*(4.3+3.55*phaseStep);
     const ankleY=10.4-lift;
-    const pawX=ankleX+dir*5.0;
+    const pawX=ankleX+dir*(5.0+1.0*phaseStep);
     const pawY=12.3-lift;
     g.lineCap='round';g.lineJoin='round';
 
