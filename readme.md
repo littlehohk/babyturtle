@@ -172,11 +172,11 @@ The current feeding extension is deliberately modest: **3.5 additional drawing u
 
 捕食時比正常短頸**額外伸出 3.5 個繪圖單位**（捕食設定 7.5，活動設定 4），較舊有的 10 或 16 更短。舊存檔可以繼續使用。
 
-## More pronounced vertical swimming strokes / 更明顯的側視游泳上下划動
+## Identically sized legs and whole-leg vertical paddling / 俯側視同尺寸四肢及整條腿上下划動
 
-**English:** To correct the previous sideways-looking motion, **Side-view swimming legs now sweep substantially farther up and down**. Each paddle's shoulder stays attached to the body, and its horizontal reach stays fixed: the front paddle tip moves **±15.5 logical drawing units vertically**, and the hind paddle tip moves **±14 units** (before view scaling). This is approximately twice the previous vertical travel. The two diagonal pairs remain out of phase. The land-walking legs, Top view, compact paddle length, sleeping pose, and saved progress remain unchanged. During each passive water glide, all paddles remain still.
+**English:** The previous Side-view paddle was a separately drawn, smaller horizontal shape; moving only its foot tip did not create a convincing up/down stroke. The Side-view swimming animation now **uses the exact same limb outline and uniform 0.5× scale as the Top view**. Each *whole limb* pivots around its attachment point through a **±1.12-radian (about ±64°) up/down sweep**, rather than merely deforming its tip. Its length and thickness therefore match the Top-view limb, with the two opposing diagonal pairs continuing to alternate. The compact sleeping pose and articulated land-walking legs remain unchanged, and all legs stay still during passive water glides. The corrected motion is applied in every side-view heading, not just pure profile.
 
-**繁體中文：** 為修正先前看起來主要左右擺動的問題，現在**側視游泳四肢會更大幅度地上下划動**。每隻前後肢的根部仍連接身體，而且水平伸出距離固定不變；前肢末端上下幅度為**正負 15.5 個邏輯繪圖單位**，後肢末端為**正負 14 個單位**（未計畫面縮放），約為上一版本上下幅度的兩倍。兩組對角四肢繼續交替動作。陸上步行、俯視模式、短肢長度、睡姿及存檔資料均保持不變；每次水中滑行期間，四肢亦會停止划動。
+**繁體中文：** 之前側視游泳四肢採用了獨立繪製、較細小的水平造型，單單令腳掌末端上下移動，仍然難以呈現真正的上下划水動作。現在側視游泳四肢改為**完全沿用俯視模式的四肢輪廓，以及相同的 0.5 倍均勻縮放比例**。游泳時**整條前肢或後肢**以連接身體的位置為軸心，約向上、向下各擺動 **1.12 弧度（約 64 度）**，而不再只令腳掌末端變形。故此，四肢的長度和粗幼與俯視模式相同，兩組對角四肢繼續交替划動。睡眠收肢、陸上彎曲步行姿態保持不變；水中滑行時四肢維持停止。修正適用於所有側視方向，不限正側面。
 
 ## Repeated swimming paddles and passive glides / 游泳時反覆划水及滑行
 
