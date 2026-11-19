@@ -172,6 +172,12 @@ The current feeding extension is deliberately modest: **3.5 additional drawing u
 
 捕食時比正常短頸**額外伸出 3.5 個繪圖單位**（捕食設定 7.5，活動設定 4），較舊有的 10 或 16 更短。舊存檔可以繼續使用。
 
+## Wider side-view leg movement / 加大側視四肢擺動幅度
+
+**English:** The side-view animation now shows **larger, easier-to-see limb movement**, while retaining the same compact limb lengths. During swimming, each paddle swings through an approximately **±0.38-radian shoulder arc** and varies its extension and tip height more noticeably. The opposing diagonal pairs still alternate, including during turns; the paddles freeze in their current positions during passive glides. On land, the same stout, bent walking legs take **wider steps**: the elbow and ankle travel farther, and each paw lifts higher before being planted. Sleeping legs remain tucked, and the **Top view is unchanged**.
+
+**繁體中文：** 現已**加大側視模式四肢的活動幅度**，但保留原有短而粗壯的四肢長度。游泳時，每隻腳掌會以肩部為軸，約在 **正負 0.38 弧度**的範圍內擺動，伸縮及上下幅度亦更明顯；兩組對角四肢仍交替划水，轉向時亦然，而在水中滑行時會維持停止划動的姿勢。陸上行走時，保留粗壯且彎曲的四肢造型，但**步幅更大**：手肘、腳踝移動幅度增加，腳掌抬得更高，然後再次踏地。睡眠時四肢仍收起，**俯視模式不變**。
+
 ## Repeated swimming paddles and passive glides / 游泳時反覆划水及滑行
 
 **English:** Ordinary swimming now repeats an approximately **0.8-second paddling burst** followed by a **0.34-second glide**. During every glide, the turtle continues moving forward a short distance under its existing momentum, gradually decelerates and **holds all four paddles stationary**. It then resumes paddling and repeats. When transitioning into a voluntary rest, a slightly longer **0.65-second glide** may occur first. Gliding is only used in water and is interrupted when urgent activities such as feeding, play or heading toward land take priority. Turning remains powered by animated paddling or footsteps; angular speed is limited to **1.05 radians/second in water** and **0.82 radians/second on land**.
