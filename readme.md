@@ -172,11 +172,11 @@ The current feeding extension is deliberately modest: **3.5 additional drawing u
 
 捕食時比正常短頸**額外伸出 3.5 個繪圖單位**（捕食設定 7.5，活動設定 4），較舊有的 10 或 16 更短。舊存檔可以繼續使用。
 
-## Up-and-down leg strokes in Side view / 側視四肢上下擺動
+## More pronounced vertical swimming strokes / 更明顯的側視游泳上下划動
 
-**English:** The Side-view leg action has been corrected: swimming feet now travel **up and down**, not mainly sideways. The horizontal length of each compact paddle is held constant, while the tip rises and falls through a visibly large range (front feet ±8 logical units and hind feet ±7.2, before screen scaling). Opposite diagonal pairs continue to alternate. On land, the stout bent walking limbs have **more pronounced vertical foot lifts** (front 3.9 logical units; rear 3.3) with less lateral foot travel. The paddle pose remains frozen during a passive water glide. Sleeping legs, Top view, head poses, feeding, and saved game progress are preserved.
+**English:** To correct the previous sideways-looking motion, **Side-view swimming legs now sweep substantially farther up and down**. Each paddle's shoulder stays attached to the body, and its horizontal reach stays fixed: the front paddle tip moves **±15.5 logical drawing units vertically**, and the hind paddle tip moves **±14 units** (before view scaling). This is approximately twice the previous vertical travel. The two diagonal pairs remain out of phase. The land-walking legs, Top view, compact paddle length, sleeping pose, and saved progress remain unchanged. During each passive water glide, all paddles remain still.
 
-**繁體中文：** 側視模式的四肢動畫已修正：游泳時腳掌現會明顯**向上及向下擺動**，而非主要左右或水平擺動。每隻短肢的水平長度保持固定，前肢末端上下移動幅度為正負 8 個邏輯繪圖單位，後肢為正負 7.2 個單位（未計畫面縮放），兩組對角四肢仍然交替划水。陸上步行時保留粗壯彎曲的腿部造型，**腳掌抬起高度更明顯**（前肢 3.9、後肢 3.3 個單位），減少過度水平擺動。水中滑行時四肢維持不動。睡姿、俯視模式、頭部伸縮、捕食和存檔資料保持不變。
+**繁體中文：** 為修正先前看起來主要左右擺動的問題，現在**側視游泳四肢會更大幅度地上下划動**。每隻前後肢的根部仍連接身體，而且水平伸出距離固定不變；前肢末端上下幅度為**正負 15.5 個邏輯繪圖單位**，後肢末端為**正負 14 個單位**（未計畫面縮放），約為上一版本上下幅度的兩倍。兩組對角四肢繼續交替動作。陸上步行、俯視模式、短肢長度、睡姿及存檔資料均保持不變；每次水中滑行期間，四肢亦會停止划動。
 
 ## Repeated swimming paddles and passive glides / 游泳時反覆划水及滑行
 
