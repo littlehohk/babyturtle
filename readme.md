@@ -172,11 +172,15 @@ The current feeding extension is deliberately modest: **3.5 additional drawing u
 
 捕食時比正常短頸**額外伸出 3.5 個繪圖單位**（捕食設定 7.5，活動設定 4），較舊有的 10 或 16 更短。舊存檔可以繼續使用。
 
-## Horizontal-only movement in Side view / 側視四肢只作水平擺動
+## Symmetrical resting legs and consistent two-view gait / 休息時四肢對稱伸展及俯側視一致步態
 
-**English:** Side-view leg animation has been changed to **horizontal movement only**, without vertical up/down strokes. During swimming, all four legs keep a fixed outward orientation and shift forward/backward in the horizontal plane; the visible feet maintain the same height throughout the stroke. The legs still use **the same shape and uniform 0.5× scale as in Top view**, and the existing opposing-diagonal timing remains. During land walking in Side view, the elbows, ankles and feet likewise travel horizontally at fixed heights, preserving the bent leg shape but removing the lifting motion. **Top-view animation is unchanged.** All paddles remain still during water glides, and sleeping, feeding, head poses and saved progress are preserved.
+**English:** When the turtle is **resting (but not sleeping)**, all four legs return to a **natural, fully extended, bilaterally symmetrical pose**, whether it is on land or in water. The last active stroke phase is ignored, so one leg cannot remain retracted while its partner is extended. **Sleeping is different**: the four limbs remain tucked under the shell.
 
-**繁體中文：** 側視四肢動畫現已改為**只作水平擺動**，不再有上下划動。游泳時，四肢保持固定朝外方向，以前後水平移動來划水，整個划水週期中腳掌高度保持不變。四肢繼續使用**與俯視模式相同的輪廓及 0.5 倍均勻縮放比例**，並保留原有兩組對角交替動作。陸上步行的側視動畫亦改為手肘、腳踝與腳掌只作水平移動、高度固定，保留彎曲四肢造型，但不再抬腳。**俯視動畫不變。** 水中滑行時四肢保持靜止；睡姿、捕食、頭部伸縮及存檔資料均維持不變。
+Side-view stroke movement is no longer calculated with an independent arbitrary sine translation. Instead, a shared Top-view gait determines the position of each of the four feet, and its movement is projected horizontally into the Side view at the turtle's current heading. This ensures the **same diagonal 1+3 / 2+4 timing, direction and relative foot displacement across both views**. Side-view swimming retains the **same paddle outline and nominal 0.5× scale as Top view**; each shoulder stays attached while the limb foreshortens naturally along the screen's horizontal axis. Side-view land legs retain their bent shape and use that same projected stride. **No Side-view vertical foot animation is added.** The legs remain motionless during gliding.
+
+**繁體中文：** 烏龜**休息（但並非睡覺）**時，無論在陸上或水中，**四隻腳都會回到自然、完全伸展、左右對稱的姿態**，不再停留於上一個划水或步行動作的不同位置。**睡覺**則不同：四肢依然收起，藏於龜殼之下。
+
+側視四肢的移動現在不再另用獨立的正弦函數控制，而是先按照俯視模式的共同步態計算四隻腳的位置，再依烏龜當前的朝向投影到側視畫面的水平軸。因此，**俯視與側視的 1、3／2、4 對角交替節奏、動作方向及相對腳掌位移一致**。側視游泳仍沿用**與俯視相同的腳掌輪廓，以及基本 0.5 倍縮放**；四肢根部固定，腿部只在畫面水平方向自然伸縮。陸上彎曲四肢亦依同一投影步幅移動。**側視不加入上下抬腳動畫**；滑行時四肢保持靜止。
 
 ## Repeated swimming paddles and passive glides / 游泳時反覆划水及滑行
 
@@ -186,9 +190,9 @@ The current feeding extension is deliberately modest: **3.5 additional drawing u
 
 ## Side-view land-walking legs based on front/rear reference / 側視陸上步行四肢造型
 
-**English:** The side-view **walking** legs have been redrawn to follow the supplied front and rear reference: **thick, muscular upper limbs splayed diagonally from the body; bent elbows/knees; short lower segments folding back toward the belly; broad, flattened feet; and small distinct claws**. The walking stroke is now driven by the elbow and ankle joints rather than rotating the whole leg downward. Opposite diagonal pairs still alternate (legs 1+3 versus 2+4), with a small foot lift during the swing phase. At forward-facing and rear-facing angles, the legs splay to either side of the shell. The existing narrower swimming paddles, land surface, tucked sleeping legs, top-view appearance, game rules, and saved progress remain unchanged.
+**English:** The side-view **walking** legs have been redrawn to follow the supplied front and rear reference: **thick, muscular upper limbs splayed diagonally from the body; bent elbows/knees; short lower segments folding back toward the belly; broad, flattened feet; and small distinct claws**. The walking stroke is now driven by the elbow and ankle joints rather than rotating the whole leg downward. Opposite diagonal pairs still alternate (legs 1+3 versus 2+4), with feet held at a constant height in Side view. At forward-facing and rear-facing angles, the legs splay to either side of the shell. The land surface, tucked sleeping legs, top-view appearance, game rules, and saved progress remain unchanged.
 
-**繁體中文：** 側視模式的**陸上步行**四肢現按提供的正面及背面參考圖片重新繪製：**粗壯的上臂／大腿向外斜伸、手肘／膝關節明顯彎曲、較短的下段折向腹部、寬扁的腳掌，以及清楚可見的小爪尖**。步行動作現在由關節的屈伸帶動，不再把整條腿向下擺動。兩組對角四肢依然交替（1、3 與 2、4），擺腿時腳掌稍微提起；正面或背面觀察時，四肢會分別向龜殼兩側張開。原有較短的游泳四肢、平台、睡眠收肢、俯視造型、遊戲規則及存檔均不變。
+**繁體中文：** 側視模式的**陸上步行**四肢現按提供的正面及背面參考圖片重新繪製：**粗壯的上臂／大腿向外斜伸、手肘／膝關節明顯彎曲、較短的下段折向腹部、寬扁的腳掌，以及清楚可見的小爪尖**。步行動作現在由關節的屈伸帶動，不再把整條腿向下擺動。兩組對角四肢依然交替（1、3 與 2、4），側視腳掌保持固定高度；正面或背面觀察時，四肢會分別向龜殼兩側張開。平台、睡眠收肢、俯視造型、遊戲規則及存檔均不變。
 
 ## Broader far-front-leg visibility / 擴大斜角前肢可見範圍
 
