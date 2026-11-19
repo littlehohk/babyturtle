@@ -24,7 +24,7 @@ title:['Baby Red-eared Slider','紅耳龜寶寶'],subtitle:['BREST · virtual tu
 let lang='en';try{lang=localStorage.getItem('brest-web-lang')==='zh'?'zh':'en'}catch(e){}
 const tr=k=>(I[k]||[k,k])[lang==='zh'?1:0],clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a);
 let loc={name:'Sha Tin, Hong Kong',lat:22.38,lon:114.19,timezone:'Asia/Hong_Kong'};
-const fresh=()=>({layoutV2:1,h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,wakeGraceUntil:0,napMask:0,lastNap:0,neckReach:4,feedStage:'',feedElapsed:0,postFeed:0,turning:false,turnDirection:0,swimRun:0,glideTime:0,glideStroke:0}});
+const fresh=()=>({layoutV2:1,h:2.5,b:2.5,hp:10,age:0,outside:26,water:23,thermal:0,light:false,dead:false,cause:'',hunger5:0,dayKey:'',fullDay:false,sleepToday:0,daylight:0,good:0,goodDay:'',time:Date.now(),weatherAt:0,t:{x:13,y:8.5,z:8.9,land:false,side:false,heading:0,sleep:false,dive:0,recovery:0,surface:false,sleepUntil:0,darkSince:0,wakeGraceUntil:0,napMask:0,lastNap:0,neckReach:4,feedStage:'',feedElapsed:0,postFeed:0,turning:false,turnDirection:0,swimRun:0,glideTime:0,glideStroke:0,paddleBurst:0}});
 let s=fresh(),worms=[],lastSave=0,lastLight=0,framePrev=performance.now(),hover=null,touch=null,settings=false,target={x:11,y:8,z:8},wander=0,play=0,rest=0,weatherBusy=false,notice='',noticeUntil=0;
 try{const p=JSON.parse(localStorage.getItem('brest-browser-v1')||'null');if(p&&p.version===1&&p.state&&Number.isFinite(p.state.hp)&&Number.isFinite(p.state.age)&&p.state.t){s=p.state;loc=p.location||loc;if(!s.layoutV2){if(s.t.land){s.t.x=clamp(s.t.x+LAND-18,LAND+1.5,26.5);s.t.z=10;}s.layoutV2=1;}}}catch(e){}
 function save(){try{localStorage.setItem('brest-browser-v1',JSON.stringify({version:1,state:s,location:loc}));lastSave=Date.now();$('saveMsg').textContent=tr('saved')+' · '+new Date().toLocaleTimeString()}catch(e){$('saveMsg').textContent=tr('cannotSave')}}
@@ -58,19 +58,31 @@ function feed(px,py){if(s.dead||s.t.side||px>=LAND/FW*W||py<WT||py>=CT||worms.le
 
 const MOUTH_REACH=2.2;
 // The former head pose corresponds exactly to NECK_SHORT.
-const NECK_COMPACT=0,NECK_SHORT=4,NECK_LONG=10,NECK_EXTEND_RATE=18;
+// Reach relative to a head partially enclosed by the shell. Each
+// activity has a distinct pose, interpolated smoothly during transitions.
+const NECK_SLEEP=-6,NECK_REST=0,NECK_MOVE=4,NECK_FEED=7.5;
+const NECK_COMPACT=NECK_REST,NECK_SHORT=NECK_MOVE,NECK_LONG=NECK_FEED;
+const NECK_EXTEND_RATE=12;
 function neckReach(t){
-  if(Number.isFinite(t.neckReach))return clamp(t.neckReach,NECK_COMPACT,NECK_LONG);
-  return t.sleep?NECK_COMPACT:NECK_SHORT; // older save data
+  if(Number.isFinite(t.neckReach))return clamp(t.neckReach,NECK_SLEEP,NECK_FEED);
+  return t.sleep?NECK_SLEEP:NECK_MOVE; // pre-existing saves
 }
 function moveNeck(t,goal,dt,speed=NECK_EXTEND_RATE){
   const old=neckReach(t);
-  t.neckReach=clamp(old+clamp(goal-old,-speed*dt,speed*dt),NECK_COMPACT,NECK_LONG);
+  t.neckReach=clamp(old+clamp(goal-old,-speed*dt,speed*dt),NECK_SLEEP,NECK_FEED);
+}
+function desiredNeckPose(t){
+  if(t.sleep)return NECK_SLEEP;
+  if(t.feedStage==='extend')return NECK_FEED;
+  if(t.feedStage==='approach'||t.feedStage==='retract')return NECK_MOVE;
+  if(t.moving||t.turning||(t.glideTime||0)>0||t.surface)return NECK_MOVE;
+  return NECK_REST;
 }
 function neckShortOrRest(t,dt){
   const hold=(t.postFeed||0)>0;
   t.postFeed=Math.max(0,(t.postFeed||0)-dt);
-  moveNeck(t,t.moving||hold?NECK_SHORT:NECK_COMPACT,dt,13);
+  const target=desiredNeckPose(t);
+  moveNeck(t,hold?Math.max(target,NECK_MOVE):target,dt,13);
 }
 function turtleDrawScale(t){
   return t.side?(.67+.33*(1-t.y/17)):(t.land?1:.56+.44*clamp(t.z/9.2,0,1));
@@ -196,7 +208,7 @@ function swim(dt,now){
   if(t.sleep){
     t.glideTime=0;t.swimRun=0;t.turning=false;
     t.feedStage='';t.feedElapsed=0;t.postFeed=0;
-    moveNeck(t,NECK_COMPACT,dt,14);
+    moveNeck(t,NECK_SLEEP,dt,14);
     if(!t.land&&!t.surface)t.z=0;
     t.moving=false;t.vx=0;t.vy=0;t.vz=0;return;
   }
@@ -216,7 +228,7 @@ function swim(dt,now){
     t.moving=false;t.vx=0;t.vy=0;t.vz=0;
     t.stroke=(t.stroke||0)+dt*1.3;
     if(play>0)play=Math.max(0,play-dt);
-    t.feedStage='';moveNeck(t,NECK_COMPACT,dt,13);
+    t.feedStage='';moveNeck(t,NECK_REST,dt,13);
     return;
   }
   const wantsLand=night&&t.darkSince&&now-t.darkSince>=300000;
@@ -701,7 +713,8 @@ function drawSideTurtle3D(t,stroke){
   const nearSide=p.c>=0?-1:1,farSide=-nearSide;
   // When the face looks toward the player, the head is the closest
   // surface: even the near-side front flipper must sit BEHIND its outline.
-  const headInFront=!t.land&&p.toward>.4;
+  const tuckedHead=t.sleep||neckReach(t)<=NECK_REST+.65;
+  const headInFront=!tuckedHead&&!t.land&&p.toward>.4;
   // In a front three-quarter view the far front paddle may be completely
   // covered by the rounded face. Shift its ROOT slightly outboard (not
   // its length) so the tip peeks out beyond the cheek. The inner portion
@@ -737,10 +750,20 @@ function drawSideTurtle3D(t,stroke){
   }
   // When travelling away from the viewer, the head is partially
   // hidden behind the domed shell; frontal turns bring it forward.
-  if(p.toward<-.13)drawSideHead3D(t,p);
+  // Sleep: no full head is drawn at all; the nose tip peeks out
+  // after the shell. Rest: head is drawn UNDER the shell.
+  if(!t.sleep&&(tuckedHead||p.toward<-.13))drawSideHead3D(t,p);
   drawSideDomedShell(r,p);
-
-  if(p.toward>=-.13&&!headInFront)drawSideHead3D(t,p);
+  if(t.sleep&&p.toward>-.2){
+    const noseX=Math.abs(p.c)>.3
+      ?Math.sign(p.c)*(r+1.0)
+      :p.headX;
+    const noseY=Math.abs(p.c)>.3?1.2:6.1;
+    ell(noseX,noseY,2.1,1.7,'#8dbb63');
+    ell(noseX+(p.c>=0?.65:-.65),noseY-.32,.38,.34,'#3c5b2f');
+  }
+  if(!t.sleep&&!tuckedHead&&p.toward>=-.13&&!headInFront)
+    drawSideHead3D(t,p);
   if(t.sleep){
     // Two tucked paws just peep out from under the rim; no long flippers.
     ell(-r*.49,4.5,2.0,1.1,'#719d4e');
@@ -875,36 +898,45 @@ function drawTurtle(now){
     // Rotate +X to the turtle's heading; face and both red cheek spots
     // remain paired and symmetric at every angle.
     g.rotate(-t.heading); // Correct world Y-up -> canvas Y-down projection.
-    const n=neckReach(t),shift=n-NECK_SHORT;
+    const n=neckReach(t),shift=n-NECK_MOVE;
+    const restingHead=!t.sleep&&!active&&!gliding&&
+      t.recovery<=0&&t.feedStage!=='extend'&&n<=NECK_REST+.65;
     if(t.sleep){
-      // Head rests against the shell; all four legs remain tucked.
+      // The entire sleeping head is INSIDE the carapace except its
+      // little snout: no eye, full face or exposed neck is drawn.
       ell(-8,-8,3.1,2.2,'#709b4c');
       ell(-8,8,3.1,2.2,'#709b4c');
       ell(7,-8,3.1,2.2,'#709b4c');
       ell(7,8,3.1,2.2,'#709b4c');
-      topNeck(n);
       shellTop();
-      g.save();g.translate(shift,0);
-      ell(16,0,8.0,7.2,'#8bb661');
-      topFace(true);
-      g.restore();
+      ell(14.1,0,1.8,2.0,'#89b75e');
+      ell(15.3,-.35,.45,.4,'#35542e');
     }else{
-      // Walking/swimming: short neck. Feeding: long. Resting: tucked.
+      // All four limbs retain the exact diagonal 1+3 / 2+4 gait.
       flipper(-8,-8,false,-1,stroke+gaitPhase(false,-1),t.land,'top'); // 4
       flipper(-8,8,false,1,stroke+gaitPhase(false,1),t.land,'top');   // 3
       flipper(5,-9,true,-1,stroke+gaitPhase(true,-1),t.land,'top');  // 1
       flipper(5,9,true,1,stroke+gaitPhase(true,1),t.land,'top');     // 2
       poly([[-11,-2],[-23,0],[-11,3]],'#719c58');
-      topNeck(n);
-      shellTop();
-      g.save();g.translate(shift,0);
-      ell(17,0,8.2,7.2,'#81aa5d');
-      topFace(false);
-      if(t.capture>.25){
-        g.strokeStyle='#2b482a';g.lineWidth=1.1;
-        g.beginPath();g.moveTo(22,-2);g.lineTo(24,0);g.lineTo(22,2);g.stroke();
+      // At rest the head is rendered FIRST: the shell covers its back
+      // and eyes, with only its forward face peeking outside the rim.
+      if(restingHead){
+        g.save();g.translate(shift,0);
+        ell(17,0,8.2,7.2,'#81aa5d');topFace(false);
+        g.restore();
+        shellTop();
+      }else{
+        topNeck(Math.max(0,n));
+        shellTop();
+        g.save();g.translate(shift,0);
+        ell(17,0,8.2,7.2,'#81aa5d');
+        topFace(false);
+        if(t.capture>.25){
+          g.strokeStyle='#2b482a';g.lineWidth=1.1;
+          g.beginPath();g.moveTo(22,-2);g.lineTo(24,0);g.lineTo(22,2);g.stroke();
+        }
+        g.restore();
       }
-      g.restore();
     }
   }
   g.restore();
