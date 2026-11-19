@@ -161,26 +161,29 @@ function mouthContact(t,w,phase){
 
 // A short passive coast starts when a period of active swimming ends.
 // No flipper phase is advanced during this glide: momentum decays naturally.
-function startGlide(t){
+// Every ordinary burst of paddling ends in a short moment of free glide.
+// Entering a voluntary rest uses the same mechanism but a longer coast.
+function startGlide(t,duration=.34){
   if(t.land||t.sleep||(t.glideTime||0)>0)return false;
   const vx=t.vx||0,vy=t.vy||0,vz=t.vz||0;
   const speed=Math.hypot(vx,vy,vz);
   if(speed<.24)return false;
-  const drift=Math.min(1.25,speed*.72);
+  const drift=Math.min(1.9,speed*.98);
   t.glideVx=vx/speed*drift;
   t.glideVy=vy/speed*drift;
   t.glideVz=vz/speed*drift;
-  t.glideTime=1.15;
-  t.glideDuration=1.15;
+  t.glideTime=duration;
+  t.glideDuration=duration;
   t.glideStroke=t.stroke||0;
-  t.swimRun=0;
+  t.swimRun=0;t.paddleBurst=0;
   t.moving=false;t.turning=false;
   return true;
 }
 function advanceGlide(t,dt){
-  const time=Math.max(0,(t.glideTime||0)-dt);
-  const fraction=time/Math.max(.1,t.glideDuration||1.15);
-  // Squared easing slows the turtle down progressively without paddling.
+  const before=t.glideTime||0;
+  const time=Math.max(0,before-dt);
+  // Maintain some forward momentum, smoothly decreasing without kicks.
+  const fraction=before/Math.max(.1,t.glideDuration||.34);
   const easing=fraction*fraction;
   const vx=(t.glideVx||0)*easing,vy=(t.glideVy||0)*easing,vz=(t.glideVz||0)*easing;
   t.x=clamp(t.x+vx*dt,1,26.5);
@@ -188,8 +191,9 @@ function advanceGlide(t,dt){
   t.z=clamp(t.z+vz*dt,0,9.2);
   t.vx=vx;t.vy=vy;t.vz=vz;
   t.glideTime=time;
+  // Freeze flipper phase and heading. Translation continues by inertia.
   t.moving=false;t.turning=false;t.stroke=t.glideStroke||0;
-  moveNeck(t,NECK_SHORT,dt,13);
+  moveNeck(t,NECK_MOVE,dt,13);
   if(time<=0){t.vx=0;t.vy=0;t.vz=0}
 }
 function approachAngleForFeeding(t,ux,uy){
@@ -206,14 +210,14 @@ function swim(dt,now){
   }
   worms=worms.filter(w=>w.life<180);
   if(t.sleep){
-    t.glideTime=0;t.swimRun=0;t.turning=false;
+    t.glideTime=0;t.swimRun=0;t.paddleBurst=0;t.turning=false;
     t.feedStage='';t.feedElapsed=0;t.postFeed=0;
     moveNeck(t,NECK_SLEEP,dt,14);
     if(!t.land&&!t.surface)t.z=0;
     t.moving=false;t.vx=0;t.vy=0;t.vz=0;return;
   }
   if(t.surface){
-    t.glideTime=0;t.swimRun=0;t.turning=false;
+    t.glideTime=0;t.swimRun=0;t.paddleBurst=0;t.turning=false;
     // The original code suspended every swimming stroke while surfacing.
     // A conscious turtle must keep paddling during its ascent.
     t.moving=true;t.vx=0;t.vy=0;t.vz=2.3;
@@ -222,7 +226,7 @@ function swim(dt,now){
     return;
   }
   if(t.recovery>0){
-    t.glideTime=0;t.swimRun=0;t.turning=false;
+    t.glideTime=0;t.swimRun=0;t.paddleBurst=0;t.turning=false;
     // Breathing recovery can last 5–15 real minutes after long dives.
     // Remain at the surface, but keep slow visible limb/head motion.
     t.moving=false;t.vx=0;t.vy=0;t.vz=0;
@@ -236,19 +240,26 @@ function swim(dt,now){
     worms.filter(w=>w.notice<=0).sort((a,b)=>
       Math.hypot(a.x-t.x,a.y-t.y,a.z-t.z)-
       Math.hypot(b.x-t.x,b.y-t.y,b.z-t.z))[0]:null;
-  // Prioritise food, the route to land, or a play action over coasting.
+  // Food, play, land transitions and surfacing take priority over
+  // gliding. Otherwise finish the current unpowered drift.
   if((t.glideTime||0)>0){
     if(!candidate&&!wantsLand&&play<=0&&!t.land){
       advanceGlide(t,dt);return;
     }
-    t.glideTime=0;t.swimRun=0;
+    t.glideTime=0;t.paddleBurst=0;
   }
-  // Even without a random rest, occasionally coast after sustained
-  // swimming. The following short rest prevents immediate repaddling.
-  if(!candidate&&!t.land&&!wantsLand&&play<=0&&
-     (t.swimRun||0)>7.0&&startGlide(t)){
-    rest=Math.max(rest,rand(.4,.9));
-    advanceGlide(t,dt);return;
+  // Ordinary cruising repeats kick -> short coast -> kick.
+  // Unlike the old seven-second timer, this occurs after EVERY
+  // approximately 0.8-second paddle burst while actually swimming.
+  const ordinaryCruise=!candidate&&!t.land&&!wantsLand&&
+    play<=0&&rest<=0;
+  if(ordinaryCruise&&t.moving){
+    t.paddleBurst=(t.paddleBurst||0)+dt;
+    if(t.paddleBurst>=.8&&startGlide(t,.34)){
+      advanceGlide(t,dt);return;
+    }
+  }else if(!ordinaryCruise){
+    t.paddleBurst=0;
   }
   if(!candidate||t.land||wantsLand){
     if(t.feedStage==='extend'||t.feedStage==='approach')
@@ -301,7 +312,7 @@ function swim(dt,now){
   }
   target=moveGoal;
   if(rest>0&&!candidate&&!wantsLand){
-    if(!t.land&&t.moving&&startGlide(t)){
+    if(!t.land&&t.moving&&startGlide(t,.65)){
       advanceGlide(t,dt);return;
     }
     rest=Math.max(0,rest-dt);
