@@ -172,11 +172,11 @@ The current feeding extension is deliberately modest: **3.5 additional drawing u
 
 捕食時比正常短頸**額外伸出 3.5 個繪圖單位**（捕食設定 7.5，活動設定 4），較舊有的 10 或 16 更短。舊存檔可以繼續使用。
 
-## Identically sized legs and whole-leg vertical paddling / 俯側視同尺寸四肢及整條腿上下划動
+## Horizontal-only movement in Side view / 側視四肢只作水平擺動
 
-**English:** The previous Side-view paddle was a separately drawn, smaller horizontal shape; moving only its foot tip did not create a convincing up/down stroke. The Side-view swimming animation now **uses the exact same limb outline and uniform 0.5× scale as the Top view**. Each *whole limb* pivots around its attachment point through a **±1.12-radian (about ±64°) up/down sweep**, rather than merely deforming its tip. Its length and thickness therefore match the Top-view limb, with the two opposing diagonal pairs continuing to alternate. The compact sleeping pose and articulated land-walking legs remain unchanged, and all legs stay still during passive water glides. The corrected motion is applied in every side-view heading, not just pure profile.
+**English:** Side-view leg animation has been changed to **horizontal movement only**, without vertical up/down strokes. During swimming, all four legs keep a fixed outward orientation and shift forward/backward in the horizontal plane; the visible feet maintain the same height throughout the stroke. The legs still use **the same shape and uniform 0.5× scale as in Top view**, and the existing opposing-diagonal timing remains. During land walking in Side view, the elbows, ankles and feet likewise travel horizontally at fixed heights, preserving the bent leg shape but removing the lifting motion. **Top-view animation is unchanged.** All paddles remain still during water glides, and sleeping, feeding, head poses and saved progress are preserved.
 
-**繁體中文：** 之前側視游泳四肢採用了獨立繪製、較細小的水平造型，單單令腳掌末端上下移動，仍然難以呈現真正的上下划水動作。現在側視游泳四肢改為**完全沿用俯視模式的四肢輪廓，以及相同的 0.5 倍均勻縮放比例**。游泳時**整條前肢或後肢**以連接身體的位置為軸心，約向上、向下各擺動 **1.12 弧度（約 64 度）**，而不再只令腳掌末端變形。故此，四肢的長度和粗幼與俯視模式相同，兩組對角四肢繼續交替划動。睡眠收肢、陸上彎曲步行姿態保持不變；水中滑行時四肢維持停止。修正適用於所有側視方向，不限正側面。
+**繁體中文：** 側視四肢動畫現已改為**只作水平擺動**，不再有上下划動。游泳時，四肢保持固定朝外方向，以前後水平移動來划水，整個划水週期中腳掌高度保持不變。四肢繼續使用**與俯視模式相同的輪廓及 0.5 倍均勻縮放比例**，並保留原有兩組對角交替動作。陸上步行的側視動畫亦改為手肘、腳踝與腳掌只作水平移動、高度固定，保留彎曲四肢造型，但不再抬腳。**俯視動畫不變。** 水中滑行時四肢保持靜止；睡姿、捕食、頭部伸縮及存檔資料均維持不變。
 
 ## Repeated swimming paddles and passive glides / 游泳時反覆划水及滑行
 
