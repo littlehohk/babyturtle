@@ -430,14 +430,15 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
     // hides every leg under the shell.
     const axis=(front?1:-1)*cameraFacing+side*cameraToward*.92;
     const outward=axis>=0?1:-1;
-    // Up-and-down paddling in Side view: keep the horizontal reach
-    // CONSTANT and move each foot vertically through a broad stroke.
-    // Earlier shoulder rotation changed the projected sideways reach
-    // more than its height, so the turtle looked as if it only waved
-    // its legs horizontally. Each pair still alternates via gaitPhase.
+    // Strong, easily visible VERTICAL paddle strokes. Earlier versions
+    // varied only the paddle silhouette near the body, so the hand
+    // appeared to slide sideways as the shell occluded the middle.
+    // Keep the shoulder rooted and HORIZONTAL reach constant. Move the
+    // whole visible foot well above and below the shell silhouette.
+    // Opposite diagonal limbs still use their existing phase offsets.
     const length=front?13.2:12.2;
     const verticalStroke=Math.sin(phase);
-    const tipY=(front?-2.2:2.9)+(front?8:7.2)*verticalStroke;
+    const tipY=(front?-2.2:2.9)+(front?15.5:14)*verticalStroke;
     g.scale(outward,1);
     ell(0,0,4.9,4.05,'#557f3d');
     g.beginPath();
