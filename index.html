@@ -461,9 +461,9 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
     // translating the entire leg) keeps the shoulder attached.
     const dx=resting?0:projectedLegStroke(
       front,side,cycle,false,cameraFacing,cameraToward);
-    // The visible distal toe is roughly half this length from the root
-    // after the common 0.5x limb scale.
-    const neutralToeReach=.5*((front?17.5:15.3)*.88+4.5);
+    // Exact neutral distal-toe reach, including the shared limb's
+    // 0.88 extension, 4-unit claw tip and 0.5 common scale.
+    const neutralToeReach=.5*.88*((front?17.5:15.3)+4);
     const projectedScale=clamp(1+dx/(outward*neutralToeReach),.5,1.5);
     g.scale(outward*projectedScale,1);
     g.rotate(-Math.PI/2);
@@ -491,7 +491,9 @@ function flipper(x,y,front,side,phase,walking=false,projection='top',cameraFacin
     // Use that same Top-view projected stride for land walking.
     // The shoulder stays fixed; knee and ankle follow the projection,
     // and feet remain at a fixed height in Side view.
-    const stride=resting?0:projectedLegStroke(
+    // Walking artwork uses the common 0.5 limb scale, so compensate
+    // here to match the already-scaled projected Top-view displacement.
+    const stride=resting?0:2*projectedLegStroke(
       front,side,phaseStep,true,cameraFacing,cameraToward);
     const elbowX=dir*8.6+stride*.44;
     const elbowY=5.5;
