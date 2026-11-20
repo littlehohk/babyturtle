@@ -422,6 +422,8 @@ const SWIM_LIMB_POSES = {
   hindReach: {spread:.84, elbow:5, wrist:.92, width:.43},
   hindPush:  {spread:1.12, elbow:-2.5, wrist:-.10, width:1.30}
 };
+// Widen the side silhouettes around the stroke and stride already traced by the joints.
+const SIDE_LEG_THICKNESS = 2;
 function swimBeat(phase){
   const quarter = phase/(Math.PI/2);
   const whole = Math.floor(quarter);
@@ -460,8 +462,10 @@ function drawSideSwimPaddle(camera, {front, far, depth, elbow, tipY, project, pa
     return {baseX, baseY:padY+row*.55, tipX, tipY:toeY+row,
             webX:baseX+.83*(tipX-baseX), webY:padY+.83*(toeY-padY)+row};
   });
-  const shoulder = front ? 3.5 + .7*facing : 3.15;
-  const joint = front ? 2.45 : 1.95;
+  const shoulder = (front ? 3.5 + .7*facing : 3.15)*SIDE_LEG_THICKNESS;
+  const joint = (front ? 2.45 : 1.95)*SIDE_LEG_THICKNESS;
+  const wrist = 1.25*SIDE_LEG_THICKNESS, web = 1.1*SIDE_LEG_THICKNESS;
+  const coreWidth = 3.7*SIDE_LEG_THICKNESS;
   const lowerX = elbowX + .23*(wristX-elbowX);
   const lowerY = elbowY + .67*(wristY-elbowY);
   // A rounded core keeps the taper visible even when the foot points
@@ -470,18 +474,18 @@ function drawSideSwimPaddle(camera, {front, far, depth, elbow, tipY, project, pa
   g.quadraticCurveTo(elbowX*.65,0,elbowX,elbowY);
   g.quadraticCurveTo(lowerX,lowerY,wristX,wristY);
   g.lineTo(padX,padY);
-  g.lineWidth=3.7;g.strokeStyle=edge;g.stroke();
-  g.lineWidth=2.6;g.strokeStyle=skin;g.stroke();
+  g.lineWidth=coreWidth;g.strokeStyle=edge;g.stroke();
+  g.lineWidth=coreWidth-1.1;g.strokeStyle=skin;g.stroke();
   g.beginPath();g.moveTo(0,-shoulder);
   g.quadraticCurveTo(elbowX*.65,-shoulder,elbowX,elbowY-joint);
-  g.quadraticCurveTo(lowerX,lowerY-joint,wristX,wristY-1.25);
-  g.quadraticCurveTo(digits[0].baseX,digits[0].baseY-1.1,digits[0].webX,digits[0].webY);
+  g.quadraticCurveTo(lowerX,lowerY-joint,wristX,wristY-wrist);
+  g.quadraticCurveTo(digits[0].baseX,digits[0].baseY-web,digits[0].webX,digits[0].webY);
   for(let i=1;i<digits.length;i++){
     const prev=digits[i-1],toe=digits[i];
     g.quadraticCurveTo((prev.baseX+toe.baseX)*.5,(prev.baseY+toe.baseY)*.5,
       toe.webX,toe.webY);
   }
-  g.quadraticCurveTo(digits[2].baseX,digits[2].baseY+1.1,wristX,wristY+1.25);
+  g.quadraticCurveTo(digits[2].baseX,digits[2].baseY+web,wristX,wristY+wrist);
   g.quadraticCurveTo(lowerX,lowerY+joint,elbowX,elbowY+joint);
   g.quadraticCurveTo(elbowX*.65,shoulder,0,shoulder);
   g.closePath();g.fillStyle=skin;g.fill();
@@ -530,33 +534,40 @@ function flipper(x, y, leg, beat, walking, resting, {camera=null, far=false, dep
     const ankleY=10.4;
     const pawX=dir*9.3+stride;
     const pawY=12.3;
+    const upperWidth=11*SIDE_LEG_THICKNESS, lowerWidth=9.5*SIDE_LEG_THICKNESS;
+    const pawHeight=2.95*SIDE_LEG_THICKNESS;
+    const soleY=pawY+2.95;
     g.lineCap='round';g.lineJoin='round';
 
+    // Grow each segment toward the body so the sole stays planted.
+    g.save();g.translate(0,-(upperWidth-11)/2);
     // Rounded muscular shoulder/hip blending into the body.
-    ell(0,1,5.5,4.8,'#557b3c');
+    ell(0,1,5.5,4.8*SIDE_LEG_THICKNESS,'#557b3c');
     // Strong diagonal upper segment, with a clear elbow silhouette.
     g.beginPath();g.moveTo(-dir*1,-.7);
     g.quadraticCurveTo(dir*4.6,1.8,elbowX,elbowY);
-    g.strokeStyle='#2b492a';g.lineWidth=11;g.stroke();
-    g.strokeStyle='#78a64f';g.lineWidth=8.8;g.stroke();
+    g.strokeStyle='#2b492a';g.lineWidth=upperWidth;g.stroke();
+    g.strokeStyle='#78a64f';g.lineWidth=upperWidth-2.2;g.stroke();
     g.beginPath();g.moveTo(dir*.8,-1.1);
     g.quadraticCurveTo(dir*4,1.0,elbowX-dir*.8,elbowY-1);
     g.strokeStyle='#b7d56c';g.lineWidth=1.65;g.stroke();
+    g.restore();
 
     // Fold back toward the belly, producing the bent, Z-like stance.
-    ell(elbowX,elbowY,4.5,4.0,'#628e43');
+    g.save();g.translate(0,-(lowerWidth-9.5)/2);
+    ell(elbowX,elbowY,4.5,4.0*SIDE_LEG_THICKNESS,'#628e43');
     g.beginPath();g.moveTo(elbowX,elbowY);
     g.quadraticCurveTo(dir*6.2,8.0,ankleX,ankleY);
-    g.strokeStyle='#304c2a';g.lineWidth=9.5;g.stroke();
-    g.strokeStyle='#7daa54';g.lineWidth=7.1;g.stroke();
+    g.strokeStyle='#304c2a';g.lineWidth=lowerWidth;g.stroke();
+    g.strokeStyle='#7daa54';g.lineWidth=lowerWidth-2.4;g.stroke();
     g.beginPath();g.moveTo(elbowX-dir*.7,elbowY+1);
     g.quadraticCurveTo(dir*6.4,7.7,ankleX,ankleY-1);
     g.strokeStyle='#c0d975';g.lineWidth=1.2;g.stroke();
 
-    // Wide, flattened, forward-facing foot; the paw stays near ground
-    // level while the alternate diagonal pair lifts for its next step.
-    ell(ankleX,ankleY,4.6,3.2,'#67964b');
-    ell(pawX,pawY,6.2,2.95,'#81af57',dir*.08);
+    ell(ankleX,ankleY,4.6,3.2*SIDE_LEG_THICKNESS,'#67964b');
+    g.restore();
+    // Build the paw upward from its sole and leave its claws at ground level.
+    ell(pawX,soleY-pawHeight,6.2,pawHeight,'#81af57',dir*.08);
     g.beginPath();g.moveTo(pawX-dir*2.5,pawY-1.1);
     g.lineTo(pawX+dir*3.1,pawY-1);
     g.strokeStyle='#bfda72';g.lineWidth=1.35;g.stroke();
@@ -792,6 +803,10 @@ function drawSideDomedShell(r,p){
 function drawSideTurtle3D(t,beat,resting,travel){
   const p=sidePose(t),r=p.shellRadius;
   function drawLegs(near){
+    // On land, the upper legs emerge from under the shell rim at each depth.
+    if(t.land){
+      g.save();g.beginPath();g.rect(-r-9,near?4.8:2.6,2*r+18,36);g.clip();
+    }
     for(const leg of LEGS){
       const front = leg.x > 0, side = Math.sign(leg.y);
       const depth = leg.x*p.sn - leg.y*p.c; // positive is away from the Side camera
@@ -810,11 +825,12 @@ function drawSideTurtle3D(t,beat,resting,travel){
       }
       flipper(x,y,leg,beat,t.land,resting,{camera:p,far:!near,depth,travel});
     }
+    if(t.land)g.restore();
   }
   // When the face looks toward the player, the head is the closest
   // surface: even the near-side front flipper must sit BEHIND its outline.
   const tuckedHead=t.sleep||neckReach(t)<=NECK_REST+.65;
-  const headInFront=!tuckedHead&&!t.land&&p.toward>.4;
+  const headInFront=!tuckedHead&&p.toward>.4;
   const pitch=Math.atan2(t.vz||0,Math.hypot(t.vx||0,t.vy||0)+.3);
   p.tilt=t.sleep?0:-pitch*.13;
   g.save();
@@ -849,14 +865,7 @@ function drawSideTurtle3D(t,beat,resting,travel){
     ell(-r*.49,4.5,2.0,1.1,'#719d4e');
     ell(r*.46,4.5,2.0,1.1,'#719d4e');
   }else{
-    // Clip only the DOWNWARD walking legs. The old swimming clip
-    // removed most of the horizontal flippers above y=3.6, causing
-    // them to look vanishingly thin or to disappear when facing front.
-    if(t.land){
-      g.save();g.beginPath();g.rect(-r-9,4.8,2*r+18,36);g.clip();
-    }
     drawLegs(true);
-    if(t.land)g.restore();
     g.strokeStyle='#334b28';g.lineWidth=1.4;
     g.beginPath();g.moveTo(-r*.78,5);g.quadraticCurveTo(0,7.4,r*.78,5);g.stroke();
     // Tail stays tucked when sleeping.
@@ -876,8 +885,6 @@ function drawSideHead3D(t,p){
   // Artwork and contact use the same neck-extended face coordinates.
   const hx=p.headX;
   const hy=t.sleep?p.headY+1.4:p.headY;
-  const noseX=p.noseX;
-  const noseY=t.sleep?p.noseY+1.4:p.noseY;
   // Rounded neck continuously emerges from shell, including 45° yaw.
   g.beginPath();
   g.moveTo(p.c*3.8,-3.5);
@@ -929,22 +936,6 @@ function drawSideHead3D(t,p){
         ell(far-.2,hy-3,1.55+front*.3,1.8+front*.3,'#283b29');
         ell(far-.7,hy-4,.7,.85,'#fff');
       }
-    }
-    // A centered, gently curved smile sits on the rounded chin when
-    // looking at the viewer. Other yaw angles keep the profile mouth.
-    g.beginPath();
-    if(headOn>.68){
-      g.moveTo(hx-2.7,noseY-.45);
-      g.quadraticCurveTo(hx,noseY+1.45,hx+2.7,noseY-.45);
-    }else{
-      g.moveTo(hx-2.5,hy+4.2);
-      g.quadraticCurveTo(noseX,hy+6.7,noseX,noseY);
-    }
-    g.strokeStyle='#253e23';g.lineWidth=1.15;g.stroke();
-    if(t.capture>.2){
-      g.beginPath();g.moveTo(noseX-1.8,noseY);
-      g.quadraticCurveTo(noseX,noseY+2.1,noseX+1.8,noseY);
-      g.strokeStyle='#233324';g.stroke();
     }
   }
 }

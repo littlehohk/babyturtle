@@ -208,9 +208,9 @@ Both views follow the same four-beat diagonal cycle. In Top view, one foreleg re
 
 ## Rounded front-facing chin and correct leg layering / 正面圓下巴及前肢遮擋修正
 
-**English:** In Side view, when the turtle swims toward the viewer, the lower head now has a fuller, **rounded chin** rather than a flat-looking underside. The head's vertical curvature increases smoothly as its face turns toward the camera, while the side-profile shape is preserved. The front-facing mouth is also drawn as a small centered curve. For front-facing swimming angles, the **head is rendered after the flippers**, covering their inner portions so that the turtle's right front leg does not appear in front of its cheek or chin. Paddle length, diagonal 1+3/2+4 swimming rhythm, sleeping posture, land-walking legs, language switch and save data remain unchanged.
+**English:** In Side view, when the turtle swims toward the viewer, the lower head now has a fuller, **rounded chin** rather than a flat-looking underside. The head's vertical curvature increases smoothly as its face turns toward the camera, while the side-profile shape is preserved. The green chin is continuous below the cheeks, including while feeding. For front-facing swimming angles, the **head is rendered after the flippers**, covering their inner portions so that the turtle's right front leg does not appear in front of its cheek or chin. Paddle length, diagonal 1+3/2+4 swimming rhythm, sleeping posture, land-walking legs, language switch and save data remain unchanged.
 
-**繁體中文：** 在側視模式中，烏龜正面游向玩家時，頭部下方改為**較圓潤的下巴**，不再顯得平直；頭部轉向觀眾時，臉部下緣的圓弧會逐漸加深，側面輪廓則維持原狀。正面嘴巴亦會顯示為置中的短弧線。正面游泳時，程式會**先繪製四肢，再繪製頭部**，使前肢靠近身體的部分藏在頭部後面，避免右前肢遮擋臉頰或下巴。四肢長度、1、3／2、4 對角划水節奏、睡姿、陸上步行、語言切換及存檔均不改變。
+**繁體中文：** 在側視模式中，烏龜正面游向玩家時，頭部下方改為**較圓潤的下巴**，不再顯得平直；頭部轉向觀眾時，臉部下緣的圓弧會逐漸加深，側面輪廓則維持原狀。臉頰下方的綠色下巴輪廓連貫，進食時亦然。正面游泳時，程式會**先繪製四肢，再繪製頭部**，使前肢靠近身體的部分藏在頭部後面，避免右前肢遮擋臉頰或下巴。四肢長度、1、3／2、4 對角划水節奏、睡姿、陸上步行、語言切換及存檔均不改變。
 
 ## Additional one-third reduction in swimming leg length / 再縮短游泳四肢
 
@@ -232,9 +232,9 @@ Both views follow the same four-beat diagonal cycle. In Top view, one foreleg re
 
 ## Horizontal side-view swimming paddles / 側視橫向划水
 
-Side view follows the same four-beat stroke as Top view. Seen from the front, one foreleg reaches beside the head while the other folds. Seen from behind, the hind legs trail outward on either side of the tail. In profile, the forefoot turns edge-on and the rear toes fan on the backward push. Each foot sweeps horizontally at a fixed height relative to its shoulder or hip, including during a dive. Switching views preserves the phase of the stroke.
+In Side view, the swimming and walking legs are about twice as thick as before. Swimming follows the same four-beat stroke as Top view. Seen from the front, one foreleg reaches beside the head while the other folds. Seen from behind, the hind legs trail outward on either side of the tail. In profile, the forefoot turns edge-on and the rear toes fan on the backward push. Each foot sweeps horizontally at a fixed height relative to its shoulder or hip, including during a dive. Switching views preserves the phase of the stroke.
 
-側視與俯視模式採用相同的四拍划水節奏。從正面看，一隻前腳向頭側伸出，另一隻則屈曲收回。從後方看，兩隻後腳從尾巴兩旁向外伸展。從側面看，前腳掌轉動時露出窄邊，後腳向後推水時則張開腳趾與蹼。每隻腳掌都沿水平方向划動，即使下潛，與肩部或髖部的高度差亦保持不變。划水途中切換視角，動作會從同一階段繼續。
+側視模式中，游泳和步行時所見的四肢粗度約為原來的兩倍。游泳時，側視與俯視模式採用相同的四拍划水節奏。從正面看，一隻前腳向頭側伸出，另一隻則屈曲收回。從後方看，兩隻後腳從尾巴兩旁向外伸展。從側面看，前腳掌轉動時露出窄邊，後腳向後推水時則張開腳趾與蹼。每隻腳掌都沿水平方向划動，即使下潛，與肩部或髖部的高度差亦保持不變。划水途中切換視角，動作會從同一階段繼續。
 
 ## Side-view movement and recovery visibility / 側視活動與呼吸恢復顯示
 
@@ -279,7 +279,7 @@ Walking on land retains **the same 1+3 versus 2+4 alternating timing**. In top v
 
 ## Narrower platform and 3D side-view turning / 縮窄平台及立體側視轉向
 
-**English:** Both views now show a **20%-width land area** on the right; the remaining 80% is open water. In Side view, the land shelf sits at the actual water surface, with water rendered below it. The turtle's body is raised above the shelf when walking or sleeping, so it remains visible. Side-view turns are no longer made by simply flattening the profile: a rounded dome with directional scute patterns, a distinct shell rim and plastron, visible far/near legs, and a neck/head that changes occlusion create approximate 45-degree front and rear views. The side-view mouth marker follows the same heading-dependent facial geometry, retaining strict mouth-only feeding. Saved turtles already on land are repositioned onto the narrower platform without resetting their age, health, or care history.
+**English:** Both views now show a **20%-width land area** on the right; the remaining 80% is open water. In Side view, the land shelf sits at the actual water surface, with water rendered below it. The turtle's body is raised above the shelf when walking or sleeping, so it remains visible. Side-view turns are no longer made by simply flattening the profile: a rounded dome with directional scute patterns, a distinct shell rim and plastron, visible far/near legs, and a neck/head that changes occlusion create approximate 45-degree front and rear views. The side-view feeding contact point follows the tip of the snout as the head turns. Saved turtles already on land are repositioned onto the narrower platform without resetting their age, health, or care history.
 
 **繁體中文：** 俯視及側視模式的陸地均縮至**右側約 20% 的寬度**，其餘約 80% 為水域。側視的陸地平台改為正確顯示於水面高度，下面仍有水。烏龜在平台上行走或睡覺時，其身體會顯示在平台上方，不再被平台遮蔽。側視轉向亦不再單純把平面的側身圖像壓扁，而是利用立體龜殼弧度、隨朝向變化的龜甲紋理、龜殼邊緣和腹甲，以及遠近四肢和頭頸遮擋關係，近似呈現前方或後方四十五度的姿態。進食的嘴尖位置亦配合新的朝向投影。已儲存並在陸地上的烏龜會移至新平台位置，而不會重設年齡、健康或飼養進度。
 
