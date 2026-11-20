@@ -130,9 +130,9 @@ Feeding now requires the rendered mouth tip to meet the animated bloodworm itsel
 
 ### Revised four-limb attachment and stroke / 四肢連接及划水修訂
 
-All four limbs now use a matching broad-shouldered, striped, webbed-paddle shape, with modest front/rear proportional differences. The roots are drawn beneath the shell, not as narrow joints. In top view, diagonal pairs alternate; the hind kicks lag slightly. In side view, far limbs render behind the body, while near limbs are clipped under the shell rim. Each stroke extends on the power phase and folds back during recovery. The artwork is a procedural interpretation of the supplied BREST swimming references.
+All four limbs use a broad-shouldered, striped, webbed-paddle shape, with modest front/rear proportional differences. Each leg pivots at a fixed socket beneath the shell. The front and hind legs in each diagonal pair move together. In Side view, the far paddles pass behind the shell as the turtle turns.
 
-四肢現採用相近的寬根部、有條紋及趾爪的划水形態，前後肢只保留適量比例差異。所有肢體均從龜殼下伸出，不再以幼細的連接點懸掛。俯視模式以對角肢體交替划水，後肢略為延遲；側視模式把遠側肢體放在身體後方，近側肢體根部則隱藏於龜殼邊緣下。推水時伸展、回收時屈曲。動畫按 BREST 參考圖片以程式推算。
+四肢的根部寬闊，腳掌有條紋、蹼和趾爪，前後肢的比例略有不同。每隻腳都以龜殼下方的關節為軸擺動。每組對角的前肢和後肢同步划水。在側視模式中，烏龜轉向時，遠側的腳掌會從龜殼後方劃過。
 
 ## Fix: turtle stationary after waking / 修正喚醒後無法移動
 
@@ -232,9 +232,9 @@ Side-view stroke movement is no longer calculated with an independent arbitrary 
 
 ## Horizontal side-view swimming paddles / 側視橫向划水
 
-**English:** While swimming in Side view, all four limbs now extend and paddle predominantly **left–right**, alongside the turtle's body, rather than pointing down. The movement preserves the established diagonal two-step rhythm: legs **1 and 3** move together while **2 and 4** move in the opposing phase. A small vertical variation and direction-dependent foreshortening help the movement look natural as the turtle turns. The upper limb roots stay embedded under the shell. **Walking on land is unchanged:** the legs still bend downward into the Z-shaped walking pose; during **sleep** they remain tucked beneath the shell.
+In Side view, each foot sweeps horizontally at a fixed height relative to its shoulder or hip. The stroke appears shorter when the turtle points toward or away from the viewer. Switching views midway through a stroke preserves its phase.
 
-**繁體中文：** 側視游泳時，四肢現主要沿身體兩旁**左右橫向伸展及划水**，不再向下垂。動作保留原有兩步對角節奏：**1、3** 同步，**2、4** 以相反相位划水。配合少量上下角度變化及轉向時的透視縮短效果，令動作較自然。四肢根部仍藏在龜殼下。**陸上步行不變**，四肢繼續以向下彎曲的 **Z 字形**走動；**睡覺時**則收起四肢。
+在側視模式中，每隻腳掌都沿水平方向划動，與肩部或髖部保持固定的高度差。烏龜游向或背向玩家時，前後擺動的幅度因透視而顯得較短。划水途中切換視角，動作會從同一階段繼續。
 
 ## Side-view movement and recovery visibility / 側視活動與呼吸恢復顯示
 
@@ -262,11 +262,18 @@ Side-view stroke movement is no longer calculated with an independent arbitrary 
 
 ## Diagonal swimming and walking gait / 對角划水與步行動作
 
-**English:** In the top-view reference, the limbs are numbered **1 = front-left, 2 = front-right, 3 = rear-right, 4 = rear-left** (with the turtle's head pointing upward). Swimming uses a repeating two-step diagonal gait: **step 1 — legs 1 and 3 swing forward while 2 and 4 swing backward; step 2 — the motions reverse**. Side view uses the same physical limb pairings, with near and far limbs changing visible layering as the turtle turns; the strokes follow its travel direction rather than merely flipping an animation.
+With the head pointing upward in Top view, **1 is front left, 2 is front right, 3 is rear right, and 4 is rear left**. Forward means toward the head. Both views repeat the following cycle.
+
+俯視圖中，龜頭朝上時，**1 是左前肢，2 是右前肢，3 是右後肢，4 是左後肢**。「向前」指朝向頭部。兩個視角均重複以下四個階段。
+
+| Phase / 階段 | Legs 1 and 3 / 第 1、3 肢 | Legs 2 and 4 / 第 2、4 肢 |
+| --- | --- | --- |
+| 1 | Forward / 向前 | Backward / 向後 |
+| 2 | Natural resting position / 自然休息位置 | Natural resting position / 自然休息位置 |
+| 3 | Backward / 向後 | Forward / 向前 |
+| 4 | Natural resting position / 自然休息位置 | Natural resting position / 自然休息位置 |
 
 Walking on land retains **the same 1+3 versus 2+4 alternating timing**. In top view, the leg drawings are shorter and tucked under the shell to imply bent joints. In side view, each walking leg changes from an extended paddle into a **Z-shaped shoulder–knee–foot articulation**, with a planted foot and alternating steps. Swimming retains the earlier compact limb proportions.
-
-**繁體中文：** 按俯視參考圖片，烏龜頭部朝上時，四肢編號為 **1＝左前肢、2＝右前肢、3＝右後肢、4＝左後肢**。游泳採用重複兩步的對角划水節奏：**第一步：1、3 向前，2、4 向後；第二步：1、3 向後，2、4 向前**。側視模式沿用相同的肢體組合；烏龜轉向時，會相應調整遠近四肢的顯示層次，划水方向亦會配合行進方向。
 
 在陸地步行時，**仍採用 1、3 與 2、4 交替的節奏**。俯視的四肢會縮短及收近龜殼，表現關節彎曲；側視的步行四肢則呈現明顯的 **Z 字形肩／髖部—膝／肘部—腳掌**構造，腳掌配合步伐落地。水中划水仍保留先前較小巧的四肢比例。
 
