@@ -434,7 +434,7 @@ function swimBeat(phase){
   const start = SWIM_POSES[index], end = SWIM_POSES[(index+1)%4];
   return start + (end - start)*ease;
 }
-function drawSideSwimPaddle(camera, {front, far, depth, elbow, tipY, project, palm, toes}){
+function drawSideSwimPaddle(camera, {front, far, depth, elbowX, project, palm, toes}){
   const facing = Math.max(0,camera.toward);
   const away = Math.max(0,-camera.toward);
   const profile = Math.abs(camera.c);
@@ -446,7 +446,6 @@ function drawSideSwimPaddle(camera, {front, far, depth, elbow, tipY, project, pa
   const wristY = toeY*(front ? .68 : .76);
   const padY = toeY*.83;
   const toeSpacing = front ? .70 + 1.75*facing : .45 + 3.10*profile + .55*facing;
-  const elbowX = project(elbow*.60 + (front ? 1 : -1.6),tipY*.44);
   const wristX = project(...palm(-1,-5.3));
   const padX = project(...palm(-1,-.5));
   const edge = far ? '#354b32' : '#2f492b';
@@ -501,7 +500,7 @@ function drawSideSwimPaddle(camera, {front, far, depth, elbow, tipY, project, pa
     g.closePath();g.fillStyle=edge;g.fill();
   }
 }
-function flipper(x, y, leg, beat, walking, resting, {camera=null, far=false, depth=0, travel=null}={}){
+function flipper(x, y, leg, beat, walking, resting, {camera=null, topView=null, far=false, depth=0, travel=null}={}){
   const front = leg.x > 0, side = Math.sign(leg.y);
   const cycle = leg.strokeSign*beat;
   const splay = side*(front ? .10 : -.18);
@@ -584,7 +583,7 @@ function flipper(x, y, leg, beat, walking, resting, {camera=null, far=false, dep
   }
   const fold = Math.max(0, front ? -cycle : cycle);
   const extension = walking ? (resting ? 1 : .82) : 1 - (front ? .14 : .09)*fold;
-  let spread=1, elbow=0, wrist=0, armWidth=1, palmWidth=1, fan=0;
+  let spread=1, elbow=0, wrist=0, palmWidth=1, fan=0;
   if(travel !== null){
     const pose = front
       ? (cycle > 0 ? SWIM_LIMB_POSES.foreReach : SWIM_LIMB_POSES.foreFold)
@@ -594,57 +593,78 @@ function flipper(x, y, leg, beat, walking, resting, {camera=null, far=false, dep
     spread = 1 + amount*(pose.spread - 1) - .18*recovery;
     elbow = amount*pose.elbow + 2*recovery;
     wrist = amount*pose.wrist + .22*recovery;
-    armWidth = 1 - (front ? .45 : .30)*amount;
     palmWidth = 1 + amount*(pose.width - 1);
     fan = front ? 0 : Math.max(0,-cycle);
   }
-  // The forearm bends about the elbow, and the web and claws turn together
-  // about the wrist. In the natural pose these are the original outline points.
   const wristCos=Math.cos(wrist), wristSin=Math.sin(wrist);
-  const palm=(u,v)=>[tipX + u*palmWidth*wristCos - v*wristSin,
-                     tipY + u*palmWidth*wristSin + v*wristCos];
+  const posedPalm=(u,v,du=0,dv=0)=>{
+    const webU=(u+du)*palmWidth, webV=v+dv;
+    return [tipX+webU*wristCos-webV*wristSin,
+            tipY+webU*wristSin+webV*wristCos];
+  };
+  let palm=posedPalm, elbowPoint=(u,v)=>[u,v];
+  const view=camera || topView;
+  let projectX, elbowX;
+  if(view){
+    const cos=Math.cos(angle), sin=Math.sin(angle);
+    const across=view.c*cos + view.sn*spread*sin;
+    const along=side*extension*(view.sn*spread*cos - view.c*sin);
+    projectX=(u,v)=>across*u+along*v;
+    const elbowU=front ? 1 : -1.6, elbowV=tipY*.44;
+    elbowX=projectX(elbowU + elbow*.60,elbowV);
+    if(topView){
+      // Express a horizontal screen displacement in the resting leg's axes.
+      const neutralAngle=splay-topView.heading;
+      const rightU=Math.cos(neutralAngle), rightV=-side*Math.sin(neutralAngle);
+      const restX=(u,v)=>rightU*u+rightV*v;
+      const shift=(u,v,dx)=>[u+rightU*dx,v+rightV*dx];
+      const elbowTravel=elbowX-restX(elbowU,elbowV);
+      const wristTravel=projectX(tipX,tipY)-restX(tipX,tipY);
+      elbowPoint=(u,v)=>shift(u,v,elbowTravel);
+      palm=(u,v,du=0,dv=0)=>{
+        const homeU=tipX+u, homeV=tipY+v;
+        const pointTravel=projectX(...posedPalm(u,v,du,dv))-restX(homeU,homeV);
+        // Most of the web moves with the wrist. The toes still flex and fan.
+        return shift(homeU,homeV,wristTravel+.3*(pointTravel-wristTravel));
+      };
+    }
+  }
   const toes=[0,1,2].map(i=>{
     const toe=-4.1+i*3.1, flare=(i-1)*2*fan;
-    const toeEnd=4 + (i===1 ? 1 : 0) + 2.6*fan;
-    return {root:palm(toe,-.5), control:palm(toe+1+flare*.4,1.8),
-            tip:palm(toe-.1+flare,toeEnd)};
+    const toeEnd=4 + (i===1 ? 1 : 0);
+    return {root:palm(toe,-.5), control:palm(toe+1,1.8,flare*.4),
+            tip:palm(toe-.1,toeEnd,flare,2.6*fan)};
   });
   if(camera){
-    // Horizontal row of the same spread, rotation and limb reflection as Top view.
-    const cos=Math.cos(angle), sin=Math.sin(angle);
-    const across=camera.c*cos + camera.sn*spread*sin;
-    const along=side*extension*(camera.sn*spread*cos - camera.c*sin);
-    const project=(u,v)=>across*u+along*v;
-    drawSideSwimPaddle(camera,{front,far,depth,elbow,tipY,project,palm,toes});
+    drawSideSwimPaddle(camera,{front,far,depth,elbowX,project:projectX,palm,toes});
     g.restore();return;
   }
-  g.scale(1,spread);
-  g.rotate(angle);
+  g.rotate(topView ? splay : angle);
   if(walking&&!resting)g.scale(.83,.62);
-  g.scale(1,side*extension);
+  g.scale(1,topView ? side : side*extension);
   ell(0,1,5.9,4.7,'#587e3e');
   g.beginPath();
   g.moveTo(-5,-2.7);
-  g.bezierCurveTo(2.3,-4,elbow+8*armWidth,2.1+elbow*.45,...palm(5,-5));
+  g.bezierCurveTo(2.3,-4,...elbowPoint(8,2.1),...palm(5,-5));
   g.quadraticCurveTo(...palm(7.6,1.4),...palm(2.1,2.5));
   g.lineTo(...palm(-1.1,1.4));
   g.quadraticCurveTo(...palm(-5.9,5),...palm(-7.1,.5));
-  g.bezierCurveTo(...palm(-9,-7),elbow-9.1*armWidth,5.9+elbow*.45,-5,-2.7);
+  g.bezierCurveTo(...palm(-9,-7),...elbowPoint(-9.1,5.9),-5,-2.7);
   g.closePath();g.fillStyle='#7ba957';g.fill();
   g.lineWidth=1.3;g.strokeStyle='#304b25';g.stroke();
   g.beginPath();g.moveTo(-2,-.5);
-  g.bezierCurveTo(2.8+elbow,4.3+elbow*.45,...palm(1.7,-6),...palm(.7,-.7));
+  g.bezierCurveTo(...elbowPoint(2.8,4.3),...palm(1.7,-6),...palm(.7,-.7));
   g.strokeStyle='#b9d56d';g.lineWidth=1.6;g.stroke();
   g.beginPath();g.moveTo(-4,1.4);
-  g.bezierCurveTo(-1+elbow,7.3+elbow*.45,...palm(-2.2,-6),...palm(-2.3,-1.4));
+  g.bezierCurveTo(...elbowPoint(-1,7.3),...palm(-2.2,-6),...palm(-2.3,-1.4));
   g.strokeStyle='#447b39';g.lineWidth=.9;g.stroke();
   if(fan>0){
     // A scalloped membrane opens between the hind toes during the backward push.
     g.save();g.globalAlpha*=fan;
     g.beginPath();g.moveTo(...palm(-5.2,-1.5));
-    g.lineTo(...palm(-4.2-2*fan,3.7+2.6*fan));
-    g.quadraticCurveTo(...palm(-2.9,1.6),...palm(-1.1,4.8+2.6*fan));
-    g.quadraticCurveTo(...palm(.7,1.6),...palm(2+2*fan,3.7+2.6*fan));
+    g.lineTo(...palm(-4.2,3.7,-2*fan,2.6*fan));
+    g.quadraticCurveTo(...palm(-2.9,1.6),...palm(-1.1,4.8,0,2.6*fan));
+    g.quadraticCurveTo(...palm(.7,1.6),...palm(2,3.7,2*fan,2.6*fan));
     g.lineTo(...palm(4,-1.5));g.closePath();
     g.fillStyle='#739d50';g.fill();g.restore();
   }
@@ -989,7 +1009,10 @@ function drawTurtle(now){
       ell(14.1,0,1.8,2.0,'#89b75e');
       ell(15.3,-.35,.45,.4,'#35542e');
     }else{
-      for(const leg of LEGS)flipper(leg.x,leg.y,leg,beat,t.land,resting,{travel});
+      const topView = travel !== null
+        ? {heading:t.heading, c:Math.cos(t.heading), sn:Math.sin(t.heading)} : null;
+      const paddle = {topView,travel};
+      for(const leg of LEGS)flipper(leg.x,leg.y,leg,beat,t.land,resting,paddle);
       poly([[-11,-2],[-23,0],[-11,3]],'#719c58');
       // At rest the head is rendered FIRST: the shell covers its back
       // and eyes, with only its forward face peeking outside the rim.
