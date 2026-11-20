@@ -232,9 +232,9 @@ Both views follow the same four-beat diagonal cycle. In Top view, one foreleg re
 
 ## Horizontal side-view swimming paddles / 側視橫向划水
 
-In Side view, each foot sweeps horizontally at a fixed height relative to its shoulder or hip. The stroke appears shorter when the turtle points toward or away from the viewer. Switching views midway through a stroke preserves its phase.
+Side view follows the same four-beat stroke as Top view. Seen from the front, one foreleg reaches beside the head while the other folds. Seen from behind, the hind legs trail outward on either side of the tail. In profile, the forefoot turns edge-on and the rear toes fan on the backward push. Each foot sweeps horizontally at a fixed height relative to its shoulder or hip, including during a dive. Switching views preserves the phase of the stroke.
 
-在側視模式中，每隻腳掌都沿水平方向划動，與肩部或髖部保持固定的高度差。烏龜游向或背向玩家時，前後擺動的幅度因透視而顯得較短。划水途中切換視角，動作會從同一階段繼續。
+側視與俯視模式採用相同的四拍划水節奏。從正面看，一隻前腳向頭側伸出，另一隻則屈曲收回。從後方看，兩隻後腳從尾巴兩旁向外伸展。從側面看，前腳掌轉動時露出窄邊，後腳向後推水時則張開腳趾與蹼。每隻腳掌都沿水平方向划動，即使下潛，與肩部或髖部的高度差亦保持不變。划水途中切換視角，動作會從同一階段繼續。
 
 ## Side-view movement and recovery visibility / 側視活動與呼吸恢復顯示
 
