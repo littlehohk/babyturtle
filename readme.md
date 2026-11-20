@@ -176,11 +176,11 @@ The current feeding extension is deliberately modest: **3.5 additional drawing u
 
 **English:** When the turtle is **resting (but not sleeping)**, all four legs return to a **natural, fully extended, bilaterally symmetrical pose**, whether it is on land or in water. The last active stroke phase is ignored, so one leg cannot remain retracted while its partner is extended. **Sleeping is different**: the four limbs remain tucked under the shell.
 
-Both views follow the same four-beat diagonal cycle. In Top view, one foreleg reaches outward on a bent elbow while the opposite wrist folds close to the shell. Each hind foot fans its toes on the backward push and narrows as it comes forward. All four legs pass through their natural positions on beats 2 and 4. In Side view, the feet sweep horizontally. Each leg holds its current pose throughout a glide.
+Both views follow the same four-beat diagonal cycle. In Top view, each foot sweeps left and right across the screen. Its elbow, wrist and toes stay level with their resting positions for the turtle's current heading. Legs 1 and 3 lead the first stroke, then legs 2 and 4 lead the third. All four return to neutral on beats 2 and 4 and hold their pose during a glide.
 
 **繁體中文：** 烏龜**休息（但並非睡覺）**時，無論在陸上或水中，**四隻腳都會回到自然、完全伸展、左右對稱的姿態**，不再停留於上一個划水或步行動作的不同位置。**睡覺**則不同：四肢依然收起，藏於龜殼之下。
 
-兩個視角均沿用四拍的對角划水節奏。從上方看，一側前肢微屈肘部向外伸展，另一側前肢則屈腕收近龜殼。後腳向後推水時張開帶蹼的腳趾，向前收回時腳趾合攏。四肢在第二拍和第四拍都回到自然位置。從側面看，腳掌沿水平方向擺動。滑行期間，四肢保持進入滑行時的姿態。
+兩個視角均沿用四拍的對角划水節奏。從上方看，每隻腳都沿畫面左右划動。無論烏龜朝向哪一方，肘、腕及腳趾划動時都各自保持在該朝向下自然伸展時的水平線上。第一拍由第 1、3 腳帶動，第三拍由第 2、4 腳帶動。四肢在第二拍和第四拍均回到自然位置，滑行時則保持當時的姿態。
 
 ## Repeated swimming paddles and passive glides / 游泳時反覆划水及滑行
 
