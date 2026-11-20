@@ -176,11 +176,11 @@ The current feeding extension is deliberately modest: **3.5 additional drawing u
 
 **English:** When the turtle is **resting (but not sleeping)**, all four legs return to a **natural, fully extended, bilaterally symmetrical pose**, whether it is on land or in water. The last active stroke phase is ignored, so one leg cannot remain retracted while its partner is extended. **Sleeping is different**: the four limbs remain tucked under the shell.
 
-Side-view stroke movement is no longer calculated with an independent arbitrary sine translation. Instead, a shared Top-view gait determines the position of each of the four feet, and its movement is projected horizontally into the Side view at the turtle's current heading. This ensures the **same diagonal 1+3 / 2+4 timing, direction and relative foot displacement across both views**. Side-view swimming retains the **same paddle outline and nominal 0.5× scale as Top view**; each shoulder stays attached while the limb foreshortens naturally along the screen's horizontal axis. Side-view land legs retain their bent shape and use that same projected stride. **No Side-view vertical foot animation is added.** The legs remain motionless during gliding.
+Both views follow the same four-beat diagonal cycle. In Top view, one foreleg reaches outward on a bent elbow while the opposite wrist folds close to the shell. Each hind foot fans its toes on the backward push and narrows as it comes forward. All four legs pass through their natural positions on beats 2 and 4. In Side view, the feet sweep horizontally. Each leg holds its current pose throughout a glide.
 
 **繁體中文：** 烏龜**休息（但並非睡覺）**時，無論在陸上或水中，**四隻腳都會回到自然、完全伸展、左右對稱的姿態**，不再停留於上一個划水或步行動作的不同位置。**睡覺**則不同：四肢依然收起，藏於龜殼之下。
 
-側視四肢的移動現在不再另用獨立的正弦函數控制，而是先按照俯視模式的共同步態計算四隻腳的位置，再依烏龜當前的朝向投影到側視畫面的水平軸。因此，**俯視與側視的 1、3／2、4 對角交替節奏、動作方向及相對腳掌位移一致**。側視游泳仍沿用**與俯視相同的腳掌輪廓，以及基本 0.5 倍縮放**；四肢根部固定，腿部只在畫面水平方向自然伸縮。陸上彎曲四肢亦依同一投影步幅移動。**側視不加入上下抬腳動畫**；滑行時四肢保持靜止。
+兩個視角均沿用四拍的對角划水節奏。從上方看，一側前肢微屈肘部向外伸展，另一側前肢則屈腕收近龜殼。後腳向後推水時張開帶蹼的腳趾，向前收回時腳趾合攏。四肢在第二拍和第四拍都回到自然位置。從側面看，腳掌沿水平方向擺動。滑行期間，四肢保持進入滑行時的姿態。
 
 ## Repeated swimming paddles and passive glides / 游泳時反覆划水及滑行
 
